@@ -1,0 +1,72 @@
+# Unity project
+# Keep Assets/, Packages/, ProjectSettings/ and all .meta files in version control.
+
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Uu]ser[Ss]ettings/
+
+# Unity generated files
+sysinfo.txt
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Auto-generated Visual Studio / Rider solution and project files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.rsuser
+*.dotCover
+
+# IDEs and editors
+.vs/
+.vscode/
+.idea/
+*.sln.iml
+
+# JetBrains Rider caches
+.consulo/
+
+# Test and coverage output
+TestResults/
+artifacts/
+coverage/
+coverage-results/
+CodeCoverage/
+*.coverage
+*.coveragexml
+
+# Addressables / build cache artifacts
+ServerData/
+
+# Crash / diagnostic artifacts
+crashlytics-build.properties
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Optional local environment files
+.env
+.env.*
+

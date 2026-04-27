@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: ShowcaseContent_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 64a7ca1e30d66dc4388fde2ccddb524e, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 472719360
+    m_Localized: Effects System
+    m_Metadata:
+      m_Items: []
+  - m_Id: 514662400
+    m_Localized: 'Interactive comparison of effect-system implementations: simple
+      object-based presentation versus batched array update.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051008
+    m_Localized: Chunk Batched Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051009
+    m_Localized: Batched data-oriented variant. Stores positions and velocities in
+      arrays and updates them with a simple for loop.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051010
+    m_Localized: Much better scaling than per-object behaviour, but less direct to
+      inspect in the hierarchy. Visual markers show only a subset of simulated effects.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051011
+    m_Localized: 'One batched update loop
+
+      Simulates more effects than it renders
+
+      Clearer
+      path toward data-oriented optimization'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051012
+    m_Localized: 'Less direct than object-per-effect
+
+      Needs custom visualization
+
+      More
+      bookkeeping than the indie variant'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051013
+    m_Localized: Indie Object Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051014
+    m_Localized: Simple MonoBehaviour variant. Spawns a readable number of effect
+      GameObjects and updates them explicitly in one Update loop.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051015
+    m_Localized: Very easy to understand and useful for small indie demos. It creates
+      many GameObjects, so it is not a high-scale runtime architecture.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051016
+    m_Localized: 'Very easy to understand
+
+      Direct GameObject visualization
+
+      Good
+      for prototypes and small scenes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 523051017
+    m_Localized: 'High object count creates overhead
+
+      Performance drops are
+      visible at 5K/10K
+
+      Less suitable for large simulations'
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
