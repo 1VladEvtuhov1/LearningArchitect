@@ -1,32 +1,35 @@
 using LearningArchitect.Core;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
+#if !UNITY_WEBGL || UNITY_EDITOR
+using System.Diagnostics;
+#endif
 
 namespace LearningArchitect.UI
 {
     public sealed class SystemStatusPanel : MonoBehaviour
     {
-        public ModuleManager manager;
-        public float refreshInterval = 1f;
-        public float memoryBarMaxGb = 8f;
-        public int smoothingSamples = 2;
-        public Color healthyDotColor = default;
-        public Color warningDotColor = default;
-        public Color criticalDotColor = default;
+        [SerializeField] private float refreshInterval = 1f;
+        [SerializeField] private float memoryBarMaxGb = 8f;
+        [SerializeField] private int smoothingSamples = 2;
+        [SerializeField] private Color healthyDotColor = default;
+        [SerializeField] private Color warningDotColor = default;
+        [SerializeField] private Color criticalDotColor = default;
 
         private TextMeshProUGUI[] metricLabels = new TextMeshProUGUI[3];
         private RectTransform[] metricBars = new RectTransform[3];
         private RectTransform[] metricFills = new RectTransform[3];
         private Image statusDot;
         private float nextRefreshTime;
+#if !UNITY_WEBGL || UNITY_EDITOR
         private Process currentProcess;
         private DateTime lastCpuSampleTimeUtc;
         private TimeSpan lastCpuTotalTime;
+#endif
         private float cpuPercent;
         private float gpuPercent = -1f;
         private float memoryGb;
@@ -50,9 +53,6 @@ namespace LearningArchitect.UI
             if (criticalDotColor == default)
                 criticalDotColor = ShowcasePalette.Error;
 
-            if (manager == null)
-                manager = GetComponent<ModuleManager>();
-
             smoothingSamples = Mathf.Max(1, smoothingSamples);
             cpuSamples = new float[smoothingSamples];
             gpuSamples = new float[smoothingSamples];
@@ -60,10 +60,22 @@ namespace LearningArchitect.UI
             for (int i = 0; i < smoothingSamples; i++)
                 gpuSamples[i] = -1f;
 
+#if !UNITY_WEBGL || UNITY_EDITOR
             currentProcess = Process.GetCurrentProcess();
             lastCpuSampleTimeUtc = DateTime.UtcNow;
             lastCpuTotalTime = currentProcess.TotalProcessorTime;
+#else
+            cpuPercent = -1f;
+            displayedCpuPercent = -1f;
+#endif
             ResolveUi();
+        }
+
+        private void OnDestroy()
+        {
+#if !UNITY_WEBGL || UNITY_EDITOR
+            currentProcess?.Dispose();
+#endif
         }
 
         private void Update()
@@ -80,89 +92,94 @@ namespace LearningArchitect.UI
         {
             Canvas canvas = FindCanvasByChild(transform, "RootFrame");
             if (canvas == null)
-                return;
+                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires a canvas containing RootFrame.");
 
             Transform card = FindDeep(canvas.transform, "SystemStatusCard");
             if (card == null)
-                return;
+                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires SystemStatusCard.");
 
             for (int i = 0; i < 3; i++)
             {
                 Transform metric = FindDeep(card, "StatusMetric_" + i);
                 Transform bar = FindDeep(card, "StatusBar_" + i);
-                metricLabels[i] = metric == null ? null : metric.GetComponent<TextMeshProUGUI>();
-                metricBars[i] = bar == null ? null : bar.GetComponent<RectTransform>();
-                metricFills[i] = bar == null ? null : bar.Find("Fill") as RectTransform;
+                if (metric == null || bar == null)
+                    throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires StatusMetric_{i} and StatusBar_{i}.");
+
+                metricLabels[i] = metric.GetComponent<TextMeshProUGUI>();
+                metricBars[i] = bar.GetComponent<RectTransform>();
+                metricFills[i] = bar.Find("Fill") as RectTransform;
+
+                if (metricLabels[i] == null || metricBars[i] == null || metricFills[i] == null)
+                    throw new InvalidOperationException($"Status metric slot {i} is not fully configured.");
             }
 
             Transform dot = FindDeep(card, "StatusDot");
-            statusDot = dot == null ? null : dot.GetComponent<Image>();
+            if (dot == null)
+                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires StatusDot.");
+
+            statusDot = dot.GetComponent<Image>();
+            if (statusDot == null)
+                throw new InvalidOperationException("StatusDot requires Image.");
+
             RefreshStatus();
         }
 
         private void RefreshStatus()
         {
-            if (metricLabels[0] == null)
-                ResolveUi();
-
-            float cpuNormalized = Mathf.Clamp01(displayedCpuPercent / 100f);
+            float cpuNormalized = displayedCpuPercent < 0f ? 0f : Mathf.Clamp01(displayedCpuPercent / 100f);
             float gpuNormalized = displayedGpuPercent < 0f ? 0f : Mathf.Clamp01(displayedGpuPercent / 100f);
             float memNormalized = Mathf.Clamp01(displayedMemoryGb / Mathf.Max(0.1f, memoryBarMaxGb));
 
-            SetMetric(0, "CPU", Mathf.RoundToInt(displayedCpuPercent) + "%", cpuNormalized);
+            SetMetric(0, "CPU", displayedCpuPercent < 0f ? ShowcaseLocalization.GetText("na") : Mathf.RoundToInt(displayedCpuPercent) + "%", cpuNormalized);
             SetMetric(1, "GPU", displayedGpuPercent < 0f ? ShowcaseLocalization.GetText("na") : Mathf.RoundToInt(displayedGpuPercent) + "%", gpuNormalized);
             SetMetric(2, "MEM", displayedMemoryGb.ToString("0.0", CultureInfo.InvariantCulture) + " GB", memNormalized);
 
-            if (statusDot != null)
-            {
-                float gpuLoad = displayedGpuPercent < 0f ? 0f : displayedGpuPercent;
-                float load = Mathf.Max(displayedCpuPercent, gpuLoad);
-                if (load >= 90f)
-                    statusDot.color = criticalDotColor;
-                else if (load >= 70f)
-                    statusDot.color = warningDotColor;
-                else
-                    statusDot.color = healthyDotColor;
-            }
+            float statusLoad = Mathf.Max(
+                displayedCpuPercent < 0f ? 0f : displayedCpuPercent,
+                displayedGpuPercent < 0f ? 0f : displayedGpuPercent);
+            float statusThreshold = statusLoad > 0f ? statusLoad : memNormalized * 100f;
+
+            if (statusThreshold >= 90f)
+                statusDot.color = criticalDotColor;
+            else if (statusThreshold >= 70f)
+                statusDot.color = warningDotColor;
+            else
+                statusDot.color = healthyDotColor;
         }
 
         private void SampleSystemCounters()
         {
+#if !UNITY_WEBGL || UNITY_EDITOR
             if (currentProcess == null)
                 currentProcess = Process.GetCurrentProcess();
 
-            try
+            currentProcess.Refresh();
+
+            DateTime nowUtc = DateTime.UtcNow;
+            TimeSpan currentCpuTime = currentProcess.TotalProcessorTime;
+            double wallSeconds = (nowUtc - lastCpuSampleTimeUtc).TotalSeconds;
+            double cpuSeconds = (currentCpuTime - lastCpuTotalTime).TotalSeconds;
+
+            if (wallSeconds > 0.0001d)
             {
-                currentProcess.Refresh();
-
-                DateTime nowUtc = DateTime.UtcNow;
-                TimeSpan currentCpuTime = currentProcess.TotalProcessorTime;
-                double wallSeconds = (nowUtc - lastCpuSampleTimeUtc).TotalSeconds;
-                double cpuSeconds = (currentCpuTime - lastCpuTotalTime).TotalSeconds;
-
-                if (wallSeconds > 0.0001d)
-                {
-                    double usage = cpuSeconds / (wallSeconds * Math.Max(1, Environment.ProcessorCount)) * 100d;
-                    cpuPercent = Mathf.Clamp((float)usage, 0f, 100f);
-                }
-
-                lastCpuSampleTimeUtc = nowUtc;
-                lastCpuTotalTime = currentCpuTime;
-                long processMemoryBytes = Math.Max(currentProcess.WorkingSet64, Math.Max(currentProcess.PrivateMemorySize64, currentProcess.PagedMemorySize64));
-                long profilerMemoryBytes = Math.Max(Profiler.GetTotalReservedMemoryLong(), Profiler.GetTotalAllocatedMemoryLong());
-                long memoryBytes = Math.Max(processMemoryBytes, profilerMemoryBytes);
-
-                memoryGb = memoryBytes / (1024f * 1024f * 1024f);
-                gpuPercent = SampleGpuPercent(currentProcess.Id);
-                PushSample(cpuPercent, gpuPercent, memoryGb);
+                double usage = cpuSeconds / (wallSeconds * Math.Max(1, Environment.ProcessorCount)) * 100d;
+                cpuPercent = Mathf.Clamp((float)usage, 0f, 100f);
             }
-            catch
-            {
-                cpuPercent = 0f;
-                memoryGb = 0f;
-                gpuPercent = -1f;
-                PushSample(cpuPercent, gpuPercent, memoryGb);
-            }
+
+            lastCpuSampleTimeUtc = nowUtc;
+            lastCpuTotalTime = currentCpuTime;
+
+            long processMemoryBytes = Math.Max(currentProcess.WorkingSet64, Math.Max(currentProcess.PrivateMemorySize64, currentProcess.PagedMemorySize64));
+            long profilerMemoryBytes = Math.Max(Profiler.GetTotalReservedMemoryLong(), Profiler.GetTotalAllocatedMemoryLong());
+            long memoryBytes = Math.Max(processMemoryBytes, profilerMemoryBytes);
+
+            memoryGb = memoryBytes / (1024f * 1024f * 1024f);
+            gpuPercent = SampleGpuPercent(currentProcess.Id);
+            PushSample(cpuPercent, gpuPercent, memoryGb);
+#else
+            memoryGb = GetProfilerMemoryGb();
+            PushSample(-1f, -1f, memoryGb);
+#endif
         }
 
         private void PushSample(float cpu, float gpu, float memory)
@@ -177,9 +194,15 @@ namespace LearningArchitect.UI
             sampleIndex = (sampleIndex + 1) % cpuSamples.Length;
             sampleCount = Mathf.Min(sampleCount + 1, cpuSamples.Length);
 
-            displayedCpuPercent = Average(cpuSamples, sampleCount);
+            displayedCpuPercent = AverageNonNegative(cpuSamples, sampleCount);
             displayedMemoryGb = Average(memorySamples, sampleCount);
             displayedGpuPercent = AverageNonNegative(gpuSamples, sampleCount);
+        }
+
+        private static float GetProfilerMemoryGb()
+        {
+            long memoryBytes = Math.Max(Profiler.GetTotalReservedMemoryLong(), Profiler.GetTotalAllocatedMemoryLong());
+            return memoryBytes / (1024f * 1024f * 1024f);
         }
 
         private static float Average(float[] values, int count)
@@ -262,17 +285,10 @@ namespace LearningArchitect.UI
 
         private void SetMetric(int index, string title, string value, float normalized)
         {
-            if (index < 0 || index >= metricLabels.Length)
-                return;
-
-            if (metricLabels[index] != null)
-                metricLabels[index].text = title + " " + value;
+            metricLabels[index].text = title + " " + value;
 
             RectTransform bar = metricBars[index];
             RectTransform fill = metricFills[index];
-            if (bar == null || fill == null)
-                return;
-
             float width = Mathf.Max(4f, (bar.rect.width - 2f) * Mathf.Clamp01(normalized));
             fill.anchorMin = new Vector2(0f, 0f);
             fill.anchorMax = new Vector2(0f, 1f);
