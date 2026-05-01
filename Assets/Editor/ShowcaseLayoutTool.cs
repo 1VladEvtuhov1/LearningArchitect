@@ -106,6 +106,7 @@ namespace LearningArchitect.Editor
             RectTransform systemStatusCard = Rect(canvas.transform, "SystemStatusCard");
             RectTransform navPanel = Rect(canvas.transform, "NavigationControlsPanel");
             RectTransform transitionOverlay = Rect(canvas.transform, "TransitionOverlay");
+            bool hasCompositeDescription = HasCompositeDescriptionContent(viewport);
 
             StretchFull(tint);
             ConfigureImage(GetOrAdd<Image>(tint.gameObject), null, ShowcasePalette.WithAlpha(ShowcasePalette.BgDeep, 0.32f), Image.Type.Simple, false);
@@ -174,6 +175,8 @@ namespace LearningArchitect.Editor
             ConfigureImage(perfIcon.GetComponent<Image>(), perfIconSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.78f), Image.Type.Simple, false);
             SetRect(chartPlaceholder, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(-36f, 102f));
             ConfigureImage(GetOrAdd<Image>(chartPlaceholder.gameObject), lineSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f), Image.Type.Simple, false);
+            GameObject performanceGraph = EnsureChild(chartPlaceholder, "PerformanceGraph", typeof(RectTransform), typeof(CanvasRenderer), typeof(PerformanceGraph));
+            SetRect(performanceGraph.GetComponent<RectTransform>(), Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             StretchInside(previewFrame, 286f, 514f, 138f, 74f);
             ConfigureImage(GetOrAdd<Image>(previewFrame.gameObject), null, new Color(1f, 1f, 1f, 0f), Image.Type.Simple, false);
@@ -210,12 +213,19 @@ namespace LearningArchitect.Editor
             ConfigureImage(GetOrAdd<Image>(viewport.gameObject), null, new Color(1f, 1f, 1f, 0.001f), Image.Type.Simple, true);
             GetOrAdd<RectMask2D>(viewport.gameObject);
 
-            descriptionText.anchorMin = new Vector2(0f, 1f);
-            descriptionText.anchorMax = new Vector2(1f, 1f);
-            descriptionText.pivot = new Vector2(0.5f, 1f);
-            descriptionText.anchoredPosition = Vector2.zero;
-            descriptionText.sizeDelta = new Vector2(0f, 1200f);
-            ConfigureText(descriptionText.GetComponent<TextMeshProUGUI>(), "<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ABOUT</b></size></color>\nChunk-based processing groups particles into spatial chunks to improve cache locality and reduce draw calls.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ARCHITECTURE</b></size></color>\nBatched data-oriented variant. Stores positions and velocities in arrays and updates them with a simple for loop.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>TRADE-OFFS</b></size></color>\nMuch better scaling than per-object behaviour, but less direct to inspect in the hierarchy.\n\n<color=#" + ShowcasePalette.SuccessHex + "><size=74%><b>PROS</b></size></color>\n\u2022 One batched update loop\n\u2022 Simulates more effects than it renders\n\u2022 Clearer path toward data-oriented optimization\n\n<color=#" + ShowcasePalette.ErrorHex + "><size=74%><b>CONS</b></size></color>\n\u2022 Less direct than object-per-effect\n\u2022 Needs custom visualization\n\u2022 More bookkeeping than the indie variant", 18f, new Color(0.830f, 0.850f, 0.880f, 1f), TextAlignmentOptions.TopLeft);
+            if (descriptionText != null)
+            {
+                descriptionText.anchorMin = new Vector2(0f, 1f);
+                descriptionText.anchorMax = new Vector2(1f, 1f);
+                descriptionText.pivot = new Vector2(0.5f, 1f);
+                descriptionText.anchoredPosition = Vector2.zero;
+                descriptionText.sizeDelta = new Vector2(0f, 1200f);
+
+                if (!hasCompositeDescription)
+                {
+                    ConfigureText(descriptionText.GetComponent<TextMeshProUGUI>(), "<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ABOUT</b></size></color>\nChunk-based processing groups particles into spatial chunks to improve cache locality and reduce draw calls.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ARCHITECTURE</b></size></color>\nBatched data-oriented variant. Stores positions and velocities in arrays and updates them with a simple for loop.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>TRADE-OFFS</b></size></color>\nMuch better scaling than per-object behaviour, but less direct to inspect in the hierarchy.\n\n<color=#" + ShowcasePalette.SuccessHex + "><size=74%><b>PROS</b></size></color>\n\u2022 One batched update loop\n\u2022 Simulates more effects than it renders\n\u2022 Clearer path toward data-oriented optimization\n\n<color=#" + ShowcasePalette.ErrorHex + "><size=74%><b>CONS</b></size></color>\n\u2022 Less direct than object-per-effect\n\u2022 Needs custom visualization\n\u2022 More bookkeeping than the indie variant", 18f, new Color(0.830f, 0.850f, 0.880f, 1f), TextAlignmentOptions.TopLeft);
+                }
+            }
 
             stressPanel.anchorMin = new Vector2(0f, 0f);
             stressPanel.anchorMax = new Vector2(1f, 0f);
@@ -231,58 +241,69 @@ namespace LearningArchitect.Editor
             StretchFull(transitionOverlay);
             ConfigureImage(GetOrAdd<Image>(transitionOverlay.gameObject), null, new Color(0.004f, 0.008f, 0.012f, 0.72f), Image.Type.Simple, false);
 
-            ModuleManager moduleManager = prefabRoot.GetComponent<ModuleManager>();
+            ShowcaseRuntimeController runtimeController = GetOrAdd<ShowcaseRuntimeController>(prefabRoot);
+            ShowcaseCompositionRoot compositionRoot = GetOrAdd<ShowcaseCompositionRoot>(prefabRoot);
+            ShowcaseCommandRouter commandRouter = GetOrAdd<ShowcaseCommandRouter>(prefabRoot);
+            ShowcaseStateHub stateHub = GetOrAdd<ShowcaseStateHub>(prefabRoot);
             HubUI hubUI = prefabRoot.GetComponent<HubUI>();
             DescriptionPanel description = prefabRoot.GetComponent<DescriptionPanel>();
             MetricsOverlay metrics = prefabRoot.GetComponent<MetricsOverlay>();
             StressTestControls stress = prefabRoot.GetComponent<StressTestControls>();
             ModuleNavigationControls navigation = prefabRoot.GetComponent<ModuleNavigationControls>();
+            ShowcaseTransitionController transitionController = GetOrAdd<ShowcaseTransitionController>(prefabRoot);
             GetOrAdd<ShowcaseLocalization>(prefabRoot);
 
-            hubUI.moduleName = moduleName.GetComponent<TextMeshProUGUI>();
-            hubUI.variantName = variantName.GetComponent<TextMeshProUGUI>();
-            hubUI.inputHints = inputHints.GetComponent<TextMeshProUGUI>();
-            hubUI.moduleSelectorName = Rect(canvas.transform, "ModuleSelectorName").GetComponent<TextMeshProUGUI>();
-            hubUI.variantSelectorName = Rect(canvas.transform, "VariantSelectorName").GetComponent<TextMeshProUGUI>();
-            hubUI.moduleColor = ShowcasePalette.TextPrimary;
-            hubUI.variantColor = ShowcasePalette.AccentMain;
-            hubUI.hintColor = ShowcasePalette.TextMuted;
-            hubUI.pulseColor = ShowcasePalette.AccentStrong;
+            hubUI.ModuleName = moduleName.GetComponent<TextMeshProUGUI>();
+            hubUI.VariantName = variantName.GetComponent<TextMeshProUGUI>();
+            hubUI.InputHints = inputHints.GetComponent<TextMeshProUGUI>();
+            hubUI.ModuleSelectorName = Rect(canvas.transform, "Text - ModuleValue").GetComponent<TextMeshProUGUI>();
+            hubUI.VariantSelectorName = Rect(canvas.transform, "Text - VariantValue").GetComponent<TextMeshProUGUI>();
+            hubUI.ModuleColor = ShowcasePalette.TextPrimary;
+            hubUI.VariantColor = ShowcasePalette.AccentMain;
+            hubUI.HintColor = ShowcasePalette.TextMuted;
+            hubUI.PulseColor = ShowcasePalette.AccentStrong;
 
             ScrollRect scrollRect = GetOrAdd<ScrollRect>(descriptionPanel.gameObject);
             scrollRect.viewport = viewport;
-            scrollRect.content = descriptionText;
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
             scrollRect.scrollSensitivity = 24f;
-            description.descriptionText = descriptionText.GetComponent<TextMeshProUGUI>();
-            description.scrollRect = scrollRect;
-            description.sectionTitleColor = ShowcasePalette.AccentMain;
-            description.positiveTextColor = ShowcasePalette.Success;
-            description.negativeTextColor = ShowcasePalette.Error;
+            description.ScrollRect = scrollRect;
+            description.SectionTitleColor = ShowcasePalette.AccentMain;
+            description.PositiveTextColor = ShowcasePalette.Success;
+            description.NegativeTextColor = ShowcasePalette.Error;
 
-            metrics.fpsText = metricsOverlay.GetComponent<TextMeshProUGUI>();
-            metrics.titleColor = ShowcasePalette.AccentMain;
-            metrics.labelColor = ShowcasePalette.TextSecondary;
-            metrics.valueColor = ShowcasePalette.TextPrimary;
-            metrics.graphBackgroundColor = ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f);
-            stress.oneKButton = Rect(canvas.transform, "StressButton_1K").GetComponent<Button>();
-            stress.fiveKButton = Rect(canvas.transform, "StressButton_5K").GetComponent<Button>();
-            stress.tenKButton = Rect(canvas.transform, "StressButton_10K").GetComponent<Button>();
-            stress.statusText = Rect(canvas.transform, "StressStatusText").GetComponent<TextMeshProUGUI>();
-            stress.inactiveLabelColor = ShowcasePalette.TextSecondary;
-            stress.hoverBackgroundColor = new Color(0.070f, 0.083f, 0.102f, 0.96f);
-            stress.pressedBackgroundColor = new Color(0.145f, 0.083f, 0.045f, 0.98f);
+            if (!TryWireCompositeDescriptionContent(viewport, scrollRect, description, descriptionText))
+            {
+                scrollRect.content = descriptionText;
+                if (descriptionText != null)
+                    description.DescriptionText = descriptionText.GetComponent<TextMeshProUGUI>();
+            }
 
-            navigation.manager = moduleManager;
-            navigation.hubUI = hubUI;
+            metrics.FpsText = metricsOverlay.GetComponent<TextMeshProUGUI>();
+            metrics.TitleColor = ShowcasePalette.AccentMain;
+            metrics.LabelColor = ShowcasePalette.TextSecondary;
+            metrics.ValueColor = ShowcasePalette.TextPrimary;
+            metrics.GraphBackgroundColor = ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f);
+            stress.OneKButton = Rect(canvas.transform, "Button - StressPreset01").GetComponent<Button>();
+            stress.FiveKButton = Rect(canvas.transform, "Button - StressPreset02").GetComponent<Button>();
+            stress.TenKButton = Rect(canvas.transform, "Button - StressPreset03").GetComponent<Button>();
+            stress.StatusText = Rect(canvas.transform, "Text - StressSummary").GetComponent<TextMeshProUGUI>();
+            stress.InactiveLabelColor = ShowcasePalette.TextSecondary;
+            stress.HoverBackgroundColor = new Color(0.070f, 0.083f, 0.102f, 0.96f);
+            stress.PressedBackgroundColor = new Color(0.145f, 0.083f, 0.045f, 0.98f);
             navigation.panelSprite = frame8WhiteSprite;
             navigation.buttonSprite = frame8WhiteSprite;
-
-            moduleManager.hubUI = hubUI;
-            moduleManager.descriptionPanel = description;
-            moduleManager.transitionOverlay = transitionOverlay.GetComponent<CanvasGroup>();
+            transitionController.transitionOverlay = transitionOverlay.GetComponent<CanvasGroup>();
+            transitionController.transitionDuration = 0.16f;
+            compositionRoot.RuntimeController = runtimeController;
+            compositionRoot.CommandRouter = commandRouter;
+            compositionRoot.TransitionController = transitionController;
+            compositionRoot.StateHub = stateHub;
+            compositionRoot.ModuleRoot = Rect(prefabRoot.transform, "ModuleRoot");
+            compositionRoot.Modules = ResolveModules(compositionRoot.Modules);
+            commandRouter.RuntimeController = runtimeController;
         }
 
         private static void ConfigureLanguageToggle(Canvas canvas, RectTransform headerLine, Sprite frame8WhiteSprite, Sprite frame8YellowSprite)
@@ -313,33 +334,59 @@ namespace LearningArchitect.Editor
 
         private static void ConfigureFooter(Canvas canvas, Sprite moduleIconSprite, Sprite variantIconSprite, Sprite stressIconSprite, Sprite frame8WhiteSprite, Sprite frame8YellowSprite)
         {
-            RectTransform moduleTitle = Rect(canvas.transform, "ModuleSectionTitle");
+            RectTransform stressPanel = Rect(canvas.transform, "StressControlsPanel");
+            RectTransform moduleTitle = Rect(canvas.transform, "Text - ModuleHeader");
             RectTransform moduleSelector = Rect(canvas.transform, "ModuleSelector");
-            RectTransform moduleSelectorName = Rect(canvas.transform, "ModuleSelectorName");
-            RectTransform variantTitle = Rect(canvas.transform, "VariantSectionTitle");
+            RectTransform moduleSelectorName = Rect(canvas.transform, "Text - ModuleValue");
+            RectTransform variantTitle = Rect(canvas.transform, "Text - VariantHeader");
             RectTransform variantSelector = Rect(canvas.transform, "VariantSelector");
-            RectTransform variantSelectorName = Rect(canvas.transform, "VariantSelectorName");
-            RectTransform variantSelectorIcon = FindDeep(variantSelector, "Image") as RectTransform;
+            RectTransform variantSelectorName = Rect(canvas.transform, "Text - VariantValue");
+            RectTransform variantSelectorIcon = FindDeep(variantSelector, "Image - VariantSelectorIcon") as RectTransform
+                                                ?? FindDeep(variantSelector, "Image") as RectTransform;
             RectTransform previousVariantButton = FindDeep(variantSelector, "PreviousVariantButton") as RectTransform;
             RectTransform nextVariantButton = FindDeep(variantSelector, "NextVariantButton") as RectTransform;
-            RectTransform stressTitle = Rect(canvas.transform, "StressSectionTitle");
-            RectTransform stressRow = Rect(canvas.transform, "StressButtonsRow");
-            RectTransform stressStatusText = Rect(canvas.transform, "StressStatusText");
+            RectTransform stressTitle = Rect(canvas.transform, "Text - StressHeader");
+            RectTransform stressRow = Rect(canvas.transform, "HorizontalLayout - StressPresets");
+            RectTransform stressStatusText = Rect(canvas.transform, "Text - StressSummary");
+            RectTransform stressStatusIcon = FindDeep(stressPanel, "Image - StressStatusIcon") as RectTransform
+                                             ?? FindDeep(stressPanel, "StressStatusIcon") as RectTransform;
 
-            SetRect(moduleTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -18f), new Vector2(180f, 18f));
+            RectTransform moduleSection = EnsureRectChild(stressPanel, "Container - ModuleSection");
+            RectTransform variantSection = EnsureRectChild(stressPanel, "Container - VariantSection");
+            RectTransform stressSection = EnsureRectChild(stressPanel, "Container - StressSection");
+            RectTransform stressContent = EnsureRectChild(stressSection, "Container - StressContent");
+            RectTransform stressStatus = EnsureRectChild(stressContent, "Container - StressSummary");
+
+            SetRect(moduleSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(332f, -36f));
+            SetRect(variantSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(372f, 0f), new Vector2(332f, -36f));
+            SetRect(stressSection, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(724f, 0f), new Vector2(-744f, -36f));
+
+            moduleTitle.SetParent(moduleSection, false);
+            moduleSelector.SetParent(moduleSection, false);
+            variantTitle.SetParent(variantSection, false);
+            variantSelector.SetParent(variantSection, false);
+            stressTitle.SetParent(stressSection, false);
+            stressContent.SetParent(stressSection, false);
+            stressRow.SetParent(stressContent, false);
+            stressStatus.SetParent(stressContent, false);
+            stressStatusText.SetParent(stressStatus, false);
+            if (stressStatusIcon != null)
+                stressStatusIcon.SetParent(stressStatus, false);
+
+            SetRect(moduleTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
             ConfigureText(moduleTitle.GetComponent<TextMeshProUGUI>(), "SELECT MODULE", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
 
-            SetRect(moduleSelector, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(20f, 20f), new Vector2(330f, 58f));
+            SetRect(moduleSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 18f), new Vector2(0f, 58f));
             ConfigureImage(GetOrAdd<Image>(moduleSelector.gameObject), frame8WhiteSprite, new Color(0.070f, 0.083f, 0.102f, 0.96f), Image.Type.Sliced, false);
             SetRect(moduleSelectorName, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(52f, 0f), new Vector2(210f, 22f));
             ConfigureText(moduleSelectorName.GetComponent<TextMeshProUGUI>(), "Effects", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
-            GameObject moduleSelectIcon = EnsureChild(moduleSelector, "ModuleSelectorIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject moduleSelectIcon = EnsureChild(moduleSelector, "Image - ModuleSelectorIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             SetRect(moduleSelectIcon.GetComponent<RectTransform>(), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(16f, 0f), new Vector2(20f, 20f));
             ConfigureImage(moduleSelectIcon.GetComponent<Image>(), moduleIconSprite, ShowcasePalette.TextPrimary, Image.Type.Simple, false);
 
-            SetRect(variantTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(384f, -18f), new Vector2(180f, 18f));
+            SetRect(variantTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
             ConfigureText(variantTitle.GetComponent<TextMeshProUGUI>(), "SELECT VARIANT", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
-            SetRect(variantSelector, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(384f, 20f), new Vector2(330f, 58f));
+            SetRect(variantSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 18f), new Vector2(0f, 58f));
             ConfigureImage(GetOrAdd<Image>(variantSelector.gameObject), frame8WhiteSprite, new Color(0.070f, 0.083f, 0.102f, 0.96f), Image.Type.Sliced, false);
             SetRect(variantSelectorName, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(52f, 0f), new Vector2(180f, 22f));
             ConfigureText(variantSelectorName.GetComponent<TextMeshProUGUI>(), "Chunk-based", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
@@ -353,16 +400,44 @@ namespace LearningArchitect.Editor
             ConfigureImage(GetOrAdd<Image>(nextVariantButton.gameObject), frame8WhiteSprite, new Color(0.045f, 0.055f, 0.070f, 0.96f), Image.Type.Sliced, true);
             ConfigureText(nextVariantButton.Find("Label").GetComponent<TextMeshProUGUI>(), "\u203A", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
 
-            SetRect(stressTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(748f, -18f), new Vector2(180f, 18f));
+            SetRect(stressTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
             ConfigureText(stressTitle.GetComponent<TextMeshProUGUI>(), "STRESS TEST", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
-            SetRect(stressRow, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(748f, 20f), new Vector2(-766f, 58f));
 
-            string[] labels = { "1K", "5K", "10K" };
-            string[] buttonNames = { "StressButton_1K", "StressButton_5K", "StressButton_10K" };
+            stressContent.anchorMin = new Vector2(0f, 0f);
+            stressContent.anchorMax = new Vector2(1f, 1f);
+            stressContent.pivot = new Vector2(0.5f, 0.5f);
+            stressContent.offsetMin = new Vector2(0f, 18f);
+            stressContent.offsetMax = new Vector2(0f, -28f);
+            stressContent.localScale = Vector3.one;
+            stressContent.localRotation = Quaternion.identity;
+
+            HorizontalLayoutGroup stressLayout = GetOrAdd<HorizontalLayoutGroup>(stressRow.gameObject);
+            stressLayout.padding = new RectOffset(0, 0, 0, 0);
+            stressLayout.spacing = 12f;
+            stressLayout.childAlignment = TextAnchor.MiddleLeft;
+            stressLayout.childControlWidth = false;
+            stressLayout.childControlHeight = false;
+            stressLayout.childForceExpandWidth = false;
+            stressLayout.childForceExpandHeight = false;
+
+            ContentSizeFitter stressRowFitter = GetOrAdd<ContentSizeFitter>(stressRow.gameObject);
+            stressRowFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            stressRowFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            SetRect(stressRow, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(0f, 50f));
+
+            string[] labels = { "1 000", "5 000", "10 000" };
+            string[] buttonNames = { "Button - StressPreset01", "Button - StressPreset02", "Button - StressPreset03" };
             for (int i = 0; i < buttonNames.Length; i++)
             {
                 RectTransform button = Rect(canvas.transform, buttonNames[i]);
-                SetRect(button, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(i * 78f, 0f), new Vector2(68f, 50f));
+                button.SetParent(stressRow, false);
+                SetRect(button, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(68f, 50f));
+                LayoutElement element = GetOrAdd<LayoutElement>(button.gameObject);
+                element.minWidth = 68f;
+                element.preferredWidth = 68f;
+                element.minHeight = 50f;
+                element.preferredHeight = 50f;
                 Color buttonColor = i == 2
                     ? new Color(0.145f, 0.083f, 0.045f, 0.98f)
                     : new Color(0.045f, 0.055f, 0.070f, 0.96f);
@@ -370,15 +445,25 @@ namespace LearningArchitect.Editor
                     ? new Color(1f, 0.765f, 0.550f, 1f)
                     : ShowcasePalette.TextSecondary;
                 ConfigureImage(GetOrAdd<Image>(button.gameObject), i == 2 ? frame8YellowSprite : frame8WhiteSprite, buttonColor, Image.Type.Sliced, true);
-                ConfigureText(button.Find("Label").GetComponent<TextMeshProUGUI>(), labels[i], 18f, labelColor, TextAlignmentOptions.Center);
+
+                RectTransform presetValue = EnsureChild(button, "Text - PresetValue", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI)).GetComponent<RectTransform>();
+                StretchFull(presetValue);
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(presetValue.gameObject), labels[i], 18f, labelColor, TextAlignmentOptions.Center);
+
+                Transform legacyLabel = button.Find("Label");
+                if (legacyLabel != null)
+                    legacyLabel.gameObject.SetActive(false);
             }
 
-            SetRect(stressStatusText, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-8f, 0f), new Vector2(244f, 44f));
-            ConfigureText(stressStatusText.GetComponent<TextMeshProUGUI>(), "<size=72%><color=#" + ShowcasePalette.TextSecondaryHex + ">Stress Load</color></size>\n<color=#" + ShowcasePalette.AccentHex + "><size=118%><b>10,000</b></size></color>", 17f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            SetRect(stressStatus, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 0f), new Vector2(286f, 50f));
+            SetRect(stressStatusText, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(30f, 0f), new Vector2(-30f, 0f));
+            ConfigureText(stressStatusText.GetComponent<TextMeshProUGUI>(), "<size=72%><color=#" + ShowcasePalette.TextSecondaryHex + ">Stress Load</color></size>\n<color=#" + ShowcasePalette.AccentHex + "><size=118%><b>10K</b></size></color>  <size=84%>Active items 10K</size>", 17f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
 
-            GameObject stressStatusIcon = EnsureChild(stressRow, "StressStatusIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            SetRect(stressStatusIcon.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-192f, 0f), new Vector2(18f, 18f));
-            ConfigureImage(stressStatusIcon.GetComponent<Image>(), stressIconSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.78f), Image.Type.Simple, false);
+            if (stressStatusIcon == null)
+                stressStatusIcon = EnsureRectChild(stressStatus, "Image - StressStatusIcon");
+
+            SetRect(stressStatusIcon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(18f, 18f));
+            ConfigureImage(GetOrAdd<Image>(stressStatusIcon.gameObject), stressIconSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.78f), Image.Type.Simple, false);
         }
 
         private static void ConfigureStatusCard(Canvas canvas, RectTransform systemStatusCard, Sprite frame16Sprite, Sprite frame8WhiteSprite, Sprite lineGreenSprite)
@@ -556,6 +641,77 @@ namespace LearningArchitect.Editor
             return null;
         }
 
+        private static bool HasCompositeDescriptionContent(RectTransform viewport)
+        {
+            return viewport != null &&
+                   FindDeep(viewport, "Container - AboutInfo") != null &&
+                   FindDeep(viewport, "Container - ArchitectureInfo") != null &&
+                   FindDeep(viewport, "Container - Trade-OffsInfo") != null &&
+                   FindDeep(viewport, "Container - ProsCons") != null;
+        }
+
+        private static bool TryWireCompositeDescriptionContent(RectTransform viewport, ScrollRect scrollRect, DescriptionPanel description, RectTransform legacyDescriptionText)
+        {
+            if (!HasCompositeDescriptionContent(viewport) || scrollRect == null)
+                return false;
+
+            RectTransform contentRoot = viewport.Find("ContentRoot") as RectTransform;
+            if (contentRoot == null)
+            {
+                GameObject contentObject = new GameObject("ContentRoot", typeof(RectTransform), typeof(CanvasRenderer), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+                contentRoot = contentObject.GetComponent<RectTransform>();
+                contentRoot.SetParent(viewport, false);
+            }
+
+            contentRoot.anchorMin = new Vector2(0f, 1f);
+            contentRoot.anchorMax = new Vector2(1f, 1f);
+            contentRoot.pivot = new Vector2(0.5f, 1f);
+            contentRoot.anchoredPosition = Vector2.zero;
+            contentRoot.sizeDelta = Vector2.zero;
+
+            VerticalLayoutGroup layoutGroup = GetOrAdd<VerticalLayoutGroup>(contentRoot.gameObject);
+            layoutGroup.padding = new RectOffset(0, 0, 0, 0);
+            layoutGroup.spacing = 18f;
+            layoutGroup.childAlignment = TextAnchor.UpperLeft;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childControlHeight = false;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandHeight = false;
+
+            ContentSizeFitter fitter = GetOrAdd<ContentSizeFitter>(contentRoot.gameObject);
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            string[] sectionNames =
+            {
+                "Container - AboutInfo",
+                "Container - ArchitectureInfo",
+                "Container - Trade-OffsInfo",
+                "Container - ProsCons"
+            };
+
+            for (int i = 0; i < sectionNames.Length; i++)
+            {
+                RectTransform section = FindDeep(viewport, sectionNames[i]) as RectTransform;
+                if (section != null)
+                    section.SetParent(contentRoot, false);
+            }
+
+            if (legacyDescriptionText != null)
+            {
+                legacyDescriptionText.gameObject.SetActive(false);
+                legacyDescriptionText.SetParent(contentRoot, false);
+                legacyDescriptionText.SetAsLastSibling();
+            }
+
+            scrollRect.content = contentRoot;
+
+            if (description != null)
+                description.DescriptionText = null;
+
+            return true;
+        }
+
         private static GameObject EnsureChild(Transform parent, string name, params System.Type[] components)
         {
             Transform child = parent.Find(name);
@@ -565,6 +721,11 @@ namespace LearningArchitect.Editor
             GameObject go = new GameObject(name, components);
             go.transform.SetParent(parent, false);
             return go;
+        }
+
+        private static RectTransform EnsureRectChild(Transform parent, string name)
+        {
+            return EnsureChild(parent, name, typeof(RectTransform)).GetComponent<RectTransform>();
         }
 
         private static T GetOrAdd<T>(GameObject go) where T : Component
@@ -615,6 +776,22 @@ namespace LearningArchitect.Editor
             rect.offsetMax = new Vector2(-right, -top);
             rect.localScale = Vector3.one;
             rect.localRotation = Quaternion.identity;
+        }
+
+        private static ModuleDefinitionSO[] ResolveModules(ModuleDefinitionSO[] currentModules)
+        {
+            if (currentModules != null && currentModules.Length > 0)
+                return currentModules;
+
+            string[] guids = AssetDatabase.FindAssets("t:ModuleDefinitionSO");
+            ModuleDefinitionSO[] modules = new ModuleDefinitionSO[guids.Length];
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                modules[i] = AssetDatabase.LoadAssetAtPath<ModuleDefinitionSO>(path);
+            }
+
+            return modules;
         }
     }
 }

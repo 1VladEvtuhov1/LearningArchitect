@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using LearningArchitect.Core;
 using LearningArchitect.UI;
@@ -93,10 +94,8 @@ namespace LearningArchitect.EditorTools
 
         private static void PopulateUiCollection(StringTableCollection collection, Locale english, Locale russian)
         {
-            StringTable englishTable = collection.GetTable(english.Identifier) as StringTable;
-            StringTable russianTable = collection.GetTable(russian.Identifier) as StringTable;
-            if (englishTable == null || russianTable == null)
-                return;
+            StringTable englishTable = GetStringTableOrThrow(collection, english);
+            StringTable russianTable = GetStringTableOrThrow(collection, russian);
 
             Dictionary<string, string> englishEntries = new Dictionary<string, string>
             {
@@ -202,43 +201,49 @@ namespace LearningArchitect.EditorTools
 
         private static void PopulateContentCollection(StringTableCollection collection, Locale english, Locale russian)
         {
-            StringTable englishTable = collection.GetTable(english.Identifier) as StringTable;
-            StringTable russianTable = collection.GetTable(russian.Identifier) as StringTable;
-            if (englishTable == null || russianTable == null)
-                return;
+            StringTable englishTable = GetStringTableOrThrow(collection, english);
+            StringTable russianTable = GetStringTableOrThrow(collection, russian);
 
             string[] moduleGuids = AssetDatabase.FindAssets("t:ModuleDefinitionSO", new[] { "Assets/Prefabs/Showcase" });
             for (int i = 0; i < moduleGuids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(moduleGuids[i]);
-                ModuleDefinitionSO module = AssetDatabase.LoadAssetAtPath<ModuleDefinitionSO>(path);
-                if (module == null)
-                    continue;
+                ModuleDefinitionSO module = LoadAssetOrThrow<ModuleDefinitionSO>(path);
 
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleNameKey(module), module.moduleName);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleNameKey(module), module.moduleNameRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.description);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.descriptionRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleNameKey(module), module.ModuleName);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleNameKey(module), module.ModuleNameRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.Description);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.DescriptionRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleThesisKey(module), module.Thesis);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleThesisKey(module), module.ThesisRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleProblemKey(module), module.ProblemStatement);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleProblemKey(module), module.ProblemStatementRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleWebGlPresetKey(module), module.WebGlPresetNote);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleWebGlPresetKey(module), module.WebGlPresetNoteRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabel);
+                SetEntry(russianTable, ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabelRu);
             }
 
             string[] variantGuids = AssetDatabase.FindAssets("t:VariantDefinitionSO", new[] { "Assets/Prefabs/Showcase" });
             for (int i = 0; i < variantGuids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(variantGuids[i]);
-                VariantDefinitionSO variant = AssetDatabase.LoadAssetAtPath<VariantDefinitionSO>(path);
-                if (variant == null)
-                    continue;
+                VariantDefinitionSO variant = LoadAssetOrThrow<VariantDefinitionSO>(path);
 
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.variantName);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.variantNameRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.architectureDescription);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.architectureDescriptionRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.tradeOffs);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.tradeOffsRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.pros);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.prosRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.cons);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.consRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantName);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantNameRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescription);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescriptionRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummary);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummaryRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.Takeaway);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.TakeawayRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.TradeOffs);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.TradeOffsRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.Pros);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.ProsRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.Cons);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.ConsRu);
             }
         }
 
@@ -250,8 +255,11 @@ namespace LearningArchitect.EditorTools
 
         private static void SetEntry(StringTable table, string key, string value)
         {
-            if (table == null || string.IsNullOrWhiteSpace(key))
-                return;
+            if (table == null)
+                throw new InvalidOperationException("String table is required.");
+
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Localization key is required.", nameof(key));
 
             StringTableEntry entry = table.GetEntry(key);
             if (entry == null)
@@ -268,6 +276,25 @@ namespace LearningArchitect.EditorTools
             string target = parent + "/" + folderName;
             if (!AssetDatabase.IsValidFolder(target))
                 AssetDatabase.CreateFolder(parent, folderName);
+        }
+
+        private static StringTable GetStringTableOrThrow(StringTableCollection collection, Locale locale)
+        {
+            StringTable table = collection.GetTable(locale.Identifier) as StringTable;
+            if (table == null)
+                throw new InvalidOperationException($"Missing string table for locale '{locale.Identifier.Code}'.");
+
+            return table;
+        }
+
+        private static T LoadAssetOrThrow<T>(string path)
+            where T : UnityEngine.Object
+        {
+            T asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset == null)
+                throw new InvalidOperationException($"Failed to load asset at path '{path}'.");
+
+            return asset;
         }
     }
 }

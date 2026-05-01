@@ -50,6 +50,9 @@ namespace LearningArchitect.UI
             panelSprite = SamplePanelSprite();
             PrepareComponents();
             BuildModernUi();
+
+            if (GetComponent<RecruiterDemoController>() == null)
+                gameObject.AddComponent<RecruiterDemoController>();
         }
 
         private void PrepareComponents()
@@ -57,26 +60,26 @@ namespace LearningArchitect.UI
             HubUI hubUi = GetComponent<HubUI>();
             if (hubUi != null)
             {
-                hubUi.moduleColor = primaryTextColor;
-                hubUi.variantColor = primaryTextColor;
-                hubUi.hintColor = secondaryTextColor;
-                hubUi.pulseColor = accentColor;
+                hubUi.ModuleColor = primaryTextColor;
+                hubUi.VariantColor = primaryTextColor;
+                hubUi.HintColor = secondaryTextColor;
+                hubUi.PulseColor = accentColor;
             }
 
             MetricsOverlay metrics = GetComponent<MetricsOverlay>();
             if (metrics != null)
             {
-                metrics.healthyColor = metricsColor;
-                metrics.warningColor = new Color(0.95f, 0.75f, 0.42f, 1f);
-                metrics.criticalColor = new Color(0.95f, 0.45f, 0.42f, 1f);
+                metrics.HealthyColor = metricsColor;
+                metrics.WarningColor = new Color(0.95f, 0.75f, 0.42f, 1f);
+                metrics.CriticalColor = new Color(0.95f, 0.45f, 0.42f, 1f);
             }
 
             StressTestControls stress = GetComponent<StressTestControls>();
             if (stress != null)
             {
-                stress.activeColor = accentColor;
-                stress.inactiveColor = softCardColor;
-                stress.textColor = primaryTextColor;
+                stress.ActiveColor = accentColor;
+                stress.InactiveColor = softCardColor;
+                stress.TextColor = primaryTextColor;
             }
 
             ModuleNavigationControls navigation = GetComponent<ModuleNavigationControls>();
@@ -97,6 +100,7 @@ namespace LearningArchitect.UI
                 navigation.buttonSize = new Vector2(44f, 44f);
                 navigation.buttonSpacing = 40f;
             }
+
         }
 
         private void BuildModernUi()
@@ -120,12 +124,14 @@ namespace LearningArchitect.UI
             RectTransform descriptionPanel = CreatePanel("DescriptionPanel", canvas.transform, cardColor, true);
             RectTransform footerPanel = CreatePanel("StressControlsPanel", canvas.transform, cardColor, true);
             RectTransform navigationPanel = CreateContainer("NavigationControlsPanel", canvas.transform);
+            RectTransform demoOverlay = CreateDemoOverlay(canvas.transform);
 
             LayoutHeader(headerBackdrop, headerPanel);
             LayoutPreview(previewFrame);
             LayoutDescription(descriptionBackdrop, descriptionPanel);
             LayoutFooter(footerPanel);
             LayoutNavigation(navigationPanel, headerPanel);
+            StretchFull(demoOverlay);
             StretchTransitionOverlay();
         }
 
@@ -146,12 +152,15 @@ namespace LearningArchitect.UI
             RectTransform inputHints = CreateText("InputHints", panel, "Module  \u25C0 \u25B6    Variant  \u25B2 \u25BC", 13f, secondaryTextColor, TextAlignmentOptions.Center);
             SetRect(inputHints, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(280f, 16f));
 
+            RectTransform recruiterDemo = CreateButton("RecruiterDemoButton", panel, ShowcaseLocalization.GetText("start_demo"));
+            SetRect(recruiterDemo, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-332f, 0f), new Vector2(156f, 30f));
+
             HubUI hubUi = GetComponent<HubUI>();
             if (hubUi != null)
             {
-                hubUi.moduleName = moduleText.GetComponent<TextMeshProUGUI>();
-                hubUi.variantName = variantText.GetComponent<TextMeshProUGUI>();
-                hubUi.inputHints = inputHints.GetComponent<TextMeshProUGUI>();
+                hubUi.ModuleName = moduleText.GetComponent<TextMeshProUGUI>();
+                hubUi.VariantName = variantText.GetComponent<TextMeshProUGUI>();
+                hubUi.InputHints = inputHints.GetComponent<TextMeshProUGUI>();
             }
         }
 
@@ -180,28 +189,41 @@ namespace LearningArchitect.UI
             panel.offsetMin = new Vector2(-(DescriptionWidth + SideMargin), BottomMargin + FooterHeight + Gap);
             panel.offsetMax = new Vector2(-SideMargin, -(TopMargin + HeaderHeight + Gap));
 
+            RectTransform tabsBar = CreateContainer("TabsBar", panel);
+            tabsBar.anchorMin = new Vector2(0f, 1f);
+            tabsBar.anchorMax = new Vector2(1f, 1f);
+            tabsBar.pivot = new Vector2(0.5f, 1f);
+            tabsBar.offsetMin = new Vector2(14f, -46f);
+            tabsBar.offsetMax = new Vector2(-14f, -14f);
+
+            RectTransform tab0 = CreateText("Tab_0", tabsBar, ShowcaseLocalization.GetText("overview"), 15f, primaryTextColor, TextAlignmentOptions.Center);
+            RectTransform tab1 = CreateText("Tab_1", tabsBar, ShowcaseLocalization.GetText("architecture"), 15f, secondaryTextColor, TextAlignmentOptions.Center);
+            RectTransform tab2 = CreateText("Tab_2", tabsBar, ShowcaseLocalization.GetText("trade_offs"), 15f, secondaryTextColor, TextAlignmentOptions.Center);
+            SetRect(tab0, new Vector2(0f, 0.5f), new Vector2(0.3333f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 24f));
+            SetRect(tab1, new Vector2(0.3333f, 0.5f), new Vector2(0.6666f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 24f));
+            SetRect(tab2, new Vector2(0.6666f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(0f, 24f));
+
+            RectTransform underline = CreatePanel("ActiveTabUnderline", tabsBar, accentColor, false);
+            underline.anchorMin = new Vector2(0f, 0f);
+            underline.anchorMax = new Vector2(0.3333f, 0f);
+            underline.pivot = new Vector2(0.5f, 0f);
+            underline.anchoredPosition = new Vector2(0f, -2f);
+            underline.sizeDelta = new Vector2(-12f, 3f);
+
             GameObject viewportObject = new GameObject("Viewport", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(RectMask2D));
             viewportObject.transform.SetParent(panel, false);
             RectTransform viewport = viewportObject.GetComponent<RectTransform>();
-            StretchInside(viewport, 14f, 14f, 14f, 14f);
+            StretchInside(viewport, 14f, 14f, 14f, 52f);
 
             Image viewportImage = viewport.GetComponent<Image>();
             viewportImage.color = new Color(1f, 1f, 1f, 0.001f);
             viewportImage.raycastTarget = true;
-
-            RectTransform descriptionText = CreateText("DescriptionText", viewport, "Loading description...", 18f, primaryTextColor, TextAlignmentOptions.TopLeft);
-            descriptionText.anchorMin = new Vector2(0f, 1f);
-            descriptionText.anchorMax = new Vector2(1f, 1f);
-            descriptionText.pivot = new Vector2(0.5f, 1f);
-            descriptionText.anchoredPosition = Vector2.zero;
-            descriptionText.sizeDelta = new Vector2(0f, 1200f);
 
             ScrollRect scrollRect = panel.gameObject.GetComponent<ScrollRect>();
             if (scrollRect == null)
                 scrollRect = panel.gameObject.AddComponent<ScrollRect>();
 
             scrollRect.viewport = viewport;
-            scrollRect.content = descriptionText;
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
@@ -211,40 +233,122 @@ namespace LearningArchitect.UI
             DescriptionPanel description = GetComponent<DescriptionPanel>();
             if (description != null)
             {
-                description.descriptionText = descriptionText.GetComponent<TextMeshProUGUI>();
-                description.scrollRect = scrollRect;
+                description.ScrollRect = scrollRect;
             }
+
+            if (TryWireCompositeDescriptionContent(viewport, scrollRect, description))
+                return;
+
+            RectTransform descriptionText = CreateText("DescriptionText", viewport, "Loading description...", 18f, primaryTextColor, TextAlignmentOptions.TopLeft);
+            descriptionText.anchorMin = new Vector2(0f, 1f);
+            descriptionText.anchorMax = new Vector2(1f, 1f);
+            descriptionText.pivot = new Vector2(0.5f, 1f);
+            descriptionText.anchoredPosition = Vector2.zero;
+            descriptionText.sizeDelta = new Vector2(0f, 0f);
+
+            ContentSizeFitter contentFitter = descriptionText.gameObject.AddComponent<ContentSizeFitter>();
+            contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scrollRect.content = descriptionText;
+
+            if (description != null)
+                description.DescriptionText = descriptionText.GetComponent<TextMeshProUGUI>();
         }
 
         private void LayoutFooter(RectTransform panel)
         {
             StretchBottom(panel, SideMargin, SideMargin, BottomMargin, FooterHeight);
 
-            RectTransform oneK = CreateButton("StressButton_1K", panel, "1K");
-            RectTransform fiveK = CreateButton("StressButton_5K", panel, "5K");
-            RectTransform tenK = CreateButton("StressButton_10K", panel, "10K");
-            SetRect(oneK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(34f, 0f), new Vector2(54f, 28f));
-            SetRect(fiveK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(100f, 0f), new Vector2(54f, 28f));
-            SetRect(tenK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(166f, 0f), new Vector2(54f, 28f));
+            RectTransform moduleSection = CreateContainer("Container - ModuleSection", panel);
+            RectTransform variantSection = CreateContainer("Container - VariantSection", panel);
+            RectTransform stressSection = CreateContainer("Container - StressSection", panel);
+            SetRect(moduleSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(332f, -20f));
+            SetRect(variantSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(372f, 0f), new Vector2(332f, -20f));
+            SetRect(stressSection, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(724f, 0f), new Vector2(-744f, -20f));
 
-            RectTransform status = CreateText("StressStatusText", panel, "Stress load  1K  \u2022  Active 1K", 14f, secondaryTextColor, TextAlignmentOptions.Left);
-            SetRect(status, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(224f, 0f), new Vector2(360f, 18f));
+            RectTransform moduleTitle = CreateText("Text - ModuleHeader", moduleSection, ShowcaseLocalization.GetText("select_module"), 16f, secondaryTextColor, TextAlignmentOptions.Left);
+            SetRect(moduleTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -16f), new Vector2(0f, 18f));
 
-            RectTransform metrics = CreateText("MetricsOverlay", panel, "<color=#8A8F99>\u25A5</color> <color=#2DD4BF>FPS 60</color>  <color=#8A8F99>|</color>  Frame 16.0 ms  <color=#8A8F99>|</color>  Active 1K", 14f, primaryTextColor, TextAlignmentOptions.Right);
-            SetRect(metrics, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-20f, 0f), new Vector2(360f, 18f));
+            RectTransform moduleSelector = CreateButton("ModuleSelector", moduleSection, string.Empty);
+            SetRect(moduleSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 30f));
+            RectTransform moduleSelectorName = CreateText("Text - ModuleValue", moduleSelector, "Effects", 18f, primaryTextColor, TextAlignmentOptions.Left);
+            SetRect(moduleSelectorName, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(-20f, 22f));
+
+            RectTransform variantTitle = CreateText("Text - VariantHeader", variantSection, ShowcaseLocalization.GetText("select_variant"), 16f, secondaryTextColor, TextAlignmentOptions.Left);
+            SetRect(variantTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -16f), new Vector2(0f, 18f));
+
+            RectTransform variantSelector = CreateButton("VariantSelector", variantSection, string.Empty);
+            SetRect(variantSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 30f));
+            RectTransform variantSelectorName = CreateText("Text - VariantValue", variantSelector, "Chunk-based", 18f, primaryTextColor, TextAlignmentOptions.Left);
+            SetRect(variantSelectorName, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(-70f, 22f));
+
+            RectTransform previousVariantButton = CreateButton("PreviousVariantButton", variantSelector, "\u2039");
+            RectTransform nextVariantButton = CreateButton("NextVariantButton", variantSelector, "\u203A");
+            SetRect(previousVariantButton, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-56f, 0f), new Vector2(28f, 28f));
+            SetRect(nextVariantButton, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-20f, 0f), new Vector2(28f, 28f));
+
+            RectTransform stressTitle = CreateText("Text - StressHeader", stressSection, ShowcaseLocalization.GetText("stress_test"), 16f, secondaryTextColor, TextAlignmentOptions.Left);
+            SetRect(stressTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -16f), new Vector2(0f, 18f));
+
+            RectTransform stressContent = CreateContainer("Container - StressContent", stressSection);
+            stressContent.anchorMin = new Vector2(0f, 0f);
+            stressContent.anchorMax = new Vector2(1f, 1f);
+            stressContent.offsetMin = new Vector2(0f, 0f);
+            stressContent.offsetMax = new Vector2(0f, -24f);
+
+            RectTransform stressRow = CreateContainer("HorizontalLayout - StressPresets", stressContent);
+            SetRect(stressRow, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(228f, 32f));
+
+            RectTransform oneK = CreateStressPresetButton("Button - StressPreset01", stressRow, "1 000");
+            RectTransform fiveK = CreateStressPresetButton("Button - StressPreset02", stressRow, "5 000");
+            RectTransform tenK = CreateStressPresetButton("Button - StressPreset03", stressRow, "10 000");
+            SetRect(oneK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(54f, 28f));
+            SetRect(fiveK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(66f, 0f), new Vector2(54f, 28f));
+            SetRect(tenK, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(132f, 0f), new Vector2(54f, 28f));
+
+            RectTransform statusContainer = CreateContainer("Container - StressSummary", stressContent);
+            SetRect(statusContainer, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(286f, 44f));
+
+            RectTransform statusIcon = CreatePanel("Image - StressStatusIcon", statusContainer, accentColor, false);
+            SetRect(statusIcon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(16f, 16f));
+
+            RectTransform status = CreateText("Text - StressSummary", statusContainer, "<size=72%>Stress load</size>\n<size=114%><b>1K</b></size>  <size=84%>Active 1K</size>", 14f, primaryTextColor, TextAlignmentOptions.Left);
+            SetRect(status, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(26f, 0f), new Vector2(-26f, 0f));
+
+            RectTransform rootFrame = CreateContainer("RootFrame", panel);
+            SetRect(rootFrame, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-20f, 0f), new Vector2(360f, 76f));
+
+            RectTransform metrics = CreateText("MetricsOverlay", rootFrame, "PERFORMANCE\nFPS 60\nFrame 16.0 ms\nSIM 1K\nActive 1K", 14f, primaryTextColor, TextAlignmentOptions.TopRight);
+            metrics.anchorMin = new Vector2(0f, 0.34f);
+            metrics.anchorMax = new Vector2(1f, 1f);
+            metrics.offsetMin = Vector2.zero;
+            metrics.offsetMax = Vector2.zero;
+            metrics.pivot = new Vector2(1f, 1f);
+
+            RectTransform chartPlaceholder = CreatePanel("ChartPlaceholder", rootFrame, new Color(1f, 1f, 1f, 0.02f), false);
+            chartPlaceholder.anchorMin = new Vector2(0f, 0f);
+            chartPlaceholder.anchorMax = new Vector2(1f, 0.30f);
+            chartPlaceholder.offsetMin = Vector2.zero;
+            chartPlaceholder.offsetMax = Vector2.zero;
+
+            GameObject performanceGraphObject = new GameObject("PerformanceGraph", typeof(RectTransform), typeof(CanvasRenderer), typeof(PerformanceGraph));
+            performanceGraphObject.transform.SetParent(chartPlaceholder, false);
+            RectTransform performanceGraphRect = performanceGraphObject.GetComponent<RectTransform>();
+            StretchFull(performanceGraphRect);
 
             StressTestControls stress = GetComponent<StressTestControls>();
             if (stress != null)
             {
-                stress.oneKButton = oneK.GetComponent<Button>();
-                stress.fiveKButton = fiveK.GetComponent<Button>();
-                stress.tenKButton = tenK.GetComponent<Button>();
-                stress.statusText = status.GetComponent<TextMeshProUGUI>();
+                stress.OneKButton = oneK.GetComponent<Button>();
+                stress.FiveKButton = fiveK.GetComponent<Button>();
+                stress.TenKButton = tenK.GetComponent<Button>();
+                stress.StatusText = status.GetComponent<TextMeshProUGUI>();
             }
 
             MetricsOverlay overlay = GetComponent<MetricsOverlay>();
             if (overlay != null)
-                overlay.fpsText = metrics.GetComponent<TextMeshProUGUI>();
+                overlay.FpsText = metrics.GetComponent<TextMeshProUGUI>();
         }
 
         private void LayoutNavigation(RectTransform navigationPanel, RectTransform headerPanel)
@@ -334,6 +438,36 @@ namespace LearningArchitect.UI
             return rect;
         }
 
+        private RectTransform CreateDemoOverlay(Transform parent)
+        {
+            GameObject root = new GameObject("DemoOverlay", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(CanvasGroup));
+            root.transform.SetParent(parent, false);
+
+            RectTransform rootRect = root.GetComponent<RectTransform>();
+            Image rootImage = root.GetComponent<Image>();
+            rootImage.color = new Color(0.03f, 0.05f, 0.08f, 0.82f);
+            rootImage.raycastTarget = true;
+
+            CanvasGroup canvasGroup = root.GetComponent<CanvasGroup>();
+            canvasGroup.alpha = 0f;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+
+            RectTransform card = CreatePanel("DemoOverlayCard", root.transform, cardColor, true);
+            SetRect(card, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(620f, 240f));
+
+            RectTransform chip = CreateText("DemoOverlayChip", card, ShowcaseLocalization.GetText("guided_demo"), 16f, secondaryTextColor, TextAlignmentOptions.Center);
+            SetRect(chip, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -34f), new Vector2(260f, 20f));
+
+            RectTransform title = CreateText("DemoOverlayTitle", card, "Recruiter Demo", 34f, primaryTextColor, TextAlignmentOptions.Center);
+            SetRect(title, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 20f), new Vector2(520f, 48f));
+
+            RectTransform body = CreateText("DemoOverlayBody", card, "Guided walkthrough of the current showcase modules.", 18f, secondaryTextColor, TextAlignmentOptions.Center);
+            SetRect(body, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -36f), new Vector2(520f, 72f));
+
+            return rootRect;
+        }
+
         private RectTransform CreateText(string name, Transform parent, string text, float fontSize, Color color, TextAlignmentOptions alignment)
         {
             GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
@@ -346,7 +480,7 @@ namespace LearningArchitect.UI
             tmp.color = color;
             tmp.alignment = alignment;
             tmp.raycastTarget = false;
-            tmp.enableWordWrapping = true;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
 
             if (TMP_Settings.defaultFontAsset != null)
                 tmp.font = TMP_Settings.defaultFontAsset;
@@ -377,6 +511,33 @@ namespace LearningArchitect.UI
             RectTransform labelRect = CreateText("Text", go.transform, "<b>" + label + "</b>", 13f, primaryTextColor, TextAlignmentOptions.Center);
             StretchFull(labelRect);
             return go.GetComponent<RectTransform>();
+        }
+
+        private RectTransform CreateStressPresetButton(string name, Transform parent, string label)
+        {
+            RectTransform root = CreateButton(name, parent, string.Empty);
+
+            Transform legacyText = root.Find("Text");
+            RectTransform valueRect;
+            if (legacyText != null)
+            {
+                legacyText.name = "Text - PresetValue";
+                valueRect = legacyText as RectTransform;
+                TextMeshProUGUI valueText = legacyText.GetComponent<TextMeshProUGUI>();
+                if (valueText != null)
+                {
+                    valueText.text = "<b>" + label + "</b>";
+                    valueText.color = primaryTextColor;
+                    valueText.alignment = TextAlignmentOptions.Center;
+                }
+            }
+            else
+            {
+                valueRect = CreateText("Text - PresetValue", root, "<b>" + label + "</b>", 13f, primaryTextColor, TextAlignmentOptions.Center);
+            }
+
+            StretchFull(valueRect);
+            return root;
         }
 
         private RectTransform CreateNavButton(string name, Transform parent, string glyph)
@@ -502,6 +663,92 @@ namespace LearningArchitect.UI
             }
 
             return null;
+        }
+
+        private static Transform FindDeep(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+
+            if (root.name == name)
+                return root;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform match = FindDeep(root.GetChild(i), name);
+                if (match != null)
+                    return match;
+            }
+
+            return null;
+        }
+
+        private static bool TryWireCompositeDescriptionContent(RectTransform viewport, ScrollRect scrollRect, DescriptionPanel description)
+        {
+            if (viewport == null || scrollRect == null)
+                return false;
+
+            if (FindDeep(viewport, "Container - AboutInfo") == null ||
+                FindDeep(viewport, "Container - ArchitectureInfo") == null ||
+                FindDeep(viewport, "Container - Trade-OffsInfo") == null)
+            {
+                return false;
+            }
+
+            RectTransform contentRoot = viewport.Find("ContentRoot") as RectTransform;
+            if (contentRoot == null)
+            {
+                GameObject contentObject = new GameObject("ContentRoot", typeof(RectTransform), typeof(CanvasRenderer), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+                contentRoot = contentObject.GetComponent<RectTransform>();
+                contentRoot.SetParent(viewport, false);
+            }
+
+            contentRoot.anchorMin = new Vector2(0f, 1f);
+            contentRoot.anchorMax = new Vector2(1f, 1f);
+            contentRoot.pivot = new Vector2(0.5f, 1f);
+            contentRoot.anchoredPosition = Vector2.zero;
+            contentRoot.sizeDelta = Vector2.zero;
+
+            VerticalLayoutGroup layoutGroup = GetOrAdd<VerticalLayoutGroup>(contentRoot.gameObject);
+            layoutGroup.padding = new RectOffset(0, 0, 0, 0);
+            layoutGroup.spacing = 18f;
+            layoutGroup.childAlignment = TextAnchor.UpperLeft;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childControlHeight = false;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandHeight = false;
+
+            ContentSizeFitter fitter = GetOrAdd<ContentSizeFitter>(contentRoot.gameObject);
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            string[] sectionNames =
+            {
+                "Container - AboutInfo",
+                "Container - ArchitectureInfo",
+                "Container - Trade-OffsInfo",
+                "Container - ProsCons"
+            };
+
+            for (int i = 0; i < sectionNames.Length; i++)
+            {
+                RectTransform section = FindDeep(viewport, sectionNames[i]) as RectTransform;
+                if (section != null)
+                    section.SetParent(contentRoot, false);
+            }
+
+            scrollRect.content = contentRoot;
+
+            if (description != null)
+                description.DescriptionText = null;
+
+            return true;
+        }
+
+        private static T GetOrAdd<T>(GameObject target) where T : Component
+        {
+            T component = target.GetComponent<T>();
+            return component != null ? component : target.AddComponent<T>();
         }
     }
 }

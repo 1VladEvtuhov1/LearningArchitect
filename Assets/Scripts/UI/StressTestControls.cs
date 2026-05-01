@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using LearningArchitect.Core;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -10,26 +14,327 @@ namespace LearningArchitect.UI
 {
     public sealed class StressTestControls : MonoBehaviour
     {
-        public ModuleManager manager;
-        public Button oneKButton;
-        public Button fiveKButton;
-        public Button tenKButton;
-        public TextMeshProUGUI statusText;
+        private static readonly int[] DefaultStressPresets = { 1000, 5000, 10000 };
+        private const float FeedbackDuration = 0.18f;
 
-        public Color activeColor = default;
-        public Color activeBackgroundColor = default;
-        public Color inactiveColor = default;
-        public Color textColor = default;
-        public Color inactiveLabelColor = default;
-        public Color hoverBackgroundColor = default;
-        public Color pressedBackgroundColor = default;
-        public float activeScale = 1.04f;
-        public float clickScale = 1.08f;
+        private sealed class PresetButtonView
+        {
+            public PresetButtonView(Button button, TextMeshProUGUI label)
+            {
+                Button = button;
+                Label = label;
+            }
 
-        private float feedbackTimer;
+            public Button Button { get; }
+
+            public TextMeshProUGUI Label { get; }
+        }
+
+        public event Action<int> StressRequested;
+
+        [SerializeField] private Button oneKButton;
+        [SerializeField] private Button fiveKButton;
+        [SerializeField] private Button tenKButton;
+        [SerializeField] private TextMeshProUGUI statusText;
+
+        [SerializeField] private Color activeColor = default;
+        [SerializeField] private Color activeBackgroundColor = default;
+        [SerializeField] private Color inactiveColor = default;
+        [SerializeField] private Color textColor = default;
+        [SerializeField] private Color inactiveLabelColor = default;
+        [SerializeField] private Color noteColor = default;
+        [SerializeField] private Color hoverBackgroundColor = default;
+        [SerializeField] private Color pressedBackgroundColor = default;
+        [SerializeField] private float activeScale = 1.04f;
+        [SerializeField] private float clickScale = 1.08f;
+
+        private readonly List<PresetButtonView> presetButtons = new(4);
+        private readonly List<UnityAction> buttonListeners = new(4);
+
+        private int[] activePresets = Array.Empty<int>();
+        private string[] activePresetLabels;
+        private string activeItemLabel = string.Empty;
+        private string contextNote = string.Empty;
+        private int displayedActiveCount;
+        private int displayedStressLevel = DefaultStressPresets[0];
         private Button feedbackButton;
+        private float feedbackTimer;
+        private bool isInitialized;
+
+        public Button OneKButton
+        {
+            get => oneKButton;
+            set => oneKButton = value;
+        }
+
+        public Button FiveKButton
+        {
+            get => fiveKButton;
+            set => fiveKButton = value;
+        }
+
+        public Button TenKButton
+        {
+            get => tenKButton;
+            set => tenKButton = value;
+        }
+
+        public TextMeshProUGUI StatusText
+        {
+            get => statusText;
+            set => statusText = value;
+        }
+
+        public Color InactiveLabelColor
+        {
+            get => inactiveLabelColor;
+            set => inactiveLabelColor = value;
+        }
+
+        public Color HoverBackgroundColor
+        {
+            get => hoverBackgroundColor;
+            set => hoverBackgroundColor = value;
+        }
+
+        public Color PressedBackgroundColor
+        {
+            get => pressedBackgroundColor;
+            set => pressedBackgroundColor = value;
+        }
+
+        public Color ActiveColor
+        {
+            get => activeColor;
+            set => activeColor = value;
+        }
+
+        public Color InactiveColor
+        {
+            get => inactiveColor;
+            set => inactiveColor = value;
+        }
+
+        public Color TextColor
+        {
+            get => textColor;
+            set => textColor = value;
+        }
+
+        public Color NoteColor
+        {
+            get => noteColor;
+            set => noteColor = value;
+        }
 
         private void Awake()
+        {
+            EnsureInitialized();
+        }
+
+        private void Update()
+        {
+            if (!EnsureInitialized())
+                return;
+
+            if (WasPressed(KeyCode.Alpha1))
+                TriggerPreset(0);
+
+            if (WasPressed(KeyCode.Alpha2))
+                TriggerPreset(1);
+
+            if (WasPressed(KeyCode.Alpha3))
+                TriggerPreset(2);
+
+            if (feedbackTimer > 0f)
+            {
+                feedbackTimer -= Time.unscaledDeltaTime;
+                if (feedbackTimer <= 0f)
+                    feedbackButton = null;
+            }
+
+            Refresh();
+        }
+
+        private void OnDestroy()
+        {
+            UnbindButtons();
+        }
+
+        public void SetStressLevel(int count)
+        {
+            if (!EnsureInitialized())
+                return;
+
+            StressRequested?.Invoke(count);
+
+            feedbackButton = GetButtonForCount(count);
+            feedbackTimer = FeedbackDuration;
+            Refresh();
+        }
+
+        public void ConfigurePresets(int[] presets, string[] presetLabels = null)
+        {
+            if (!EnsureInitialized())
+                return;
+
+            activePresets = NormalizePresets(presets);
+            if (activePresets.Length > presetButtons.Count)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(StressTestControls)} found {presetButtons.Count} preset buttons, but {activePresets.Length} presets were requested.");
+            }
+
+            activePresetLabels = AreCustomLabelsValid(presetLabels, activePresets.Length)
+                ? (string[])presetLabels.Clone()
+                : null;
+
+            ApplyPresetLabels();
+            Refresh();
+        }
+
+        public void ShowStressState(int level, int activeCount)
+        {
+            if (!EnsureInitialized())
+                return;
+
+            displayedStressLevel = level;
+            displayedActiveCount = activeCount;
+            Refresh();
+        }
+
+        public void ConfigureModule(ModuleDefinitionSO module)
+        {
+            if (!EnsureInitialized())
+                return;
+
+            activeItemLabel = ShowcaseLocalization.GetModuleActiveItemLabel(module);
+            contextNote = ShowcaseLocalization.GetModuleWebGlPresetNote(module);
+            Refresh();
+        }
+
+        private void Refresh()
+        {
+            if (!EnsureInitialized())
+                return;
+
+            int visiblePresetCount = Mathf.Min(activePresets.Length, presetButtons.Count);
+            for (int i = 0; i < presetButtons.Count; i++)
+            {
+                PresetButtonView view = presetButtons[i];
+                bool isVisible = i < visiblePresetCount;
+                view.Button.gameObject.SetActive(isVisible);
+
+                if (!isVisible)
+                    continue;
+
+                SetButtonState(view.Button, displayedStressLevel == activePresets[i], view.Label);
+            }
+
+            if (statusText == null)
+                return;
+
+            string prefix = feedbackTimer > 0f
+                ? ShowcaseLocalization.GetText("load_selected")
+                : ShowcaseLocalization.GetText("stress_load");
+            statusText.text = BuildStatusText(prefix, displayedStressLevel, displayedActiveCount);
+            statusText.color = Color.white;
+        }
+
+        private void SetButtonState(Button button, bool active, TextMeshProUGUI label)
+        {
+            ColorBlock colors = button.colors;
+            colors.normalColor = active ? activeBackgroundColor : inactiveColor;
+            colors.highlightedColor = hoverBackgroundColor;
+            colors.pressedColor = pressedBackgroundColor;
+            colors.selectedColor = active ? activeBackgroundColor : inactiveColor;
+            colors.disabledColor = new Color(inactiveColor.r, inactiveColor.g, inactiveColor.b, 0.42f);
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+            button.transform.localScale = Vector3.one * GetButtonScale(button, active);
+
+            if (label != null)
+                label.color = active ? activeColor : inactiveLabelColor;
+        }
+
+        private Button GetButtonForCount(int count)
+        {
+            int buttonCount = Mathf.Min(activePresets.Length, presetButtons.Count);
+            for (int i = 0; i < buttonCount; i++)
+            {
+                if (activePresets[i] == count)
+                    return presetButtons[i].Button;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(count), $"No stress button is configured for count {count}.");
+        }
+
+        private float GetButtonScale(Button button, bool active)
+        {
+            if (button != feedbackButton)
+                return active ? activeScale : 1f;
+
+            float pulse = feedbackTimer <= 0f ? 0f : Mathf.Clamp01(feedbackTimer / FeedbackDuration);
+            return Mathf.Lerp(active ? activeScale : 1f, clickScale, pulse);
+        }
+
+        private void TriggerPreset(int presetIndex)
+        {
+            if (!EnsureInitialized())
+                return;
+
+            if ((uint)presetIndex >= (uint)activePresets.Length)
+                return;
+
+            SetStressLevel(activePresets[presetIndex]);
+        }
+
+        private void ApplyPresetLabels()
+        {
+            for (int i = 0; i < presetButtons.Count; i++)
+            {
+                bool isVisible = i < activePresets.Length;
+                presetButtons[i].Button.gameObject.SetActive(isVisible);
+
+                if (!isVisible || presetButtons[i].Label == null)
+                    continue;
+
+                presetButtons[i].Label.text = GetPresetLabel(i);
+            }
+        }
+
+        private string GetPresetLabel(int index)
+        {
+            if (activePresetLabels != null)
+                return activePresetLabels[index];
+
+            return FormatCount(activePresets[index]);
+        }
+
+        private bool EnsureInitialized()
+        {
+            if (isInitialized)
+                return true;
+
+            ApplyPaletteDefaults();
+            if (!TryResolveUi())
+                return false;
+
+            if (statusText != null)
+            {
+                statusText.richText = true;
+                statusText.enableAutoSizing = false;
+            }
+
+            activePresets = (int[])DefaultStressPresets.Clone();
+            BindButtons();
+            isInitialized = true;
+            ApplyPresetLabels();
+            Refresh();
+            return true;
+        }
+
+        private void ApplyPaletteDefaults()
         {
             if (activeColor == default)
                 activeColor = ShowcasePalette.AccentMain;
@@ -44,108 +349,133 @@ namespace LearningArchitect.UI
                 textColor = ShowcasePalette.TextPrimary;
 
             if (inactiveLabelColor == default)
-                inactiveLabelColor = textColor;
+                inactiveLabelColor = ShowcasePalette.TextSecondary;
+
+            if (noteColor == default)
+                noteColor = ShowcasePalette.TextMuted;
 
             if (hoverBackgroundColor == default)
                 hoverBackgroundColor = ShowcasePalette.PanelHover;
 
             if (pressedBackgroundColor == default)
                 pressedBackgroundColor = ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.22f);
-
-            if (manager == null)
-                manager = GetComponent<ModuleManager>();
-
-            AddListener(oneKButton, 1000);
-            AddListener(fiveKButton, 5000);
-            AddListener(tenKButton, 10000);
-            Refresh();
         }
 
-        private void Update()
+        private bool TryResolveUi()
         {
-            if (WasPressed(KeyCode.Alpha1))
-                SetStressLevel(1000);
+            ClearResolvedButtons();
 
-            if (WasPressed(KeyCode.Alpha2))
-                SetStressLevel(5000);
+            if (TryResolveStructuredUi())
+                return true;
 
-            if (WasPressed(KeyCode.Alpha3))
-                SetStressLevel(10000);
-
-            if (feedbackTimer > 0f)
-                feedbackTimer -= Time.unscaledDeltaTime;
-            else
-                feedbackButton = null;
-
-            Refresh();
+            return TryResolveLegacyUi();
         }
 
-        private void OnDestroy()
+        private bool TryResolveStructuredUi()
         {
-            RemoveListener(oneKButton);
-            RemoveListener(fiveKButton);
-            RemoveListener(tenKButton);
+            Canvas canvas = FindCanvasByChild(transform, "StressControlsPanel");
+            if (canvas == null)
+                return false;
+
+            Transform panel = FindDeep(canvas.transform, "StressControlsPanel");
+            if (panel == null)
+                return false;
+
+            statusText = statusText != null
+                ? statusText
+                : FindDeep(panel, "Text - StressSummary")?.GetComponent<TextMeshProUGUI>()
+                  ?? FindDeep(panel, "StressStatusText")?.GetComponent<TextMeshProUGUI>()
+                  ?? FindDeep(panel, "Text - StressStatus")?.GetComponent<TextMeshProUGUI>();
+
+            Transform presetRoot = FindDeep(panel, "HorizontalLayout - StressPresets")
+                                   ?? FindDeep(panel, "HorizontalLayout - StressButtons")
+                                   ?? FindDeep(panel, "StressButtonsRow");
+            CollectButtons(presetRoot);
+
+            if (presetButtons.Count == 0)
+                CollectLegacyButtons();
+
+            return statusText != null && presetButtons.Count > 0;
         }
 
-        public void SetStressLevel(int count)
+        private bool TryResolveLegacyUi()
         {
-            if (manager != null)
-                manager.SetStressLevel(count);
+            if (statusText == null)
+                return false;
 
-            feedbackButton = GetButtonForCount(count);
-            feedbackTimer = 0.18f;
-            Refresh();
+            CollectLegacyButtons();
+            return presetButtons.Count > 0;
         }
 
-        private void Refresh()
+        private void CollectLegacyButtons()
         {
-            int level = manager == null ? 0 : manager.CurrentStressLevel;
+            AppendButton(oneKButton);
+            AppendButton(fiveKButton);
+            AppendButton(tenKButton);
+        }
 
-            SetButtonState(oneKButton, level == 1000);
-            SetButtonState(fiveKButton, level == 5000);
-            SetButtonState(tenKButton, level == 10000);
+        private void CollectButtons(Transform root)
+        {
+            if (root == null)
+                return;
 
-            if (statusText != null)
+            for (int i = 0; i < root.childCount; i++)
             {
-                int activeCount = manager == null ? 0 : manager.ActiveItemCount;
-                string prefix = feedbackTimer > 0f ? ShowcaseLocalization.GetText("load_selected") : ShowcaseLocalization.GetText("stress_load");
-                statusText.text = prefix + "  " + FormatCount(level) + "  \u2022  " + ShowcaseLocalization.GetText("active") + " " + FormatCount(activeCount);
-                statusText.color = feedbackTimer > 0f ? activeColor : textColor;
+                Button button = root.GetChild(i).GetComponent<Button>();
+                if (button == null)
+                    continue;
+
+                AppendButton(button);
             }
         }
 
-        private void AddListener(Button button, int count)
+        private void AppendButton(Button button)
         {
             if (button == null)
                 return;
 
-            button.onClick.AddListener(delegate { SetStressLevel(count); });
-        }
-
-        private static void RemoveListener(Button button)
-        {
-            if (button != null)
-                button.onClick.RemoveAllListeners();
-        }
-
-        private void SetButtonState(Button button, bool active)
-        {
-            if (button == null)
-                return;
-
-            ColorBlock colors = button.colors;
-            colors.normalColor = active ? activeBackgroundColor : inactiveColor;
-            colors.highlightedColor = hoverBackgroundColor;
-            colors.pressedColor = pressedBackgroundColor;
-            colors.selectedColor = active ? activeBackgroundColor : inactiveColor;
-            colors.disabledColor = new Color(inactiveColor.r, inactiveColor.g, inactiveColor.b, 0.42f);
-            colors.fadeDuration = 0.08f;
-            button.colors = colors;
-            button.transform.localScale = Vector3.one * GetButtonScale(button, active);
+            for (int i = 0; i < presetButtons.Count; i++)
+            {
+                if (presetButtons[i].Button == button)
+                    return;
+            }
 
             TextMeshProUGUI label = FindButtonLabel(button.transform);
             if (label != null)
-                label.color = active ? activeColor : inactiveLabelColor;
+                label.richText = true;
+
+            presetButtons.Add(new PresetButtonView(button, label));
+        }
+
+        private void BindButtons()
+        {
+            UnbindButtons();
+
+            for (int i = 0; i < presetButtons.Count; i++)
+            {
+                int presetIndex = i;
+                UnityAction listener = delegate { TriggerPreset(presetIndex); };
+                presetButtons[i].Button.onClick.AddListener(listener);
+                buttonListeners.Add(listener);
+            }
+        }
+
+        private void UnbindButtons()
+        {
+            int count = Mathf.Min(presetButtons.Count, buttonListeners.Count);
+            for (int i = 0; i < count; i++)
+            {
+                if (presetButtons[i].Button != null)
+                    presetButtons[i].Button.onClick.RemoveListener(buttonListeners[i]);
+            }
+
+            buttonListeners.Clear();
+        }
+
+        private void ClearResolvedButtons()
+        {
+            UnbindButtons();
+            presetButtons.Clear();
         }
 
         private static TextMeshProUGUI FindButtonLabel(Transform buttonTransform)
@@ -153,42 +483,77 @@ namespace LearningArchitect.UI
             if (buttonTransform == null)
                 return null;
 
-            Transform labelTransform = buttonTransform.Find("Label");
-            if (labelTransform == null)
-                labelTransform = buttonTransform.Find("Text");
+            string[] names = { "Text - PresetValue", "Text - Label", "Label", "Text", "Text - Value" };
+            for (int i = 0; i < names.Length; i++)
+            {
+                Transform labelTransform = FindDeep(buttonTransform, names[i]);
+                if (labelTransform == null)
+                    continue;
 
-            return labelTransform == null ? null : labelTransform.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI label = labelTransform.GetComponent<TextMeshProUGUI>();
+                if (label != null)
+                    return label;
+            }
+
+            return buttonTransform.GetComponentInChildren<TextMeshProUGUI>(true);
         }
 
-        private Button GetButtonForCount(int count)
+        private int[] NormalizePresets(int[] presets)
         {
-            if (count == 1000)
-                return oneKButton;
+            if (presets == null || presets.Length == 0)
+                return (int[])DefaultStressPresets.Clone();
 
-            if (count == 5000)
-                return fiveKButton;
+            int[] normalized = new int[presets.Length];
+            for (int i = 0; i < presets.Length; i++)
+            {
+                if (presets[i] < 1)
+                    throw new ArgumentOutOfRangeException(nameof(presets), "Stress presets must be positive.");
 
-            if (count == 10000)
-                return tenKButton;
+                normalized[i] = presets[i];
+            }
 
-            return null;
+            return normalized;
         }
 
-        private float GetButtonScale(Button button, bool active)
+        private string BuildStatusText(string prefix, int level, int activeCount)
         {
-            if (button != feedbackButton)
-                return active ? activeScale : 1f;
+            string countLabel = string.IsNullOrWhiteSpace(activeItemLabel)
+                ? ShowcaseLocalization.GetText("active_items")
+                : activeItemLabel;
 
-            float pulse = feedbackTimer <= 0f ? 0f : Mathf.Clamp01(feedbackTimer / 0.18f);
-            return Mathf.Lerp(active ? activeScale : 1f, clickScale, pulse);
+            string titleHex = ToHex(feedbackTimer > 0f ? activeColor : inactiveLabelColor);
+            string valueHex = ToHex(activeColor);
+            string bodyHex = ToHex(textColor);
+            string noteHex = ToHex(noteColor);
+
+            string text =
+                "<size=72%><color=" + titleHex + ">" + prefix + "</color></size>\n" +
+                "<color=" + valueHex + "><size=118%><b>" + FormatCount(level) + "</b></size></color>" +
+                "  <size=84%><color=" + bodyHex + ">" + countLabel + " " + FormatCount(activeCount) + "</color></size>";
+
+            if (string.IsNullOrWhiteSpace(contextNote))
+                return text;
+
+            return text + "\n<size=74%><color=" + noteHex + ">" + contextNote + "</color></size>";
+        }
+
+        private static bool AreCustomLabelsValid(string[] presetLabels, int expectedLength)
+        {
+            if (presetLabels == null || presetLabels.Length == 0 || presetLabels.Length != expectedLength)
+                return false;
+
+            for (int i = 0; i < presetLabels.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(presetLabels[i]))
+                    return false;
+            }
+
+            return true;
         }
 
         private static string FormatCount(int value)
         {
-            if (value >= 1000)
-                return (value / 1000).ToString() + "K";
-
-            return value.ToString();
+            return value.ToString("N0", CultureInfo.InvariantCulture).Replace(",", " ");
         }
 
         private static bool WasPressed(KeyCode key)
@@ -214,6 +579,41 @@ namespace LearningArchitect.UI
 #else
             return false;
 #endif
+        }
+
+        private static Canvas FindCanvasByChild(Transform root, string childName)
+        {
+            Canvas[] canvases = root.GetComponentsInChildren<Canvas>(true);
+            for (int i = 0; i < canvases.Length; i++)
+            {
+                if (FindDeep(canvases[i].transform, childName) != null)
+                    return canvases[i];
+            }
+
+            return null;
+        }
+
+        private static Transform FindDeep(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+
+            if (root.name == name)
+                return root;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform match = FindDeep(root.GetChild(i), name);
+                if (match != null)
+                    return match;
+            }
+
+            return null;
+        }
+
+        private static string ToHex(Color color)
+        {
+            return "#" + ColorUtility.ToHtmlStringRGB(color);
         }
     }
 }

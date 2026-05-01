@@ -58,6 +58,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Effects.IndieEffectsVariant
   effectPrefab: {fileID: 0}
-  count: 500
-  radius: 5.5
+  count: 25
+  radius: 4.25
   rotateSpeed: 45

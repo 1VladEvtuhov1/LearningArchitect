@@ -38,7 +38,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 523051010
     m_Localized: Much better scaling than per-object behaviour, but less direct to
-      inspect in the hierarchy. Visual markers show only a subset of simulated effects.
+      inspect in the hierarchy. Visual markers show only a subset of simulated effects,
+      so the on-scene count stays lower than the simulated load.
     m_Metadata:
       m_Items: []
   - m_Id: 523051011
@@ -89,6 +90,780 @@ MonoBehaviour:
       visible at 5K/10K
 
       Less suitable for large simulations'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689685626880
+    m_Localized: AI System
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689790484480
+    m_Localized: 'Interactive comparison of decision-making approaches for crowds
+      of simple agents: FSM, Utility AI and Behavior Tree.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689790484481
+    m_Localized: Object Pooling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689790484482
+    m_Localized: Comparison between naive instantiation churn and explicit pooled
+      reuse for repeated visual emissions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689790484483
+    m_Localized: Update Loop Strategies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689790484484
+    m_Localized: Shows the runtime difference between per-object MonoBehaviour updates
+      and a centralized owner loop.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873088
+    m_Localized: Behavior Tree Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873089
+    m_Localized: Selector-driven variant. Agents evaluate ordered branches such as
+      recover, inspect and patrol, then execute the first valid branch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873090
+    m_Localized: Keeps decision rules modular and readable in branch form, but evaluation
+      order becomes important and tree authoring needs discipline.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873091
+    m_Localized: 'Ordered branch logic
+
+      Readable selector / leaf structure
+
+      Easy
+      to grow from simple to richer behavior'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873092
+    m_Localized: 'Branch order matters
+
+      More authoring discipline than FSM
+
+      Can
+      grow noisy without shared nodes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873093
+    m_Localized: FSM Decision Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873094
+    m_Localized: Finite-state variant. Every agent tracks a tiny explicit state and
+      transitions between idle and move phases.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873095
+    m_Localized: Very easy to debug and reason about, but branch-heavy and harder
+      to extend when the number of states grows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873096
+    m_Localized: 'Explicit states
+
+      Simple transition graph
+
+      Predictable
+      debugging flow'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873097
+    m_Localized: 'More branching per agent
+
+      State explosion risk
+
+      Less
+      flexible prioritization'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873098
+    m_Localized: Utility Scoring Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873099
+    m_Localized: Utility-driven variant. Agents periodically score candidate goals
+      and bias movement toward the best option.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873100
+    m_Localized: More adaptive than a tiny FSM, but behaviour is less obvious from
+      a single agent snapshot and tuning scores matters.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873101
+    m_Localized: 'Adaptive prioritization
+
+      Smoother behavior blending
+
+      Good
+      base for richer heuristics'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689798873102
+    m_Localized: 'Harder to inspect at a glance
+
+      Needs score tuning
+
+      Less
+      explicit than FSM'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067392
+    m_Localized: Instantiation / Destroy Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067393
+    m_Localized: Naive lifecycle variant. Visual markers are created and destroyed
+      continuously as the simulation churns.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067394
+    m_Localized: Simple to author, but creates allocation churn, transform churn
+      and more work for the engine as load rises.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067395
+    m_Localized: 'Minimal authoring complexity
+
+      Easy to understand lifecycle
+
+      Shows
+      raw engine cost clearly'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067396
+    m_Localized: 'Continuous allocations
+
+      Destroy/instantiate overhead
+
+      Poor
+      stress scaling'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067397
+    m_Localized: Reusable Pool Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067398
+    m_Localized: Pool-backed variant. A fixed set of markers is created once and
+      then recycled for subsequent emissions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067399
+    m_Localized: Better runtime stability and much less churn, but it needs pool
+      warmup and stricter bookkeeping of active slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067400
+    m_Localized: 'Stable allocations
+
+      Cheaper reuse path
+
+      Better sustained
+      load behavior'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067401
+    m_Localized: 'Needs prewarm capacity
+
+      More bookkeeping
+
+      Idle memory
+      footprint'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067402
+    m_Localized: Centralized Update Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067403
+    m_Localized: Central loop variant. Positions and velocities are updated in one
+      owner loop while only a subset is rendered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067404
+    m_Localized: Scales better and keeps orchestration in one place, but loses the
+      object-local mental model and needs custom data handling.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067405
+    m_Localized: 'One update owner
+
+      Cleaner scaling path
+
+      Lower callback
+      overhead'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067406
+    m_Localized: 'Less object-local logic
+
+      Needs custom data layout
+
+      Harder
+      to inspect per item'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067407
+    m_Localized: Per-Object Update Variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067408
+    m_Localized: Object-centric variant. Every visible mover owns its own MonoBehaviour
+      Update loop and local motion state.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067409
+    m_Localized: Very approachable for small counts, but callback overhead and hierarchy
+      noise grow quickly with the number of objects.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067410
+    m_Localized: 'Straightforward authoring
+
+      Local behavior per object
+
+      Great
+      for tiny scenes'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 314689803067411
+    m_Localized: 'Many Update callbacks
+
+      Hierarchy noise
+
+      Weak scaling
+      for large swarms'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819196596224
+    m_Localized: 3D Animation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819288870912
+    m_Localized: Interactive 3D animation module demonstrating how rig topology changes
+      the runtime animation problem even before authored clips enter the picture.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819288870913
+    m_Localized: Inventory Systems
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819288870914
+    m_Localized: Interactive inventory module focused on state mutation patterns,
+      stack movement and the cost of per-slot ownership.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819288870915
+    m_Localized: VFX Delivery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819288870916
+    m_Localized: 'Interactive VFX module about presentation architecture: how visible
+      feedback is delivered, pooled and bounded when effect density rises.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842432
+    m_Localized: Creature Crowd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842433
+    m_Localized: The creature rig is non-humanoid and topology-specific. Motion is
+      driven by body sway, tail follow-through and quadruped gait timing instead
+      of biped assumptions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842434
+    m_Localized: Shared animation tooling becomes less universal because each creature
+      family pushes different rig rules.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842435
+    m_Localized: 'Flexible topology-specific motion
+
+      Good fit for procedural
+      creatures
+
+      Distinct visual identity'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842436
+    m_Localized: 'Lower rig reuse across creature families
+
+      More bespoke motion
+      rules
+
+      Comparisons against humanoid intuition are weaker'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842437
+    m_Localized: Humanoid Crowd
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842438
+    m_Localized: 'A small humanoid rig is sampled procedurally from shared motion
+      data. The emphasis is on a recognizable biped pose stack: torso, head, arms
+      and legs.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842439
+    m_Localized: Humanoid rigs ask for clearer joint intent and usually more authored
+      pose discipline.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842440
+    m_Localized: 'Readable motion language
+
+      Clear silhouette changes
+
+      Good
+      baseline for character-facing features'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842441
+    m_Localized: 'More semantic joints to maintain
+
+      Higher expectation of believable
+      posing
+
+      Scales visible rig complexity faster'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842442
+    m_Localized: Object Slots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842443
+    m_Localized: Each slot is represented as a dedicated object state. Transfers
+      are easy to reason about because ownership, type and stack size stay attached
+      to the slot instance.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842444
+    m_Localized: Mutation walks object references and each slot carries its own lifecycle
+      state.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842445
+    m_Localized: 'Readable ownership model
+
+      Easy to extend with slot-specific
+      rules
+
+      Direct debugging at the slot level'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842446
+    m_Localized: 'Higher per-slot overhead
+
+      More object state to traverse
+
+      Harder
+      to batch under heavier counts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842447
+    m_Localized: Packed Slots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842448
+    m_Localized: Slot data is stored in tightly packed arrays. Transfer rules are
+      applied by index so the hot loop stays centralized and cache-friendly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842449
+    m_Localized: Rules must be expressed through indices and explicit arrays instead
+      of rich per-slot objects.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842450
+    m_Localized: 'Stable centralized update path
+
+      Better scaling headroom
+
+      Cheaper
+      iteration over large slot sets'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819309842451
+    m_Localized: 'Less expressive per-slot modeling
+
+      More bookkeeping around
+      indices
+
+      Feature work needs stronger discipline'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036736
+    m_Localized: Batched Pulses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036737
+    m_Localized: Logical pulses are updated in arrays and only a bounded visible
+      subset is rendered. The visual layer stays pooled even when the logical effect
+      stream becomes large.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036738
+    m_Localized: The link between logical events and visible markers is less literal,
+      so content tuning becomes more systems-oriented.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036739
+    m_Localized: 'Cheap visible layer under heavy logical load
+
+      Clear separation
+      between simulation and presentation
+
+      Predictable pooling behavior'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036740
+    m_Localized: 'Less one-to-one authoring feel
+
+      Needs deliberate mapping
+      from events to visuals
+
+      Debugging is more systems-focused than scene-focused'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036741
+    m_Localized: Emitter Bursts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036742
+    m_Localized: Each visible node owns its own particle emitter. Authoring is straightforward
+      because the visual behavior lives next to the emitter transform.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036743
+    m_Localized: Per-node ownership increases scene-side component count and makes
+      high emitter density more expensive.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036744
+    m_Localized: 'Local authoring is intuitive
+
+      Emitter state stays easy to
+      inspect
+
+      Strong fit for sparse hero moments'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1473819314036745
+    m_Localized: 'Scene component count rises quickly
+
+      Dense emitter fields
+      get expensive
+
+      Harder to compress into a shared render path'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110327431168
+    m_Localized: Compare decision models over the same shared world state.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208384
+    m_Localized: AI crowds need more than believable behavior. The decision model
+      also has to stay inspectable, predictable, and maintainable as agent count
+      grows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208385
+    m_Localized: Use 500-2000 agents in browser and 5K on desktop. Presets scale
+      full decision simulation while visible agents stay curated for readability.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208386
+    m_Localized: visible agents
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208387
+    m_Localized: Compare procedural crowd animation for humanoid and non-humanoid
+      rigs inside the same showcase shell.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208388
+    m_Localized: Animation architecture is not only about clips or controllers. Rig
+      shape, visible count and pose evaluation strategy all change what scales cleanly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208389
+    m_Localized: Use 24-72 for humanoids and 16-64 for creatures in browser-like
+      environments. These variants emphasize visible rig complexity over hidden logical
+      count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208390
+    m_Localized: animated rigs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208391
+    m_Localized: Compare a readable object-centric effect loop with a batched data-oriented
+      simulation path.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208392
+    m_Localized: Effect-heavy scenes often start with direct GameObject logic and
+      then hit hierarchy, update, and visualization cost. This module shows when
+      simulation state should be separated from the rendered subset.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208393
+    m_Localized: Use 25 to 2500 in browser for stable viewing. 10000 is a stress
+      demonstration and depends heavily on browser and machine. In the chunked variant,
+      stress load shows simulated effects while visible effects shows the marker
+      subset on scene.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110344208394
+    m_Localized: visible effects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402688
+    m_Localized: Compare object-rich slot ownership with packed slot processing under
+      sustained transfer load.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402689
+    m_Localized: Inventory features often start as convenient object graphs and later
+      become a hot data path once stacking, transfer rules and bulk operations grow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402690
+    m_Localized: Use 256-2048 for object slots and 1024-8192 for packed slots. The
+      packed path is intentionally tuned for heavier stress presets.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402691
+    m_Localized: visible slots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402692
+    m_Localized: Show how the same visual outcome changes when object lifetime is
+      reused instead of churned.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402693
+    m_Localized: Repeated spawn and despawn loops create allocation and lifecycle
+      cost that often stays hidden until load spikes. This module isolates object
+      reuse as a first-class production pattern.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402694
+    m_Localized: Use 500 or 2000 in browser. Higher presets are meant to expose churn
+      differences and may not stay smooth on every machine.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402695
+    m_Localized: visible projectiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402696
+    m_Localized: Show why ownership of update work matters before reaching ECS-level
+      complexity.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402697
+    m_Localized: Many Unity systems begin with one MonoBehaviour per object because
+      it is easy to read. This module shows when callback count and hierarchy noise
+      make a centralized owner loop the better baseline.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402698
+    m_Localized: Use lower presets for the per-object variant in browser. The centralized
+      variant is the more browser-safe comparison path.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402699
+    m_Localized: visible movers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402700
+    m_Localized: Compare emitter-per-node presentation with a batched pulse layer
+      for dense visual feedback.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402701
+    m_Localized: VFX systems often fail not because the feedback is conceptually
+      wrong, but because ownership and rendering strategy do not match the expected
+      density.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402702
+    m_Localized: Use 24-120 for emitter bursts and 800-4800 for batched pulses. The
+      two variants intentionally represent different ownership models.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110348402703
+    m_Localized: visible emitters
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110360985600
+    m_Localized: Evaluates ordered branches such as recover, inspect, and patrol.
+      Compared with FSM, behavior composition is more modular; compared with Utility
+      AI, priority is explicit rather than score-driven.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179904
+    m_Localized: Behavior Trees scale well in authoring clarity when branch discipline
+      is strong.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179905
+    m_Localized: Uses explicit per-agent states and direct transitions. Relative
+      to Utility AI and Behavior Trees, this is the easiest variant to trace step
+      by step.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179906
+    m_Localized: FSM is the clearest baseline when state space is small and predictable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179907
+    m_Localized: Scores candidate actions and moves toward the best option. Compared
+      with FSM, behavior is more adaptive; compared with Behavior Trees, tuning shifts
+      from branch order to score design.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179908
+    m_Localized: Utility AI is strong when adaptation matters more than explicit
+      step-by-step readability.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179909
+    m_Localized: Non-humanoid animation shifts the problem from human readability
+      to topology control, where every rig family wants its own locomotion rules.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179910
+    m_Localized: Strong option when the project benefits from bespoke silhouettes
+      and procedural motion can stay aligned with a specific body plan.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179911
+    m_Localized: Humanoid motion is easier to read because viewers immediately understand
+      the pose, but the rig carries more semantic joints and balancing expectations.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179912
+    m_Localized: Best fit when readability, body language and familiar silhouettes
+      are part of the feature value.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110365179913
+    m_Localized: Stores simulation state in arrays and renders only a representative
+      subset. Compared with the indie variant, it favors scalable simulation over
+      object-level visibility. The selected stress load can be much higher than the
+      number of cubes shown on scene.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374208
+    m_Localized: In this variant, stress load and visible scene count are intentionally
+      different. Simulation scales independently from presentation.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374209
+    m_Localized: Creates a readable set of effect GameObjects and updates them directly.
+      Compared with the chunked variant, simulation and presentation stay tightly
+      coupled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374210
+    m_Localized: Best for small, legible showcases; weak as a path to large-scale
+      effect simulation.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374211
+    m_Localized: The object-centric version favors readability and direct mutation,
+      but pays more per-slot overhead when the inventory graph gets larger.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374212
+    m_Localized: Good baseline when rules change often and debugging individual slot
+      behavior matters more than raw throughput.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374213
+    m_Localized: The packed version trades some ergonomics for a much more predictable
+      mutation path when many slots update every frame.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374214
+    m_Localized: Useful once inventory traffic becomes systemic and the project needs
+      deterministic high-volume processing more than per-slot convenience.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374215
+    m_Localized: Continuously creates and destroys visual markers. Compared with
+      the pooled variant, the visible result is similar, but lifecycle cost is much
+      higher.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374216
+    m_Localized: Instantiate/Destroy is acceptable for low churn, but it becomes
+      the bottleneck once repetition is part of the feature.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374217
+    m_Localized: Warms a reusable set of markers and recycles slots on demand. Compared
+      with instantiation churn, it shifts cost upfront and stabilizes the steady-state
+      loop.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374218
+    m_Localized: Pooling is a production pattern for repeatable emissions, not just
+      a micro-optimization.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374219
+    m_Localized: One owner updates shared arrays of positions and velocities. Compared
+      with per-object Update, it reduces callback overhead and makes future data-oriented
+      refactors easier.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374220
+    m_Localized: Centralizing update ownership is often the first meaningful step
+      toward scalable Unity runtime code.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374221
+    m_Localized: Each mover owns its own MonoBehaviour Update and local state. Compared
+      with centralized update, the mental model is friendlier but scales poorly in
+      callback count.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374222
+    m_Localized: Per-object Update is a good teaching baseline and a weak long-term
+      scaling path.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374223
+    m_Localized: The batched path favors scale by separating logical pulses from
+      the rendered subset instead of letting every effect source own a full emitter
+      stack.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374224
+    m_Localized: Appropriate for dense feedback fields where the project needs visual
+      rhythm without one renderer or emitter per event.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374225
+    m_Localized: Emitter-per-node VFX is easy to author and inspect, but the visible
+      graph grows quickly as more burst sources are added.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1474110369374226
+    m_Localized: Useful for hero interactions, sparse emitters and content that benefits
+      from local ownership of its visual feedback.
     m_Metadata:
       m_Items: []
   references:

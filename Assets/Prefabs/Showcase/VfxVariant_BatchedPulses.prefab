@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3416184046040021404
+--- !u!1 &5216840241422276828
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 12186102995027759}
-  - component: {fileID: 6809242568601474752}
-  - component: {fileID: 5826882177406551356}
+  - component: {fileID: 4458057141168068308}
+  - component: {fileID: 8660752097038892295}
+  - component: {fileID: 806226052267682838}
   m_Layer: 0
-  m_Name: EffectsVariant_Chunk
+  m_Name: VfxVariant_BatchedPulses
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &12186102995027759
+--- !u!4 &4458057141168068308
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3416184046040021404}
+  m_GameObject: {fileID: 5216840241422276828}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -33,31 +33,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6809242568601474752
+--- !u!114 &8660752097038892295
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3416184046040021404}
+  m_GameObject: {fileID: 5216840241422276828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cbfc84e02f2f0448929288851226c7f, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c233bd63fa8b4a4ebd7e1ff29309a69, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Effects.EffectsModule
---- !u!114 &5826882177406551356
+  m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.VFX.VfxModule
+--- !u!114 &806226052267682838
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3416184046040021404}
+  m_GameObject: {fileID: 5216840241422276828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84dd54721dd195947967b4cec8835be7, type: 3}
+  m_Script: {fileID: 11500000, guid: af4999e27d9fe4646bc0ed84d866c1fa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Effects.ChunkEffectsVariant
-  count: 250
-  visualCount: 240
-  radius: 4.75
-  speed: 0.8
+  m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.VFX.BatchedPulseVfxVariant
+  count: 3200
+  visibleCount: 180
+  visibleCountStressPresets: 2003000060090000c0120000
+  visibleCountPresets: 78000000b4000000f0000000
+  visualLimit: 260
+  radius: 6.8
+  pulseLifetime: 1.05
+  driftSpeed: 0.42
