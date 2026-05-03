@@ -1,0 +1,18 @@
+{
+  "name": "LearningArchitect.Modules.Tests.Editor",
+  "references": [
+    "LearningArchitect.Showcase",
+    "LearningArchitect.Modules.Performance",
+    "LearningArchitect.Modules.Pooling",
+    "LearningArchitect.Modules.Inventory",
+    "LearningArchitect.Modules.Effects",
+    "LearningArchitect.Modules.VFX",
+    "LearningArchitect.Modules.Animation3D"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
