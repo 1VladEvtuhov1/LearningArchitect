@@ -16,12 +16,12 @@ MonoBehaviour:
   m_GUID: eda5a44e70fe5574885dddd98a03a5d3
   m_SerializeEntries:
   - m_GUID: 64a7ca1e30d66dc4388fde2ccddb524e
-    m_Address: Assets/Localization/Tables/ShowcaseContent Shared Data.asset
+    m_Address: Assets/Showcase/Localization/Tables/ShowcaseContent Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c4cbe9c1fe0566f4496f59ed9032b3e4
-    m_Address: Assets/Localization/Tables/ShowcaseUI Shared Data.asset
+    m_Address: Assets/Showcase/Localization/Tables/ShowcaseUI Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

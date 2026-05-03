@@ -9,10 +9,18 @@ namespace LearningArchitect.EditorTools
 {
     public static class PaladinCombatAnimationSetup
     {
-        private const string ShowcaseFolder = "Assets/Prefabs/Showcase";
-        private const string ShootingPath = "Assets/Content/Models/Paladin J Nordstrom@Shooting.fbx";
+        private const string ModuleRootFolder = "Assets/Modules/LayeredCharacterAnimation";
+        private const string DataFolder = ModuleRootFolder + "/Data";
+        private const string PrefabsFolder = ModuleRootFolder + "/Prefabs";
+        private const string MaterialsFolder = ModuleRootFolder + "/Materials";
+        private const string AnimationsFolder = ModuleRootFolder + "/Animations";
+        private const string AvatarMasksFolder = ModuleRootFolder + "/AvatarMasks";
+        private const string ModelsFolder = ModuleRootFolder + "/Models";
+        private const string ShootingPath = ModelsFolder + "/ShootingAndModel.fbx";
         private static readonly string[] RunningClipCandidates =
         {
+            ModelsFolder + "/Running.fbx",
+            ModelsFolder + "/Paladin J Nordstrom@Running.fbx",
             "Assets/Content/Models/Running.fbx",
             "Assets/Content/Models/Paladin J Nordstrom@Running.fbx"
         };
@@ -38,31 +46,31 @@ namespace LearningArchitect.EditorTools
                 throw new System.InvalidOperationException("Valid humanoid avatar was not found on shooting model.");
 
             Material bodyMaterial = CreateMaterial(
-                $"{ShowcaseFolder}/Animation_PaladinBody.mat",
+                $"{MaterialsFolder}/Animation_PaladinBody.mat",
                 "Animation_PaladinBody",
                 new Color(0.24f, 0.42f, 0.56f, 1f));
 
             Material helmetMaterial = CreateMaterial(
-                $"{ShowcaseFolder}/Animation_PaladinHelmet.mat",
+                $"{MaterialsFolder}/Animation_PaladinHelmet.mat",
                 "Animation_PaladinHelmet",
                 new Color(1f, 0.56f, 0.24f, 1f));
 
-            AvatarMask upperBodyMask = CreateUpperBodyMask($"{ShowcaseFolder}/Animation_PaladinUpperBody.mask");
+            AvatarMask upperBodyMask = CreateUpperBodyMask($"{AvatarMasksFolder}/Animation_PaladinUpperBody.mask");
             AnimatorController controller = CreateCombatController(
-                $"{ShowcaseFolder}/Animation_PaladinCombat.controller",
+                $"{AnimationsFolder}/Animation_PaladinCombat.controller",
                 runningClip,
                 shootingClip,
                 upperBodyMask);
 
             GameObject actorPrefab = CreateActorPrefab(
-                $"{ShowcaseFolder}/AnimationActor_PaladinCombat.prefab",
+                $"{PrefabsFolder}/AnimationActor_PaladinCombat.prefab",
                 avatar,
                 controller,
                 bodyMaterial,
                 helmetMaterial);
 
             HumanoidAnimationProfileSO profile = CreateProfile(
-                $"{ShowcaseFolder}/Animation_PaladinCombatProfile.asset",
+                $"{DataFolder}/Animation_PaladinCombatProfile.asset",
                 actorPrefab,
                 avatar,
                 controller,
@@ -70,8 +78,8 @@ namespace LearningArchitect.EditorTools
                 shootingClip);
 
             VariantDefinitionSO runVariant = CreateVariant(
-                $"{ShowcaseFolder}/Animation_RunVariant.asset",
-                $"{ShowcaseFolder}/AnimationVariant_Run.prefab",
+                $"{DataFolder}/Animation_RunVariant.asset",
+                $"{PrefabsFolder}/AnimationVariant_Run.prefab",
                 "AnimationVariant_Run",
                 "Run",
                 "Бег",
@@ -94,8 +102,8 @@ namespace LearningArchitect.EditorTools
                 });
 
             VariantDefinitionSO shootVariant = CreateVariant(
-                $"{ShowcaseFolder}/Animation_ShootVariant.asset",
-                $"{ShowcaseFolder}/AnimationVariant_Shoot.prefab",
+                $"{DataFolder}/Animation_ShootVariant.asset",
+                $"{PrefabsFolder}/AnimationVariant_Shoot.prefab",
                 "AnimationVariant_Shoot",
                 "Shoot",
                 "Стрельба",
@@ -118,8 +126,8 @@ namespace LearningArchitect.EditorTools
                 });
 
             VariantDefinitionSO runShootVariant = CreateVariant(
-                $"{ShowcaseFolder}/Animation_RunShootVariant.asset",
-                $"{ShowcaseFolder}/AnimationVariant_RunShoot.prefab",
+                $"{DataFolder}/Animation_RunShootVariant.asset",
+                $"{PrefabsFolder}/AnimationVariant_RunShoot.prefab",
                 "AnimationVariant_RunShoot",
                 "Run + Shoot",
                 "Бег + стрельба",
@@ -539,7 +547,7 @@ namespace LearningArchitect.EditorTools
 
         private static void UpdateModule(params VariantDefinitionSO[] variants)
         {
-            ModuleDefinitionSO module = AssetDatabase.LoadAssetAtPath<ModuleDefinitionSO>($"{ShowcaseFolder}/Animation3DModule.asset");
+            ModuleDefinitionSO module = AssetDatabase.LoadAssetAtPath<ModuleDefinitionSO>($"{DataFolder}/Animation3DModule.asset");
             if (module == null)
                 throw new System.InvalidOperationException("Animation3DModule asset was not found.");
 

@@ -13,10 +13,15 @@ namespace LearningArchitect.EditorTools
 {
     public static class ShowcaseLocalizationSetupTool
     {
-        private const string RootFolder = "Assets/Localization";
-        private const string LocalesFolder = "Assets/Localization/Locales";
-        private const string TablesFolder = "Assets/Localization/Tables";
-        private const string SettingsPath = "Assets/Localization/ShowcaseLocalizationSettings.asset";
+        private const string RootFolder = "Assets/Showcase/Localization";
+        private const string LocalesFolder = "Assets/Showcase/Localization/Locales";
+        private const string TablesFolder = "Assets/Showcase/Localization/Tables";
+        private const string SettingsPath = "Assets/Showcase/Localization/ShowcaseLocalizationSettings.asset";
+        private static readonly string[] DefinitionSearchFolders =
+        {
+            "Assets/Showcase/Data",
+            "Assets/Modules"
+        };
 
         [MenuItem("Learning Architect/Localization/Setup Showcase Localization")]
         public static void Setup()
@@ -204,7 +209,7 @@ namespace LearningArchitect.EditorTools
             StringTable englishTable = GetStringTableOrThrow(collection, english);
             StringTable russianTable = GetStringTableOrThrow(collection, russian);
 
-            string[] moduleGuids = AssetDatabase.FindAssets("t:ModuleDefinitionSO", new[] { "Assets/Prefabs/Showcase" });
+            string[] moduleGuids = AssetDatabase.FindAssets("t:ModuleDefinitionSO", DefinitionSearchFolders);
             for (int i = 0; i < moduleGuids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(moduleGuids[i]);
@@ -224,7 +229,7 @@ namespace LearningArchitect.EditorTools
                 SetEntry(russianTable, ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabelRu);
             }
 
-            string[] variantGuids = AssetDatabase.FindAssets("t:VariantDefinitionSO", new[] { "Assets/Prefabs/Showcase" });
+            string[] variantGuids = AssetDatabase.FindAssets("t:VariantDefinitionSO", DefinitionSearchFolders);
             for (int i = 0; i < variantGuids.Length; i++)
             {
                 string path = AssetDatabase.GUIDToAssetPath(variantGuids[i]);

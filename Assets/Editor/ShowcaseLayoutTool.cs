@@ -9,7 +9,7 @@ namespace LearningArchitect.Editor
 {
     public static class ShowcaseLayoutTool
     {
-        private const string PrefabPath = "Assets/Prefabs/Showcase/ArchitectureShowcaseHub.prefab";
+        private const string PrefabPath = "Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab";
 
         [MenuItem("Tools/LearningArchitect/Rebuild Showcase Layout")]
         public static void RebuildMenu()
@@ -66,20 +66,20 @@ namespace LearningArchitect.Editor
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
 
-            Sprite borderSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Frames/Border_r16.png");
-            Sprite frame16Sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Frames/Frame_r16.png");
-            Sprite frame8WhiteSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Frames/Frame_r8_white.png");
-            Sprite frame8YellowSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Frames/Frame_r8_yellow.png");
-            Sprite effectIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/EffectSystem_icon.png");
-            Sprite moduleIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Module_icon.png");
-            Sprite variantIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Variant_icon.png");
-            Sprite loadedIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Loaded_icon.png");
-            Sprite orbitIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Orbit_icon.png");
-            Sprite zoomIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Zoom_icon.png");
-            Sprite perfIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Performance_icon.png");
-            Sprite stressIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Icons/Stress_icon.png");
-            Sprite lineSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Lines/Line.png");
-            Sprite lineGreenSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Content/UI/Lines/LineGreen.png");
+            Sprite borderSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Frames/Border_r16.png");
+            Sprite frame16Sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Frames/Frame_r16.png");
+            Sprite frame8WhiteSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Frames/Frame_r8_white.png");
+            Sprite frame8YellowSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Frames/Frame_r8_yellow.png");
+            Sprite effectIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/EffectSystem_icon.png");
+            Sprite moduleIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Module_icon.png");
+            Sprite variantIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Variant_icon.png");
+            Sprite loadedIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Loaded_icon.png");
+            Sprite orbitIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Orbit_icon.png");
+            Sprite zoomIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Zoom_icon.png");
+            Sprite perfIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Performance_icon.png");
+            Sprite stressIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Icons/Stress_icon.png");
+            Sprite lineSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Lines/Line.png");
+            Sprite lineGreenSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Lines/LineGreen.png");
 
             RectTransform tint = Rect(canvas.transform, "ShowcaseBackgroundTint");
             RectTransform rootFrame = Rect(canvas.transform, "RootFrame");

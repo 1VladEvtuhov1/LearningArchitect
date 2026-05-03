@@ -12,8 +12,8 @@ The module demonstrates one common game-dev mechanic:
 
 Current source FBX files:
 
-- `Assets/Content/Models/Running.fbx`
-- `Assets/Content/Models/Paladin J Nordstrom@Shooting.fbx`
+- `Assets/Modules/LayeredCharacterAnimation/Models/Running.fbx`
+- `Assets/Modules/LayeredCharacterAnimation/Models/ShootingAndModel.fbx`
 
 Both are imported as Humanoid rigs. The shooting FBX is used as the visible model because it contains the Paladin mesh. The running FBX provides the locomotion clip and is imported against the shooting avatar so the locomotion retarget stays aligned with the visible rig.
 
@@ -21,18 +21,18 @@ Both are imported as Humanoid rigs. The shooting FBX is used as the visible mode
 
 The setup utility creates and updates:
 
-- `Assets/Prefabs/Showcase/Animation_PaladinCombat.controller`
-- `Assets/Prefabs/Showcase/Animation_PaladinUpperBody.mask`
-- `Assets/Prefabs/Showcase/AnimationActor_PaladinCombat.prefab`
-- `Assets/Prefabs/Showcase/Animation_PaladinCombatProfile.asset`
-- `Assets/Prefabs/Showcase/AnimationVariant_Run.prefab`
-- `Assets/Prefabs/Showcase/AnimationVariant_Shoot.prefab`
-- `Assets/Prefabs/Showcase/AnimationVariant_RunShoot.prefab`
-- `Assets/Prefabs/Showcase/Animation_RunVariant.asset`
-- `Assets/Prefabs/Showcase/Animation_ShootVariant.asset`
-- `Assets/Prefabs/Showcase/Animation_RunShootVariant.asset`
+- `Assets/Modules/LayeredCharacterAnimation/Animations/Animation_PaladinCombat.controller`
+- `Assets/Modules/LayeredCharacterAnimation/AvatarMasks/Animation_PaladinUpperBody.mask`
+- `Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationActor_PaladinCombat.prefab`
+- `Assets/Modules/LayeredCharacterAnimation/Data/Animation_PaladinCombatProfile.asset`
+- `Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_Run.prefab`
+- `Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_Shoot.prefab`
+- `Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_RunShoot.prefab`
+- `Assets/Modules/LayeredCharacterAnimation/Data/Animation_RunVariant.asset`
+- `Assets/Modules/LayeredCharacterAnimation/Data/Animation_ShootVariant.asset`
+- `Assets/Modules/LayeredCharacterAnimation/Data/Animation_RunShootVariant.asset`
 
-The module asset `Assets/Prefabs/Showcase/Animation3DModule.asset` now references these three variants.
+The module asset `Assets/Modules/LayeredCharacterAnimation/Data/Animation3DModule.asset` now references these three variants.
 
 ## Runtime Variants
 

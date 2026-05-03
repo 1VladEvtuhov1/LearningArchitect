@@ -1,0 +1,203 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: ShowcaseUI_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: c4cbe9c1fe0566f4496f59ed9032b3e4, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1856839680
+    m_Localized: ENGINE SYSTEMS / <color=#FF8C3C>VISUALIZER</color>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1949114368
+    m_Localized: MODULE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502976
+    m_Localized: VARIANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502977
+    m_Localized: LOADED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502978
+    m_Localized: ORBIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502979
+    m_Localized: ZOOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502980
+    m_Localized: PERFORMANCE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502981
+    m_Localized: SYSTEM STATUS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502982
+    m_Localized: SELECT MODULE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502983
+    m_Localized: SELECT VARIANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502984
+    m_Localized: STRESS TEST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502985
+    m_Localized: Overview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502986
+    m_Localized: Architecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502987
+    m_Localized: Trade-offs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502988
+    m_Localized: ABOUT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502989
+    m_Localized: KEY FEATURES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502990
+    m_Localized: WATCH OUT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502991
+    m_Localized: STRENGTHS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502992
+    m_Localized: PROS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502993
+    m_Localized: CONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502994
+    m_Localized: No module selected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502995
+    m_Localized: No variant selected.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502996
+    m_Localized: No architecture notes provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502997
+    m_Localized: No trade-off notes provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502998
+    m_Localized: No key features listed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957502999
+    m_Localized: No strengths listed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503000
+    m_Localized: No pros listed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503001
+    m_Localized: No cons listed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503002
+    m_Localized: No constraints listed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503003
+    m_Localized: Realtime architecture preview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503004
+    m_Localized: "Switching module  \u2039"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503005
+    m_Localized: "Switching module  \u203A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503006
+    m_Localized: "Switching variant  \u2039"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503007
+    m_Localized: "Switching variant  \u203A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503008
+    m_Localized: Load selected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503009
+    m_Localized: Stress load
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503010
+    m_Localized: Active
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503011
+    m_Localized: FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503012
+    m_Localized: Frame Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503013
+    m_Localized: Particles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503014
+    m_Localized: N/A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503015
+    m_Localized: Previous module
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503016
+    m_Localized: Next module
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503017
+    m_Localized: Previous variant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1957503018
+    m_Localized: Next variant
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
