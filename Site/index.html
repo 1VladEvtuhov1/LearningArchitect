@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LearningArchitect | Interactive Architecture Showcase</title>
+  <meta name="description" content="LearningArchitect is a Unity-based architecture showcase for comparing runtime strategies, stress presets, and implementation trade-offs in one shared interactive shell.">
+  <meta name="theme-color" content="#0a0d14">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="topbar" id="top">
+      <a class="brand" href="#top">LearningArchitect</a>
+      <div class="topbar-links">
+        <a href="#interactive-demo" id="nav-demo">Interactive Demo</a>
+        <a href="#module-explorer" id="nav-modules">Modules</a>
+        <a href="#architecture-notes" id="nav-architecture">Architecture Notes</a>
+      </div>
+      <div class="topbar-actions">
+        <a class="topbar-source-link" href="#" id="topbar-source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
+        <div class="lang-toggle" aria-label="Language switcher">
+          <button class="lang-toggle-button is-active" id="lang-en" type="button" aria-pressed="true">EN</button>
+          <button class="lang-toggle-button" id="lang-ru" type="button" aria-pressed="false">RU</button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <p class="eyebrow" id="hero-eyebrow">Interactive Unity Architecture Showcase</p>
+      <h1 id="hero-title">Trade&#8209;offs in one browser demo.</h1>
+      <p class="hero-summary" id="hero-summary">Launch WebGL and compare decisions on one page.</p>
+      <div class="hero-buttons">
+        <a class="button button-primary" href="#interactive-demo" id="jump-to-demo">Launch Demo</a>
+        <a class="button button-secondary" href="#" id="source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
+        <a class="button button-ghost" href="#architecture-notes" id="cta-architecture">Architecture Notes</a>
+      </div>
+    </header>
+
+    <main class="main-grid demo-section" id="interactive-demo">
+      <aside class="sidebar demo-console">
+        <h2 id="section-demo-title">Read the context, then launch.</h2>
+        <p class="sidebar-copy" id="section-demo-copy">The page stages WebGL delivery in the background. Unity starts only when you choose to launch.</p>
+
+        <div class="status-strip" aria-live="polite">
+          <span class="status-pill" id="preload-pill">Preload idle</span>
+          <span class="status-copy" id="preload-copy">Core demo delivery will start staging in the background while you read.</span>
+        </div>
+
+        <div class="sidebar-actions demo-actions">
+          <button class="button button-primary" id="launch-demo" type="button">Launch Demo</button>
+          <button class="button button-accent" id="toggle-fullscreen" type="button">Open Fullscreen</button>
+          <a class="button button-secondary" href="#architecture-notes" id="cta-read-notes">Read Architecture Notes</a>
+        </div>
+
+        <div class="demo-console-topline">
+          <span class="demo-console-label" id="demo-console-label">WebGL Host State</span>
+          <span class="demo-console-stage" id="demo-stage">Waiting for configuration</span>
+        </div>
+
+        <div class="demo-progress" aria-hidden="true">
+          <div class="demo-progress-bar" id="demo-progress-bar"></div>
+        </div>
+
+        <p class="demo-supporting" id="demo-supporting">The host shell is ready. Drop a Unity WebGL export into <code>Site/webgl/Build</code>, run <code>prepare-webgl-site.ps1</code>, and this section can preload and launch the runtime from the same page.</p>
+
+        <div class="demo-notes">
+          <p id="demo-note-1"><strong>Review mode:</strong> keep scrolling and reading while the page stages the loader and build URLs.</p>
+          <p id="demo-note-2"><strong>Interview mode:</strong> jump back here and launch the runtime once the reviewer has context.</p>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="content-heading">
+          <p class="eyebrow" id="section-demo-eyebrow">Interactive Demo</p>
+          <h2 id="poster-title">Launch the showcase shell here.</h2>
+          <p class="content-copy" id="demo-inline-copy">Runtime, modules, stress presets, and notes stay on one page.</p>
+        </div>
+
+        <article class="demo-host">
+          <div class="demo-frame" id="demo-frame">
+            <div class="demo-poster" id="demo-poster">
+              <div class="poster-copy">
+                <p class="poster-label" id="poster-label">Embedded Unity Runtime</p>
+                <p id="poster-status">No WebGL build is connected yet. The presentation shell is ready; add the export and generate <code>webgl/build-manifest.json</code>.</p>
+              </div>
+
+              <div class="poster-gallery">
+                <img src="./assets/images/inventory-metrics.png" alt="Inventory metrics preview from the LearningArchitect showcase.">
+                <img src="./assets/images/vfx-batched.png" alt="VFX batched preview from the LearningArchitect showcase.">
+              </div>
+            </div>
+
+            <canvas id="unity-canvas" width="1280" height="720" aria-label="LearningArchitect Unity WebGL canvas"></canvas>
+          </div>
+        </article>
+
+        <div class="live-status">
+          <div><span class="dot dot-orange"></span><span id="hero-chip-1">7 modules</span></div>
+          <div><span class="dot dot-teal"></span><span id="hero-chip-3">Shared stress presets</span></div>
+          <div><span class="dot dot-blue"></span><span id="hero-chip-4">WebGL portfolio shell</span></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="modules" id="module-explorer">
+      <div class="section-heading">
+        <p class="eyebrow" id="section-modules-eyebrow">Module Explorer</p>
+        <h2 id="section-modules-title">Pick a strong example before the live client.</h2>
+        <p id="section-modules-copy">Use one module as the entry point, then switch variants and presets in the runtime.</p>
+      </div>
+
+      <div class="module-layout">
+        <div class="module-selector" id="module-selector" role="tablist" aria-label="Showcase modules"></div>
+
+        <article class="module-detail">
+          <div class="module-detail-copy">
+            <div class="module-detail-header">
+              <p class="detail-kicker" id="module-category">Architecture Pattern Module</p>
+              <h3 id="module-title">Update Loop Strategies</h3>
+              <p id="module-summary">Compare per-object callbacks against a centralized owner loop under the same hub and stress shell.</p>
+            </div>
+
+            <dl class="detail-grid">
+              <div>
+                <dt id="module-label-variants">Variants</dt>
+                <dd id="module-variants">Per-Object, Centralized</dd>
+              </div>
+              <div>
+                <dt id="module-label-focus">Focus</dt>
+                <dd id="module-focus">Callback ownership and scaling pressure.</dd>
+              </div>
+              <div>
+                <dt id="module-label-try">What To Try</dt>
+                <dd id="module-try">Switch variants, raise the stress preset, and compare how quickly the explanation maps to the visible behavior.</dd>
+              </div>
+              <div>
+                <dt id="module-label-signal">Architecture Signal</dt>
+                <dd id="module-signal">The module shows when a friendly object-per-object mental model stops being the right scaling baseline.</dd>
+              </div>
+            </dl>
+          </div>
+
+          <figure class="module-preview">
+            <img id="module-image" src="./assets/images/module-preview-a.png" alt="Preview of the LearningArchitect showcase UI and runtime scene.">
+            <figcaption id="module-caption">A browser reviewer can inspect architecture notes while the shared shell keeps module controls consistent.</figcaption>
+          </figure>
+        </article>
+      </div>
+    </section>
+
+    <section class="architecture" id="architecture-notes">
+      <div class="section-heading">
+        <p class="eyebrow" id="section-architecture-eyebrow">Architecture Notes</p>
+        <h2 id="section-architecture-title">One shell, swappable variants, shared stress and metrics.</h2>
+        <p id="section-architecture-copy">Enough context for a reviewer to understand the structure before opening the repository.</p>
+      </div>
+
+      <div class="architecture-grid">
+        <section class="stack-card">
+          <p class="stack-index">01</p>
+          <h3 id="stack-1-title">Showcase Shell</h3>
+          <p id="stack-1-copy">The shell owns selection, stress state, localization, and lifecycle instead of scene-specific setup.</p>
+        </section>
+        <section class="stack-card">
+          <p class="stack-index">02</p>
+          <h3 id="stack-2-title">Presentation Shell</h3>
+          <p id="stack-2-copy">UI presenters subscribe to shared state so the interface stays comparable while modules change underneath it.</p>
+        </section>
+        <section class="stack-card">
+          <p class="stack-index">03</p>
+          <h3 id="stack-3-title">Module Layer</h3>
+          <p id="stack-3-copy">Active variants implement the same stress and lifecycle contract while preserving their own runtime behavior.</p>
+        </section>
+        <section class="brief-card">
+          <p class="brief-label" id="brief-runtime-label">Runtime in five steps</p>
+          <ol id="brief-runtime-list">
+            <li id="brief-runtime-1">Composition root builds the coordinator.</li>
+            <li id="brief-runtime-2">Coordinator selects module and variant data.</li>
+            <li id="brief-runtime-3">Spawner instantiates the variant prefab.</li>
+            <li id="brief-runtime-4">Runtime host validates lifecycle and stress contracts.</li>
+            <li id="brief-runtime-5">State hub publishes module, variant, stress, and metrics to the UI.</li>
+          </ol>
+        </section>
+        <section class="brief-card architecture-wide">
+          <p class="brief-label" id="brief-review-label">Why it is portfolio-ready</p>
+          <p id="brief-review-copy">The value is not another Unity scene. The value is one disciplined runtime shell for comparing multiple implementation paths under the same rules.</p>
+        </section>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p class="footer-copy" id="footer-copy">Unity runtime for explaining architecture trade&#8209;offs in one browser-friendly shell.</p>
+      <div class="footer-links">
+        <a href="#top" id="footer-top">Back to top</a>
+        <a href="#architecture-notes" id="footer-architecture">Architecture Notes</a>
+        <a href="#" id="footer-source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

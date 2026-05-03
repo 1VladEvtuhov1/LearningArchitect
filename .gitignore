@@ -57,6 +57,15 @@ CodeCoverage/
 
 # Addressables / build cache artifacts
 ServerData/
+Assets/AddressableAssetsData/WebGL.meta
+Assets/AddressableAssetsData/WebGL/
+
+# Portfolio site generated WebGL export
+Site/webgl/Build/
+Site/webgl/StreamingAssets/
+Site/webgl/TemplateData/
+Site/webgl/index.html
+Site/webgl/build-manifest.json
 
 # Crash / diagnostic artifacts
 crashlytics-build.properties
@@ -69,4 +78,3 @@ desktop.ini
 # Optional local environment files
 .env
 .env.*
-
