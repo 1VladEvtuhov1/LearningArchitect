@@ -27,8 +27,7 @@ namespace LearningArchitect.Modules.Performance
             return new ShowcaseMetricsSnapshot(
                 count,
                 ActiveCount,
-                PerObjectUpdateMover.GetLastOperationsPerFrame(),
-                PerObjectUpdateMover.GetLastSimulationTimeMs());
+                PerObjectUpdateMover.GetLastModuleCpuMs());
         }
 
         public void SetStressLevel(int value)

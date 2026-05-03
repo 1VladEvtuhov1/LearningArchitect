@@ -13,8 +13,7 @@ namespace LearningArchitect.Modules.Effects
         [SerializeField] private float rotateSpeed = 40f;
 
         private readonly List<GameObject> effects = new List<GameObject>(512);
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount => effects.Count;
 
@@ -37,13 +36,12 @@ namespace LearningArchitect.Modules.Effects
                 }
             }
 
-            operationsPerFrame = effects.Count;
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(count, ActiveCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(count, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int value)

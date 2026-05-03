@@ -53,10 +53,10 @@ namespace LearningArchitect.UI
 
         private int[] activePresets = Array.Empty<int>();
         private string[] activePresetLabels;
-        private string activeItemLabel = string.Empty;
         private string contextNote = string.Empty;
-        private int displayedActiveCount;
         private int displayedStressLevel = DefaultStressPresets[0];
+        private int displayedSimulationCount = DefaultStressPresets[0];
+        private int displayedVisibleCount;
         private Button feedbackButton;
         private float feedbackTimer;
         private bool isInitialized;
@@ -193,13 +193,14 @@ namespace LearningArchitect.UI
             Refresh();
         }
 
-        public void ShowStressState(int level, int activeCount)
+        public void ShowStressState(int level, int activeCount, ShowcaseMetricsSnapshot metrics)
         {
             if (!EnsureInitialized())
                 return;
 
             displayedStressLevel = level;
-            displayedActiveCount = activeCount;
+            displayedSimulationCount = metrics.HasSimulationCount ? metrics.SimulationCount : level;
+            displayedVisibleCount = metrics.HasVisibleCount ? metrics.VisibleCount : activeCount;
             Refresh();
         }
 
@@ -208,7 +209,6 @@ namespace LearningArchitect.UI
             if (!EnsureInitialized())
                 return;
 
-            activeItemLabel = ShowcaseLocalization.GetModuleActiveItemLabel(module);
             contextNote = ShowcaseLocalization.GetModuleWebGlPresetNote(module);
             Refresh();
         }
@@ -237,7 +237,7 @@ namespace LearningArchitect.UI
             string prefix = feedbackTimer > 0f
                 ? ShowcaseLocalization.GetText("load_selected")
                 : ShowcaseLocalization.GetText("stress_load");
-            statusText.text = BuildStatusText(prefix, displayedStressLevel, displayedActiveCount);
+            statusText.text = BuildStatusText(prefix, displayedSimulationCount, displayedVisibleCount);
             statusText.color = Color.white;
         }
 
@@ -515,12 +515,8 @@ namespace LearningArchitect.UI
             return normalized;
         }
 
-        private string BuildStatusText(string prefix, int level, int activeCount)
+        private string BuildStatusText(string prefix, int simulationCount, int visibleCount)
         {
-            string countLabel = string.IsNullOrWhiteSpace(activeItemLabel)
-                ? ShowcaseLocalization.GetText("active_items")
-                : activeItemLabel;
-
             string titleHex = ToHex(feedbackTimer > 0f ? activeColor : inactiveLabelColor);
             string valueHex = ToHex(activeColor);
             string bodyHex = ToHex(textColor);
@@ -528,8 +524,8 @@ namespace LearningArchitect.UI
 
             string text =
                 "<size=72%><color=" + titleHex + ">" + prefix + "</color></size>\n" +
-                "<color=" + valueHex + "><size=118%><b>" + FormatCount(level) + "</b></size></color>" +
-                "  <size=84%><color=" + bodyHex + ">" + countLabel + " " + FormatCount(activeCount) + "</color></size>";
+                "<color=" + valueHex + "><size=118%><b>" + FormatCount(simulationCount) + "</b></size></color>" +
+                "  <size=84%><color=" + bodyHex + ">Visible " + FormatCount(visibleCount) + "</color></size>";
 
             if (string.IsNullOrWhiteSpace(contextNote))
                 return text;

@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.Pooling",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using LearningArchitect.Core;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace LearningArchitect.Modules.Animation3D
         private Vector3[] velocities;
         private float[] phases;
         private CreatureRig[] rigs;
-        private float lastSimulationTimeMs;
+        private float lastModuleCpuMs;
 
         public int ActiveCount => rigs == null ? 0 : rigs.Length;
 
@@ -46,7 +47,7 @@ namespace LearningArchitect.Modules.Animation3D
             if (positions == null || velocities == null || phases == null)
                 return;
 
-            double startTime = Time.realtimeSinceStartupAsDouble;
+            long startedAt = Stopwatch.GetTimestamp();
             float deltaTime = Time.deltaTime;
             float radiusSquared = radius * radius;
 
@@ -68,7 +69,7 @@ namespace LearningArchitect.Modules.Animation3D
             for (int i = 0; i < rigs.Length; i++)
                 ApplyRigPose(rigs[i], positions[i], velocities[i], phases[i]);
 
-            lastSimulationTimeMs = (float)((Time.realtimeSinceStartupAsDouble - startTime) * 1000.0d);
+            lastModuleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public void SetStressLevel(int value)
@@ -87,8 +88,7 @@ namespace LearningArchitect.Modules.Animation3D
         {
             int simulationCount = positions == null ? count : positions.Length;
             int visibleActors = rigs == null ? 0 : rigs.Length;
-            int operationsPerFrame = simulationCount * 6;
-            return new ShowcaseMetricsSnapshot(simulationCount, visibleActors, operationsPerFrame, lastSimulationTimeMs);
+            return new ShowcaseMetricsSnapshot(simulationCount, visibleActors, lastModuleCpuMs);
         }
 
         private void Rebuild(int targetCount)

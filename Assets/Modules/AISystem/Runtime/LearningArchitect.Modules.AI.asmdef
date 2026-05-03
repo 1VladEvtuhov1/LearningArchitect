@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.AI",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

@@ -24,8 +24,7 @@ namespace LearningArchitect.Modules.Pooling
         private readonly List<Projectile> activeProjectiles = new(256);
         private int targetVisualCount;
         private int nextSpawnIndex;
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount => activeProjectiles.Count;
 
@@ -37,12 +36,8 @@ namespace LearningArchitect.Modules.Pooling
         private void Update()
         {
             long startedAt = Stopwatch.GetTimestamp();
-            int spawnedThisFrame = 0;
             while (activeProjectiles.Count < targetVisualCount)
-            {
                 SpawnProjectile();
-                spawnedThisFrame++;
-            }
 
             for (int i = activeProjectiles.Count - 1; i >= 0; i--)
             {
@@ -60,13 +55,12 @@ namespace LearningArchitect.Modules.Pooling
                 activeProjectiles[i] = projectile;
             }
 
-            operationsPerFrame = activeProjectiles.Count + spawnedThisFrame;
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(targetVisualCount, ActiveCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(count, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int value)

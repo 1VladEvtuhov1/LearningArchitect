@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.VFX",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

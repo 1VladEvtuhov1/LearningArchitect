@@ -32,8 +32,7 @@ namespace LearningArchitect.Modules.Inventory
         private Renderer[] renderers;
         private int operationsCursor;
         private float nextVisualRefreshTime;
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount => visuals == null ? 0 : visuals.Length;
 
@@ -50,13 +49,13 @@ namespace LearningArchitect.Modules.Inventory
 
             long startedAt = Stopwatch.GetTimestamp();
             SimulateInventory(Time.deltaTime);
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
             RefreshVisuals(false);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(slotCount, ActiveCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(slotCount, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int count)
@@ -137,7 +136,6 @@ namespace LearningArchitect.Modules.Inventory
         private void SimulateInventory(float deltaTime)
         {
             int operations = Mathf.Max(18, slotCount / 30);
-            operationsPerFrame = operations;
             for (int i = 0; i < slotCount; i++)
             {
                 InventorySlotState slot = slots[i];

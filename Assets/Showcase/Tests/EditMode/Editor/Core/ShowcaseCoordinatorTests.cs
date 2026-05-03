@@ -105,7 +105,7 @@ namespace LearningArchitect.Tests.Core
                 Assert.AreEqual("Centralized Runtime Prefab", moduleRoot.transform.GetChild(0).name);
                 Assert.AreEqual(12, coordinator.CurrentStressLevel);
                 Assert.AreEqual(12, coordinator.ActiveItemCount);
-                Assert.AreEqual(24, coordinator.CurrentMetrics.OperationsPerFrame);
+                Assert.AreEqual(0.25f, coordinator.CurrentMetrics.ModuleCpuMs);
             }
             finally
             {

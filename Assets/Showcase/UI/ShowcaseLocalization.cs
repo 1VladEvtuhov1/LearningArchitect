@@ -151,6 +151,30 @@ namespace LearningArchitect.UI
             return GetContentText(BuildVariantArchitectureKey(variant), variant.ArchitectureDescription, variant.ArchitectureDescriptionRu);
         }
 
+        public static string GetVariantDataFlow(VariantDefinitionSO variant)
+        {
+            if (variant == null)
+                return string.Empty;
+
+            return GetContentText(BuildVariantDataFlowKey(variant), variant.DataFlow, variant.DataFlowRu);
+        }
+
+        public static string GetVariantRuntimeLifecycle(VariantDefinitionSO variant)
+        {
+            if (variant == null)
+                return string.Empty;
+
+            return GetContentText(BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycle, variant.RuntimeLifecycleRu);
+        }
+
+        public static string GetVariantWhyThisApproach(VariantDefinitionSO variant)
+        {
+            if (variant == null)
+                return string.Empty;
+
+            return GetContentText(BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproach, variant.WhyThisApproachRu);
+        }
+
         public static string GetVariantCompareSummary(VariantDefinitionSO variant)
         {
             if (variant == null)
@@ -234,6 +258,21 @@ namespace LearningArchitect.UI
         public static string BuildVariantCompareKey(VariantDefinitionSO variant)
         {
             return BuildContentKey(variant == null ? string.Empty : variant.name, "compare");
+        }
+
+        public static string BuildVariantDataFlowKey(VariantDefinitionSO variant)
+        {
+            return BuildContentKey(variant == null ? string.Empty : variant.name, "data_flow");
+        }
+
+        public static string BuildVariantRuntimeLifecycleKey(VariantDefinitionSO variant)
+        {
+            return BuildContentKey(variant == null ? string.Empty : variant.name, "runtime_lifecycle");
+        }
+
+        public static string BuildVariantWhyThisApproachKey(VariantDefinitionSO variant)
+        {
+            return BuildContentKey(variant == null ? string.Empty : variant.name, "why_this_approach");
         }
 
         public static string BuildVariantTakeawayKey(VariantDefinitionSO variant)
@@ -553,6 +592,14 @@ namespace LearningArchitect.UI
                     return language == ShowcaseLanguage.Russian ? "Обзор" : "Overview";
                 case "architecture":
                     return language == ShowcaseLanguage.Russian ? "Архитектура" : "Architecture";
+                case "core_idea":
+                    return language == ShowcaseLanguage.Russian ? "РћСЃРЅРѕРІРЅР°СЏ РёРґРµСЏ" : "Core Idea";
+                case "data_flow":
+                    return language == ShowcaseLanguage.Russian ? "РџРѕС‚РѕРє РґР°РЅРЅС‹С…" : "Data Flow";
+                case "runtime_lifecycle":
+                    return language == ShowcaseLanguage.Russian ? "Р–РёР·РЅРµРЅРЅС‹Р№ С†РёРєР» runtime" : "Runtime Lifecycle";
+                case "why_this_approach":
+                    return language == ShowcaseLanguage.Russian ? "РџРѕС‡РµРјСѓ СЌС‚РѕС‚ РїРѕРґС…РѕРґ" : "Why This Approach";
                 case "trade_offs":
                     return language == ShowcaseLanguage.Russian ? "Компромиссы" : "Trade-offs";
                 case "about":
@@ -573,6 +620,12 @@ namespace LearningArchitect.UI
                     return language == ShowcaseLanguage.Russian ? "Вариант не выбран." : "No variant selected.";
                 case "no_architecture_notes":
                     return language == ShowcaseLanguage.Russian ? "Описание архитектуры отсутствует." : "No architecture notes provided.";
+                case "no_data_flow":
+                    return language == ShowcaseLanguage.Russian ? "РџРѕС‚РѕРє РґР°РЅРЅС‹С… РЅРµ РѕРїРёСЃР°РЅ." : "No data flow notes provided.";
+                case "no_runtime_lifecycle":
+                    return language == ShowcaseLanguage.Russian ? "Р–РёР·РЅРµРЅРЅС‹Р№ С†РёРєР» runtime РЅРµ РѕРїРёСЃР°РЅ." : "No runtime lifecycle notes provided.";
+                case "no_why_this_approach":
+                    return language == ShowcaseLanguage.Russian ? "РћР±РѕСЃРЅРѕРІР°РЅРёРµ РІС‹Р±РѕСЂР° РїРѕРґС…РѕРґР° РЅРµ СѓРєР°Р·Р°РЅРѕ." : "No rationale for this approach provided.";
                 case "no_problem_statement":
                     return language == ShowcaseLanguage.Russian ? "Постановка проблемы не указана." : "No problem statement provided.";
                 case "no_compare_summary":

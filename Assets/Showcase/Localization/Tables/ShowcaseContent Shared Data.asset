@@ -603,6 +603,306 @@ MonoBehaviour:
     m_Key: vfx_emitterburstsvariant.takeaway
     m_Metadata:
       m_Items: []
+  - m_Id: 2245328118816768
+    m_Key: ai_behaviortreevariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328206897152
+    m_Key: ai_behaviortreevariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328206897153
+    m_Key: ai_behaviortreevariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091456
+    m_Key: ai_fsmvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091457
+    m_Key: ai_fsmvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091458
+    m_Key: ai_fsmvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091459
+    m_Key: ai_utilityvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091460
+    m_Key: ai_utilityvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091461
+    m_Key: ai_utilityvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091462
+    m_Key: effects_chunkvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091463
+    m_Key: effects_chunkvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091464
+    m_Key: effects_chunkvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091465
+    m_Key: effects_indievariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091466
+    m_Key: effects_indievariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091467
+    m_Key: effects_indievariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091468
+    m_Key: inventory_objectslotsvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091469
+    m_Key: inventory_objectslotsvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091470
+    m_Key: inventory_objectslotsvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091471
+    m_Key: inventory_packedslotsvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091472
+    m_Key: inventory_packedslotsvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091473
+    m_Key: inventory_packedslotsvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285760
+    m_Key: animation_creaturevariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285761
+    m_Key: animation_creaturevariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285762
+    m_Key: animation_creaturevariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328219480064
+    m_Key: animation_humanoidvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328219480065
+    m_Key: animation_humanoidvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674368
+    m_Key: animation_humanoidvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674369
+    m_Key: animation_runshootvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674370
+    m_Key: animation_runshootvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674371
+    m_Key: animation_runshootvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674372
+    m_Key: animation_runvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674373
+    m_Key: animation_runvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674374
+    m_Key: animation_runvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674375
+    m_Key: animation_shootvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674376
+    m_Key: animation_shootvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674377
+    m_Key: animation_shootvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674378
+    m_Key: pooling_instantiationvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674379
+    m_Key: pooling_instantiationvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674380
+    m_Key: pooling_instantiationvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674381
+    m_Key: pooling_pooledvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674382
+    m_Key: pooling_pooledvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674383
+    m_Key: pooling_pooledvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674384
+    m_Key: updateloop_centralizedvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674385
+    m_Key: updateloop_centralizedvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674386
+    m_Key: updateloop_centralizedvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674387
+    m_Key: updateloop_perobjectvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674388
+    m_Key: updateloop_perobjectvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674389
+    m_Key: updateloop_perobjectvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674390
+    m_Key: vfx_batchedpulsesvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674391
+    m_Key: vfx_batchedpulsesvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674392
+    m_Key: vfx_batchedpulsesvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674393
+    m_Key: vfx_emitterburstsvariant.data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674394
+    m_Key: vfx_emitterburstsvariant.runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674395
+    m_Key: vfx_emitterburstsvariant.why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049478832128
+    m_Key: animation_runshootvariant.variant_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718208
+    m_Key: animation_runshootvariant.architecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718209
+    m_Key: animation_runshootvariant.compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718210
+    m_Key: animation_runshootvariant.takeaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718211
+    m_Key: animation_runshootvariant.trade_offs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718212
+    m_Key: animation_runshootvariant.pros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718213
+    m_Key: animation_runshootvariant.cons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718214
+    m_Key: animation_runvariant.variant_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718215
+    m_Key: animation_runvariant.architecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912512
+    m_Key: animation_runvariant.compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912513
+    m_Key: animation_runvariant.takeaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912514
+    m_Key: animation_runvariant.trade_offs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912515
+    m_Key: animation_runvariant.pros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912516
+    m_Key: animation_runvariant.cons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912517
+    m_Key: animation_shootvariant.variant_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912518
+    m_Key: animation_shootvariant.architecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912519
+    m_Key: animation_shootvariant.compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912520
+    m_Key: animation_shootvariant.takeaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912521
+    m_Key: animation_shootvariant.trade_offs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912522
+    m_Key: animation_shootvariant.pros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912523
+    m_Key: animation_shootvariant.cons
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using LearningArchitect.Core;
 using UnityEngine;
 
@@ -55,7 +56,7 @@ namespace LearningArchitect.Modules.Animation3D
         private Vector3[] velocities;
         private float[] phases;
         private HumanoidVisual[] visuals;
-        private float lastSimulationTimeMs;
+        private float lastModuleCpuMs;
 
         public int ActiveCount => visuals == null ? 0 : visuals.Length;
 
@@ -70,7 +71,7 @@ namespace LearningArchitect.Modules.Animation3D
             if (positions == null || velocities == null || phases == null)
                 return;
 
-            double startTime = Time.realtimeSinceStartupAsDouble;
+            long startedAt = Stopwatch.GetTimestamp();
             float deltaTime = Time.deltaTime;
             float radiusSquared = radius * radius;
             bool usesLocomotion = playbackMode != PlaybackMode.Shoot;
@@ -98,7 +99,7 @@ namespace LearningArchitect.Modules.Animation3D
                 ApplyVisual(visuals[i], positions[i], animationVelocity, phases[i], deltaTime);
             }
 
-            lastSimulationTimeMs = (float)((Time.realtimeSinceStartupAsDouble - startTime) * 1000.0d);
+            lastModuleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public void SetStressLevel(int value)
@@ -117,11 +118,7 @@ namespace LearningArchitect.Modules.Animation3D
         {
             int simulationCount = positions == null ? count : positions.Length;
             int visibleActors = visuals == null ? 0 : visuals.Length;
-            int actorCost = animationProfile != null && animationProfile.HasActorPrefab
-                ? playbackMode == PlaybackMode.RunAndShoot ? 7 : 5
-                : 7;
-            int operationsPerFrame = simulationCount * actorCost;
-            return new ShowcaseMetricsSnapshot(simulationCount, visibleActors, operationsPerFrame, lastSimulationTimeMs);
+            return new ShowcaseMetricsSnapshot(simulationCount, visibleActors, lastModuleCpuMs);
         }
 
         private void Rebuild(int targetCount)

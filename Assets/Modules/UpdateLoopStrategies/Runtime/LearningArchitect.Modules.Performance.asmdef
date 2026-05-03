@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.Performance",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

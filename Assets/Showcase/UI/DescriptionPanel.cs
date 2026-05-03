@@ -579,6 +579,9 @@ namespace LearningArchitect.UI
             string takeaway = ShowcaseLocalization.GetVariantTakeaway(currentVariant);
             string webGlPreset = ShowcaseLocalization.GetModuleWebGlPresetNote(currentModule);
             string architectureDescription = ShowcaseLocalization.GetVariantArchitectureDescription(currentVariant);
+            string dataFlow = ShowcaseLocalization.GetVariantDataFlow(currentVariant);
+            string runtimeLifecycle = ShowcaseLocalization.GetVariantRuntimeLifecycle(currentVariant);
+            string whyThisApproach = ShowcaseLocalization.GetVariantWhyThisApproach(currentVariant);
             string tradeOffs = ShowcaseLocalization.GetVariantTradeOffs(currentVariant);
             string pros = ShowcaseLocalization.GetVariantPros(currentVariant);
             string cons = ShowcaseLocalization.GetVariantCons(currentVariant);
@@ -598,9 +601,13 @@ namespace LearningArchitect.UI
 
                 case 1:
                     AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("architecture"), architectureDescription, ShowcaseLocalization.GetText("no_architecture_notes"));
                     AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("core_idea"), architectureDescription, ShowcaseLocalization.GetText("no_architecture_notes"));
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("data_flow"), dataFlow);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("runtime_lifecycle"), runtimeLifecycle);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("why_this_approach"), string.IsNullOrWhiteSpace(whyThisApproach) ? compareSummary : whyThisApproach);
                     AddOptionalListSection(ShowcaseLocalization.GetText("strengths"), pros, positiveTextColor);
+                    AddRequiredListSection(ShowcaseLocalization.GetText("watch_out"), cons, ShowcaseLocalization.GetText("no_constraints"), negativeTextColor);
                     AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
                     break;
 
@@ -824,6 +831,11 @@ namespace LearningArchitect.UI
             sectionDefinitions.Add(new SectionDefinition(title, value, string.Empty, true, true, bulletColor));
         }
 
+        private void AddRequiredListSection(string title, string value, string fallback, Color bulletColor)
+        {
+            sectionDefinitions.Add(new SectionDefinition(title, value, fallback, false, true, bulletColor));
+        }
+
         private void ApplyCompositeSections()
         {
             EnsureSectionPoolSize(sectionDefinitions.Count);
@@ -845,7 +857,7 @@ namespace LearningArchitect.UI
         private bool TryResolveSectionBody(SectionDefinition definition, out string body)
         {
             string resolved = definition.TreatAsList
-                ? FormatListBody(definition.Value, null, definition.BulletColor)
+                ? FormatListBody(definition.Value, definition.EmptyFallback, definition.BulletColor)
                 : NormalizeBody(definition.Value);
 
             if (string.IsNullOrWhiteSpace(resolved))

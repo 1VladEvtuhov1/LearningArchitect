@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.Inventory",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

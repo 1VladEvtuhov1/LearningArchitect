@@ -319,7 +319,7 @@ namespace LearningArchitect.UI
             RectTransform rootFrame = CreateContainer("RootFrame", panel);
             SetRect(rootFrame, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-20f, 0f), new Vector2(360f, 76f));
 
-            RectTransform metrics = CreateText("MetricsOverlay", rootFrame, "PERFORMANCE\nFPS 60\nFrame 16.0 ms\nSIM 1K\nActive 1K", 14f, primaryTextColor, TextAlignmentOptions.TopRight);
+            RectTransform metrics = CreateText("MetricsOverlay", rootFrame, "PERFORMANCE\nFPS 60\nFrame ms 16.0\nModule CPU 2.5 ms\nSimulated 1K\nVisible 1K", 14f, primaryTextColor, TextAlignmentOptions.TopRight);
             metrics.anchorMin = new Vector2(0f, 0.34f);
             metrics.anchorMax = new Vector2(1f, 1f);
             metrics.offsetMin = Vector2.zero;

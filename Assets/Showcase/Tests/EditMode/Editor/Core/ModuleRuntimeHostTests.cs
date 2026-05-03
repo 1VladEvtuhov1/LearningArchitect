@@ -76,7 +76,7 @@ namespace LearningArchitect.Tests.Core
 
             public ShowcaseMetricsSnapshot GetMetricsSnapshot()
             {
-                return new ShowcaseMetricsSnapshot(ActiveCountValue, ActiveCountValue, ActiveCountValue, 0.1f);
+                return new ShowcaseMetricsSnapshot(ActiveCountValue, ActiveCountValue, 0.1f);
             }
         }
     }

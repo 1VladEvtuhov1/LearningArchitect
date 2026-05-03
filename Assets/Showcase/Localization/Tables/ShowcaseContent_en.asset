@@ -344,12 +344,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1473819196596224
-    m_Localized: 3D Animation
+    m_Localized: Layered Character Animation
     m_Metadata:
       m_Items: []
   - m_Id: 1473819288870912
-    m_Localized: Interactive 3D animation module demonstrating how rig topology changes
-      the runtime animation problem even before authored clips enter the picture.
+    m_Localized: 'Interactive character-animation module focused on a common game-dev
+      mechanic: keeping locomotion active while a combat action plays on the upper
+      body.'
     m_Metadata:
       m_Items: []
   - m_Id: 1473819288870913
@@ -586,23 +587,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1474110344208387
-    m_Localized: Compare procedural crowd animation for humanoid and non-humanoid
-      rigs inside the same showcase shell.
+    m_Localized: Show how one humanoid model can run, shoot, or combine both through
+      Animator layers and an upper-body AvatarMask.
     m_Metadata:
       m_Items: []
   - m_Id: 1474110344208388
-    m_Localized: Animation architecture is not only about clips or controllers. Rig
-      shape, visible count and pose evaluation strategy all change what scales cleanly.
+    m_Localized: Full-body clips are easy to preview, but action games need composition.
+      The interesting architecture is separating locomotion ownership from upper-body
+      actions.
     m_Metadata:
       m_Items: []
   - m_Id: 1474110344208389
-    m_Localized: Use 24-72 for humanoids and 16-64 for creatures in browser-like
-      environments. These variants emphasize visible rig complexity over hidden logical
-      count.
+    m_Localized: Use Solo/Squad/Crowd presets for browser-safe previews. The goal
+      is readability of layer mixing, not pushing thousands of skinned meshes.
     m_Metadata:
       m_Items: []
   - m_Id: 1474110344208390
-    m_Localized: animated rigs
+    m_Localized: animated actors
     m_Metadata:
       m_Items: []
   - m_Id: 1474110344208391
@@ -864,6 +865,403 @@ MonoBehaviour:
   - m_Id: 1474110369374226
     m_Localized: Useful for hero interactions, sparse emitters and content that benefits
       from local ownership of its visual feedback.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328118816768
+    m_Localized: Each agent evaluates ordered behavior branches through a shared
+      tree model, then applies the first branch that succeeds.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328206897152
+    m_Localized: Stress presets seed agent count, each frame runs branch evaluation
+      plus movement integration, and teardown clears the shared simulation host.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328206897153
+    m_Localized: Chosen when behaviors need authorable structure and ordered fallbacks
+      without exploding into a large manual transition table.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091456
+    m_Localized: Each agent stores an explicit state enum, the decision model evaluates
+      transitions, and the presenter reflects the chosen movement target.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091457
+    m_Localized: Stress presets create more agents, each frame advances sensing and
+      state transitions, and cleanup disposes the shared simulation host.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091458
+    m_Localized: Best baseline when behavior should be debuggable step by step and
+      the state space stays small enough to remain explicit.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091459
+    m_Localized: Each agent scores candidate actions, selects the highest utility
+      option, and the host converts that choice into movement and recovery behavior.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091460
+    m_Localized: Stress presets seed agent count, every frame recalculates action
+      scores, and the host-owned simulation state is recycled on unload.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091461
+    m_Localized: Chosen when adaptation matters more than explicit scriptability
+      and behavior should respond continuously to changing context.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091462
+    m_Localized: Effect state lives in arrays, one batched update loop advances logical
+      particles, and only a representative visual slice is rendered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091463
+    m_Localized: Stress presets resize logical chunks, the batch update advances
+      all entries each frame, and the visible proxy set is recycled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091464
+    m_Localized: Chosen when logical density matters more than one-to-one scene objects
+      and the project needs predictable scaling under load.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091465
+    m_Localized: Each visible effect owns its own lifetime, position, and visual
+      response, then writes motion directly to its GameObject.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091466
+    m_Localized: Stress presets spawn a readable set of effect actors, each actor
+      updates itself every frame, and cleanup happens per object.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091467
+    m_Localized: Kept as the simple path because it mirrors how small teams prototype
+      effect behavior before they need scale-oriented orchestration.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091468
+    m_Localized: Each slot object owns item references and counts, and transfer rules
+      mutate those slot instances directly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091469
+    m_Localized: Stress presets create more slots, the variant runs transfer passes
+      over slot objects, and the object graph stays alive for the session.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091470
+    m_Localized: Good when rules are still evolving and engineers need to inspect
+      ownership and mutations at the slot level.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091471
+    m_Localized: Item ids, counts, and metadata stay in packed arrays, and transfer
+      rules operate by index over centralized storage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091472
+    m_Localized: Stress presets expand packed buffers, one update path processes
+      transfer work, and the view only reflects resulting state.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328211091473
+    m_Localized: Chosen when inventory traffic becomes systemic and the team needs
+      cache-friendly, centralized updates.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285760
+    m_Localized: Shared simulation state drives topology-specific actors, and each
+      creature rig translates that state into bespoke procedural pose changes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285761
+    m_Localized: Stress presets size the creature set, Update advances motion parameters,
+      and creature visuals stay bound to the variant until teardown.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328215285762
+    m_Localized: Chosen when silhouette variety and non-humanoid motion are more
+      important than universal rig reuse.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328219480064
+    m_Localized: Shared crowd state drives per-actor parameters, humanoid rigs sample
+      the same animation logic, and each actor writes results to its Animator.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328219480065
+    m_Localized: Stress presets size the crowd, Update advances shared phase and
+      actor parameters, and visuals stay active for the variant lifetime.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674368
+    m_Localized: Chosen when readability and avatar reuse matter, because humanoid
+      rigs communicate motion intent with familiar body language.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674369
+    m_Localized: Base locomotion stays on the lower body while an upper-body layer
+      injects the firing pose through masking and synchronized parameters.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674370
+    m_Localized: Activation loads the layered controller, Update maintains locomotion
+      plus combat parameters, and shutdown removes the combined rig.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674372
+    m_Localized: A single locomotion parameter path drives the base Animator state,
+      and the pose is authored as one clean full-body clip.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674373
+    m_Localized: Variant activation loads the controller and avatar, Update only
+      maintains simple locomotion state, and shutdown releases the rig.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674374
+    m_Localized: Useful as the simplest baseline for validating retargeted movement
+      before layering extra mechanics.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674375
+    m_Localized: The Animator stays on an authored firing state, and the variant
+      feeds only the parameters needed to hold the combat pose.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674376
+    m_Localized: Activation binds the combat controller, the pose loops with minimal
+      runtime logic, and teardown unloads the presentation rig.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674377
+    m_Localized: Useful as a reference pose because it isolates weapon handling and
+      upper-body readability without locomotion complexity.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674378
+    m_Localized: The spawner decides target churn, creates markers on demand, lets
+      them expire, and destroys them when their lifetime ends.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674379
+    m_Localized: Each frame checks target load, spawns fresh objects, updates active
+      markers, and releases memory only through destroy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674380
+    m_Localized: Kept as the control case because it exposes the real cost of naive
+      allocation-heavy lifecycles.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674381
+    m_Localized: Emission requests claim slots from a prewarmed pool, active markers
+      update in place, and completed markers return to free slots.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674382
+    m_Localized: Startup prewarms reusable objects, stress load adjusts logical demand,
+      each frame reuses active slots, and deactivate returns the pool to idle.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674383
+    m_Localized: Chosen for repeatable emissions because it moves cost to setup and
+      stabilizes the steady-state frame loop.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674384
+    m_Localized: One manager updates shared position and velocity arrays, then pushes
+      the resulting transforms into a bounded visual layer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674385
+    m_Localized: Stress presets resize simulation buffers, one Update advances all
+      entries, and visuals are reused until variant shutdown.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674386
+    m_Localized: Chosen when coordination and scaling matter more than per-object
+      scripting convenience.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674387
+    m_Localized: Each mover reads its local fields in its own Update, integrates
+      motion, and writes directly to its Transform.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674388
+    m_Localized: Stress presets instantiate mover GameObjects, each object runs independently
+      every frame, and teardown destroys the whole set.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674389
+    m_Localized: Useful as a baseline because ownership stays local and every behavior
+      is easy to trace in the hierarchy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674390
+    m_Localized: Logical pulse events live in arrays, one controller advances them,
+      and a limited marker set visualizes only the currently relevant pulses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674391
+    m_Localized: Stress presets expand logical pulse count, one batched Update advances
+      the field, and visual markers are reused across pulses.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674392
+    m_Localized: Chosen when feedback density is high and the project needs far more
+      logical events than visible scene objects.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674393
+    m_Localized: Each node owns a particle emitter, local timers decide when to burst,
+      and the particle system handles the visual playback.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674394
+    m_Localized: Stress presets enable more emitter nodes, Update triggers local
+      burst logic, and emitters stay resident until variant shutdown.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674395
+    m_Localized: Useful when artists need local authoring and clear scene-side ownership
+      for each feedback source.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049478832128
+    m_Localized: Run + Shoot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718208
+    m_Localized: The base layer keeps the running clip on the legs while an AvatarMask
+      routes the shooting clip to body, head, arms and fingers on a second Animator
+      layer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2245328223674371
+    m_Localized: 'Chosen because it demonstrates the real value of layered animation:
+      concurrent mechanics without duplicating full-body clips.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718209
+    m_Localized: 'This is the production-style case: locomotion and combat are composed
+      instead of replacing each other.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718210
+    m_Localized: Best demonstration of why Animator layers and masks matter for game
+      animation systems.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718211
+    m_Localized: More setup and masking discipline, but the mechanic remains responsive
+      while moving.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718212
+    m_Localized: 'Movement and shooting coexist
+
+      Upper-body mask keeps legs
+      running
+
+      Closer to real action-game animation graphs'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718213
+    m_Localized: 'Needs clean humanoid avatar
+
+      Mask boundaries must be tuned
+
+      Layered
+      clips can expose pose conflicts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718214
+    m_Localized: Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049562718215
+    m_Localized: The same Paladin model plays a humanoid locomotion clip through
+      a reusable AnimatorController. Movement drives Speed and Turn parameters, while
+      the upper-body shooting layer stays disabled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912512
+    m_Localized: Clean baseline for checking retargeted locomotion, root locking
+      and readable movement direction.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912513
+    m_Localized: Best when the character only needs full-body movement and simple
+      parameter driving.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912514
+    m_Localized: Readable and cheap, but it does not cover concurrent combat actions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912515
+    m_Localized: 'Simple controller path
+
+      Clear locomotion baseline
+
+      Good
+      for validating imported clips'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912516
+    m_Localized: 'No concurrent action layer
+
+      Combat interrupts movement
+
+      Less
+      representative for action games'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912517
+    m_Localized: Shoot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912518
+    m_Localized: The model stays in place and plays the shooting clip as the base
+      full-body state. This isolates aiming and weapon pose readability before mixing
+      is enabled.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912519
+    m_Localized: Useful for checking the authored combat pose, but movement and shooting
+      still compete for the same body.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912520
+    m_Localized: Best as an authored combat reference state, not as the final runtime
+      solution.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912521
+    m_Localized: Strong pose clarity, weak locomotion composition.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912522
+    m_Localized: 'Clear weapon pose
+
+      Easy to debug clip import
+
+      Stable
+      stationary preview'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257049566912523
+    m_Localized: 'Cannot move while firing
+
+      Full-body clip owns the legs
+
+      Not
+      enough for shooter locomotion'
     m_Metadata:
       m_Items: []
   references:

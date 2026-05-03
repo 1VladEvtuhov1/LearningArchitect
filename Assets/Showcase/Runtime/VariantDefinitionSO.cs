@@ -16,6 +16,12 @@ namespace LearningArchitect.Core
         [SerializeField] private string[] stressPresetLabelsRu;
         [SerializeField] [TextArea] private string architectureDescription;
         [SerializeField] [TextArea] private string architectureDescriptionRu;
+        [SerializeField] [TextArea] private string dataFlow;
+        [SerializeField] [TextArea] private string dataFlowRu;
+        [SerializeField] [TextArea] private string runtimeLifecycle;
+        [SerializeField] [TextArea] private string runtimeLifecycleRu;
+        [SerializeField] [TextArea] private string whyThisApproach;
+        [SerializeField] [TextArea] private string whyThisApproachRu;
         [SerializeField] [TextArea] private string compareSummary;
         [SerializeField] [TextArea] private string compareSummaryRu;
         [SerializeField] [TextArea] private string takeaway;
@@ -33,6 +39,12 @@ namespace LearningArchitect.Core
         public GameObject Prefab => prefab;
         public string ArchitectureDescription => architectureDescription;
         public string ArchitectureDescriptionRu => architectureDescriptionRu;
+        public string DataFlow => dataFlow;
+        public string DataFlowRu => dataFlowRu;
+        public string RuntimeLifecycle => runtimeLifecycle;
+        public string RuntimeLifecycleRu => runtimeLifecycleRu;
+        public string WhyThisApproach => whyThisApproach;
+        public string WhyThisApproachRu => whyThisApproachRu;
         public string CompareSummary => compareSummary;
         public string CompareSummaryRu => compareSummaryRu;
         public string Takeaway => takeaway;
@@ -75,6 +87,30 @@ namespace LearningArchitect.Core
                 return compareSummaryRu;
 
             return compareSummary;
+        }
+
+        public string GetDataFlow(ShowcaseLanguage language)
+        {
+            if (language == ShowcaseLanguage.Russian && !string.IsNullOrWhiteSpace(dataFlowRu))
+                return dataFlowRu;
+
+            return dataFlow;
+        }
+
+        public string GetRuntimeLifecycle(ShowcaseLanguage language)
+        {
+            if (language == ShowcaseLanguage.Russian && !string.IsNullOrWhiteSpace(runtimeLifecycleRu))
+                return runtimeLifecycleRu;
+
+            return runtimeLifecycle;
+        }
+
+        public string GetWhyThisApproach(ShowcaseLanguage language)
+        {
+            if (language == ShowcaseLanguage.Russian && !string.IsNullOrWhiteSpace(whyThisApproachRu))
+                return whyThisApproachRu;
+
+            return whyThisApproach;
         }
 
         public string GetTakeaway(ShowcaseLanguage language)

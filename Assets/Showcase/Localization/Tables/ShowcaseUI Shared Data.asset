@@ -195,6 +195,106 @@ MonoBehaviour:
     m_Key: tooltip_next_variant
     m_Metadata:
       m_Items: []
+  - m_Id: 2257050737123328
+    m_Key: module_group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118272
+    m_Key: module_type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118273
+    m_Key: variants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118274
+    m_Key: guided_demo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118275
+    m_Key: start_demo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118276
+    m_Key: stop_demo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118277
+    m_Key: demo_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118278
+    m_Key: step
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118279
+    m_Key: problem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118280
+    m_Key: compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118281
+    m_Key: takeaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118282
+    m_Key: webgl_preset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118283
+    m_Key: core_idea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118284
+    m_Key: data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118285
+    m_Key: runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118286
+    m_Key: why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118287
+    m_Key: active_items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118288
+    m_Key: no_problem_statement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118289
+    m_Key: no_compare_summary
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118290
+    m_Key: no_takeaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118291
+    m_Key: no_data_flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118292
+    m_Key: no_runtime_lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118293
+    m_Key: no_why_this_approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118294
+    m_Key: no_module_type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118295
+    m_Key: no_webgl_note
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

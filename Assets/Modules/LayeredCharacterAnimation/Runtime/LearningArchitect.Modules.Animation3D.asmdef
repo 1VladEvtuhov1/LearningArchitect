@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.Animation3D",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

@@ -10,9 +10,7 @@ namespace LearningArchitect.Modules.Performance
 
         private static int currentFrame = -1;
         private static long currentFrameTicks;
-        private static int currentFrameOperations;
         private static long lastCompletedTicks;
-        private static int lastCompletedOperations;
 
         private Vector3 velocity;
 
@@ -38,7 +36,6 @@ namespace LearningArchitect.Modules.Performance
             }
 
             transform.localPosition = position;
-            currentFrameOperations++;
             currentFrameTicks += Stopwatch.GetTimestamp() - startedAt;
         }
 
@@ -46,19 +43,12 @@ namespace LearningArchitect.Modules.Performance
         {
             currentFrame = -1;
             currentFrameTicks = 0L;
-            currentFrameOperations = 0;
             lastCompletedTicks = 0L;
-            lastCompletedOperations = 0;
         }
 
-        public static float GetLastSimulationTimeMs()
+        public static float GetLastModuleCpuMs()
         {
             return (float)(lastCompletedTicks * 1000d / Stopwatch.Frequency);
-        }
-
-        public static int GetLastOperationsPerFrame()
-        {
-            return lastCompletedOperations;
         }
 
         private static void AdvanceFrameIfNeeded()
@@ -68,10 +58,8 @@ namespace LearningArchitect.Modules.Performance
                 return;
 
             lastCompletedTicks = currentFrameTicks;
-            lastCompletedOperations = currentFrameOperations;
             currentFrame = frame;
             currentFrameTicks = 0L;
-            currentFrameOperations = 0;
         }
     }
 }

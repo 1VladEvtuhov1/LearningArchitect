@@ -198,6 +198,106 @@ MonoBehaviour:
     m_Localized: Next variant
     m_Metadata:
       m_Items: []
+  - m_Id: 2257050737123328
+    m_Localized: GROUP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118272
+    m_Localized: MODULE TYPE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118273
+    m_Localized: VARIANTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118274
+    m_Localized: GUIDED DEMO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118275
+    m_Localized: START DEMO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118276
+    m_Localized: STOP DEMO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118277
+    m_Localized: DEMO COMPLETE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118278
+    m_Localized: STEP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118279
+    m_Localized: PROBLEM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118280
+    m_Localized: COMPARE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118281
+    m_Localized: TAKEAWAY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118282
+    m_Localized: WEBGL PRESET
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118283
+    m_Localized: Core Idea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118284
+    m_Localized: Data Flow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118285
+    m_Localized: Runtime Lifecycle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118286
+    m_Localized: Why This Approach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118287
+    m_Localized: Active items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118288
+    m_Localized: No problem statement provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118289
+    m_Localized: No comparison summary provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118290
+    m_Localized: No takeaway provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118291
+    m_Localized: No data flow notes provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118292
+    m_Localized: No runtime lifecycle notes provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118293
+    m_Localized: No rationale for this approach provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118294
+    m_Localized: No module type specified.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118295
+    m_Localized: No WebGL note provided.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

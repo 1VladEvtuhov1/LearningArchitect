@@ -25,8 +25,7 @@ namespace LearningArchitect.Modules.VFX
         [SerializeField] private Material particleMaterial;
 
         private EmitterRig[] emitters;
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount => emitters == null ? 0 : emitters.Length;
 
@@ -43,7 +42,6 @@ namespace LearningArchitect.Modules.VFX
             long startedAt = Stopwatch.GetTimestamp();
             float time = Time.time;
             float deltaTime = Time.deltaTime;
-            int burstsTriggered = 0;
             for (int i = 0; i < emitters.Length; i++)
             {
                 EmitterRig emitter = emitters[i];
@@ -61,19 +59,17 @@ namespace LearningArchitect.Modules.VFX
                 {
                     emitter.ParticleSystem.Emit(4 + (i % 3));
                     emitter.NextBurstTime = time + baseBurstInterval + ((i % 5) * 0.03f);
-                    burstsTriggered++;
                 }
 
                 emitters[i] = emitter;
             }
 
-            operationsPerFrame = emitters.Length + burstsTriggered;
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(count, ActiveCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(count, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int value)

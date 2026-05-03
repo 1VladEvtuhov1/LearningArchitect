@@ -16,8 +16,7 @@ namespace LearningArchitect.Modules.Effects
         private Vector3[] positions;
         private Vector3[] velocities;
         private Transform[] visuals;
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount => visuals == null ? 0 : visuals.Length;
 
@@ -53,13 +52,12 @@ namespace LearningArchitect.Modules.Effects
                 visuals[i].localPosition = positions[i];
             }
 
-            operationsPerFrame = count + visuals.Length;
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(count, ActiveCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(count, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int value)

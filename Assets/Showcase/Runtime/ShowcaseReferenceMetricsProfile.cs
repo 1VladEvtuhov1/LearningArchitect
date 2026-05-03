@@ -7,16 +7,14 @@ namespace LearningArchitect.Core
             float frameTimeMs,
             int simulationCount,
             int visibleCount,
-            int operationsPerFrame,
-            float simulationCpuMs,
+            float moduleCpuMs,
             float[] graphSamples)
         {
             Fps = fps;
             FrameTimeMs = frameTimeMs;
             SimulationCount = simulationCount;
             VisibleCount = visibleCount;
-            OperationsPerFrame = operationsPerFrame;
-            SimulationCpuMs = simulationCpuMs;
+            ModuleCpuMs = moduleCpuMs;
             GraphSamples = graphSamples;
         }
 
@@ -24,8 +22,7 @@ namespace LearningArchitect.Core
         public float FrameTimeMs { get; }
         public int SimulationCount { get; }
         public int VisibleCount { get; }
-        public int OperationsPerFrame { get; }
-        public float SimulationCpuMs { get; }
+        public float ModuleCpuMs { get; }
         public float[] GraphSamples { get; }
     }
 }

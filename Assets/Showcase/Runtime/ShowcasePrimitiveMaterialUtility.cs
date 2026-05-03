@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LearningArchitect.Core
 {
-    internal static class ShowcasePrimitiveMaterialUtility
+    public static class ShowcasePrimitiveMaterialUtility
     {
         private static readonly Color DefaultBaseColor = new Color(0.48f, 0.51f, 0.58f, 1f);
         private static Material sharedMaterial;

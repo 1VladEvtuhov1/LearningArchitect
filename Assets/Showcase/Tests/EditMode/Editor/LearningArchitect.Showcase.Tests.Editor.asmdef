@@ -1,0 +1,15 @@
+{
+  "name": "LearningArchitect.Showcase.Tests.Editor",
+  "references": [
+    "LearningArchitect.Showcase",
+    "LearningArchitect.Editor",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

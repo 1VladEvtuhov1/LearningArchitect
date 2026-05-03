@@ -84,12 +84,66 @@ namespace LearningArchitect.Tests.UI
 
                 List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
 
-                Assert.AreEqual(3, visibleSections.Count);
+                Assert.AreEqual(4, visibleSections.Count);
                 Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("architecture"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[2].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[1].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("core_idea"), visibleSections[2].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("watch_out"), visibleSections[3].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("no_constraints"), visibleSections[3].Body);
                 Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("strengths")));
+                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("data_flow")));
+                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("runtime_lifecycle")));
+                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("why_this_approach")));
                 Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("takeaway")));
+            }
+            finally
+            {
+                harness?.Dispose();
+                DestroyImmediateSafe(module);
+                DestroyImmediateSafe(variant);
+            }
+        }
+
+        [Test]
+        public void ArchitectureTab_ShowsStructuredArchitectureSections_WhenVariantProvidesThem()
+        {
+            ModuleDefinitionSO module = null;
+            VariantDefinitionSO variant = null;
+            DescriptionPanelHarness harness = null;
+
+            try
+            {
+                module = CreateModule(
+                    "ModuleStructured",
+                    description: "Module description",
+                    problem: "Scale update cost across thousands of entities",
+                    webGlPreset: string.Empty);
+                variant = CreateVariant(
+                    "VariantStructured",
+                    architecture: "A central coordinator owns update ordering and shared state.",
+                    dataFlow: "Input -> Coordinator -> Systems -> Presenters",
+                    runtimeLifecycle: "Bootstrap, simulate per frame, then release pooled visuals on deactivate.",
+                    whyThisApproach: "It keeps ownership explicit and makes cross-system profiling easier.",
+                    takeaway: "Good when global orchestration matters.",
+                    pros: "- Predictable\n- Easy to profile",
+                    cons: "- More coupling to the coordinator");
+                harness = DescriptionPanelHarness.Create();
+
+                harness.Panel.SetContent(module, variant);
+                harness.Panel.SetTab(1);
+
+                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
+
+                Assert.AreEqual(9, visibleSections.Count);
+                Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[0].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[1].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("core_idea"), visibleSections[2].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("data_flow"), visibleSections[3].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("runtime_lifecycle"), visibleSections[4].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("why_this_approach"), visibleSections[5].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("strengths"), visibleSections[6].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("watch_out"), visibleSections[7].Header);
+                Assert.AreEqual(ShowcaseLocalization.GetText("takeaway"), visibleSections[8].Header);
             }
             finally
             {
@@ -196,6 +250,9 @@ namespace LearningArchitect.Tests.UI
         private static VariantDefinitionSO CreateVariant(
             string assetName,
             string architecture = "",
+            string dataFlow = "",
+            string runtimeLifecycle = "",
+            string whyThisApproach = "",
             string compare = "",
             string takeaway = "",
             string tradeOffs = "",
@@ -206,6 +263,9 @@ namespace LearningArchitect.Tests.UI
             variant.name = assetName;
             SetField(variant, "variantName", assetName);
             SetField(variant, "architectureDescription", architecture);
+            SetField(variant, "dataFlow", dataFlow);
+            SetField(variant, "runtimeLifecycle", runtimeLifecycle);
+            SetField(variant, "whyThisApproach", whyThisApproach);
             SetField(variant, "compareSummary", compare);
             SetField(variant, "takeaway", takeaway);
             SetField(variant, "tradeOffs", tradeOffs);

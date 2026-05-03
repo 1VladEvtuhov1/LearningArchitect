@@ -34,6 +34,7 @@ namespace LearningArchitect.UI
         {
             stateHub.SelectionChanged += HandleSelectionChanged;
             stateHub.StressStateChanged += HandleStressStateChanged;
+            stateHub.MetricsChanged += HandleMetricsChanged;
             ShowcaseLocalization.LanguageChanged += HandleLanguageChanged;
             view.StressRequested += HandleStressRequested;
             Refresh();
@@ -43,6 +44,7 @@ namespace LearningArchitect.UI
         {
             stateHub.SelectionChanged -= HandleSelectionChanged;
             stateHub.StressStateChanged -= HandleStressStateChanged;
+            stateHub.MetricsChanged -= HandleMetricsChanged;
             ShowcaseLocalization.LanguageChanged -= HandleLanguageChanged;
             view.StressRequested -= HandleStressRequested;
         }
@@ -53,7 +55,7 @@ namespace LearningArchitect.UI
             view.ConfigurePresets(
                 variant != null ? variant.GetStressPresets() : null,
                 variant != null ? variant.GetStressPresetLabels(ShowcaseLocalization.CurrentLanguage) : null);
-            view.ShowStressState(stateHub.CurrentStressLevel, stateHub.ActiveItemCount);
+            view.ShowStressState(stateHub.CurrentStressLevel, stateHub.ActiveItemCount, stateHub.CurrentMetrics);
         }
 
         private void HandleStressRequested(int level)
@@ -63,7 +65,12 @@ namespace LearningArchitect.UI
 
         private void HandleStressStateChanged(int level, int activeCount)
         {
-            view.ShowStressState(level, activeCount);
+            view.ShowStressState(level, activeCount, stateHub.CurrentMetrics);
+        }
+
+        private void HandleMetricsChanged(ShowcaseMetricsSnapshot metrics)
+        {
+            view.ShowStressState(stateHub.CurrentStressLevel, stateHub.ActiveItemCount, metrics);
         }
 
         private void HandleLanguageChanged(ShowcaseLanguage language)
@@ -77,7 +84,7 @@ namespace LearningArchitect.UI
             view.ConfigurePresets(
                 stateHub.CurrentVariant != null ? stateHub.CurrentVariant.GetStressPresets() : null,
                 stateHub.CurrentVariant != null ? stateHub.CurrentVariant.GetStressPresetLabels(ShowcaseLocalization.CurrentLanguage) : null);
-            view.ShowStressState(stateHub.CurrentStressLevel, stateHub.ActiveItemCount);
+            view.ShowStressState(stateHub.CurrentStressLevel, stateHub.ActiveItemCount, stateHub.CurrentMetrics);
         }
     }
 }

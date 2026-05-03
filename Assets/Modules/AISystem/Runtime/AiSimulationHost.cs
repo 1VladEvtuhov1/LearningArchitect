@@ -21,8 +21,7 @@ namespace LearningArchitect.Modules.AI
         private int visualLimit;
         private int activeCount;
         private bool initialized;
-        private int operationsPerFrame;
-        private float simulationTimeMs;
+        private float moduleCpuMs;
 
         public int ActiveCount
         {
@@ -70,8 +69,7 @@ namespace LearningArchitect.Modules.AI
             EnsureInitialized();
             long startedAt = Stopwatch.GetTimestamp();
             runner.Tick(deltaTime);
-            simulationTimeMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
-            operationsPerFrame = activeCount;
+            moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
             presenter.Sync(runner.World);
         }
 
@@ -94,14 +92,13 @@ namespace LearningArchitect.Modules.AI
             presenter.Dispose();
             initialized = false;
             activeCount = 0;
-            operationsPerFrame = 0;
-            simulationTimeMs = 0f;
+            moduleCpuMs = 0f;
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
             EnsureInitialized();
-            return new ShowcaseMetricsSnapshot(activeCount, presenter.VisibleCount, operationsPerFrame, simulationTimeMs);
+            return new ShowcaseMetricsSnapshot(activeCount, presenter.VisibleCount, moduleCpuMs);
         }
 
         private void Rebuild(int count)

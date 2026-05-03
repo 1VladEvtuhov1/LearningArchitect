@@ -1,0 +1,10 @@
+{
+  "name": "LearningArchitect.Showcase",
+  "references": [
+    "UnityEngine.UI",
+    "Unity.TextMeshPro",
+    "Unity.InputSystem",
+    "Unity.Localization",
+    "Unity.ResourceManager"
+  ]
+}

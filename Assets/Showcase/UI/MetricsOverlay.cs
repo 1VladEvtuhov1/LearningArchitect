@@ -15,8 +15,7 @@ namespace LearningArchitect.UI
                 float frameTimeMs,
                 int simulationCount,
                 int visibleCount,
-                int operationsPerFrame,
-                float simulationCpuMs,
+                float moduleCpuMs,
                 float graphMaxValue,
                 float graphMidValue,
                 float[] graphSamples,
@@ -30,8 +29,7 @@ namespace LearningArchitect.UI
                 FrameTimeMs = frameTimeMs;
                 SimulationCount = simulationCount;
                 VisibleCount = visibleCount;
-                OperationsPerFrame = operationsPerFrame;
-                SimulationCpuMs = simulationCpuMs;
+                ModuleCpuMs = moduleCpuMs;
                 GraphMaxValue = graphMaxValue;
                 GraphMidValue = graphMidValue;
                 GraphSamples = graphSamples;
@@ -46,8 +44,7 @@ namespace LearningArchitect.UI
             public float FrameTimeMs { get; }
             public int SimulationCount { get; }
             public int VisibleCount { get; }
-            public int OperationsPerFrame { get; }
-            public float SimulationCpuMs { get; }
+            public float ModuleCpuMs { get; }
             public float GraphMaxValue { get; }
             public float GraphMidValue { get; }
             public float[] GraphSamples { get; }
@@ -83,6 +80,7 @@ namespace LearningArchitect.UI
         [SerializeField] private Color valueColor = default;
         [SerializeField] private int graphSampleCount = 64;
         [SerializeField] private float graphMaxFps = 180f;
+        private const int VisibleMetricRowCount = 5;
 
         private float nextRefreshTime;
         private float smoothedFps;
@@ -101,7 +99,6 @@ namespace LearningArchitect.UI
         private Image chartBackgroundImage;
         private PerformanceGraph performanceGraph;
         private int activeCount;
-        private string activeItemLabel;
         private ShowcaseMetricsSnapshot currentMetrics = ShowcaseMetricsSnapshot.Empty;
         private ReferenceMetricsProfile referenceProfile;
         private bool referenceGraphDirty;
@@ -193,24 +190,15 @@ namespace LearningArchitect.UI
             string titleHex = ColorUtility.ToHtmlStringRGB(titleColor);
             string labelHex = ColorUtility.ToHtmlStringRGB(labelColor);
             string valueHex = ColorUtility.ToHtmlStringRGB(valueColor);
-            string countLabel = string.IsNullOrWhiteSpace(activeItemLabel)
-                ? ShowcaseLocalization.GetText("active_items")
-                : activeItemLabel;
-            int operationsPerFrame = GetOperationsPerFrame();
-            float simulationCpuMs = GetSimulationCpuMs();
+            float moduleCpuMs = GetModuleCpuMs();
 
             string metricsText =
                 "<size=78%><color=#" + titleHex + "><b>" + ShowcaseLocalization.GetText("performance") + "</b></color></size>\n" +
                 "<line-height=102%><size=84%><color=#" + labelHex + ">" + ShowcaseLocalization.GetText("fps") + "</color>    <size=122%><color=#" + metricColor + "><b>" + smoothedFps.ToString("0") + "</b></color></size>\n" +
-                "<color=#" + labelHex + ">" + ShowcaseLocalization.GetText("frame_time") + "</color>    <color=#" + valueHex + ">" + smoothedFrameMs.ToString("0.0") + " ms</color>\n" +
-                "<color=#" + labelHex + ">SIM</color>    <color=#" + valueHex + ">" + FormatCount(GetSimulationCount()) + "</color>\n" +
-                "<color=#" + labelHex + ">" + countLabel + "</color>    <color=#" + valueHex + ">" + FormatCount(GetVisibleCount()) + "</color>";
-
-            if (operationsPerFrame >= 0)
-                metricsText += "\n<color=#" + labelHex + ">OPS/frame</color>    <color=#" + valueHex + ">" + FormatCount(operationsPerFrame) + "</color>";
-
-            if (simulationCpuMs >= 0f)
-                metricsText += "\n<color=#" + labelHex + ">SIM CPU</color>    <color=#" + valueHex + ">" + simulationCpuMs.ToString("0.00") + " ms</color>";
+                "<color=#" + labelHex + ">" + GetFrameMetricLabel() + "</color>    <color=#" + valueHex + ">" + smoothedFrameMs.ToString("0.0") + " ms</color>\n" +
+                "<color=#" + labelHex + ">" + GetModuleCpuLabel() + "</color>    <color=#" + valueHex + ">" + FormatCpuValue(moduleCpuMs) + "</color>\n" +
+                "<color=#" + labelHex + ">" + GetSimulationLabel() + "</color>    <color=#" + valueHex + ">" + FormatCount(GetSimulationCount()) + "</color>\n" +
+                "<color=#" + labelHex + ">" + GetVisibleLabel() + "</color>    <color=#" + valueHex + ">" + FormatCount(GetVisibleCount()) + "</color>";
 
             if (HasStructuredCardUi())
             {
@@ -239,7 +227,6 @@ namespace LearningArchitect.UI
 
         public void ConfigureModule(ModuleDefinitionSO module)
         {
-            activeItemLabel = ShowcaseLocalization.GetModuleActiveItemLabel(module);
         }
 
         private bool EnsureInitialized()
@@ -276,9 +263,6 @@ namespace LearningArchitect.UI
 
             if (valueColor == default)
                 valueColor = ShowcasePalette.TextPrimary;
-
-            if (string.IsNullOrWhiteSpace(activeItemLabel))
-                activeItemLabel = ShowcaseLocalization.GetText("active_items");
 
             TryResolveStructuredCard();
 
@@ -368,13 +352,13 @@ namespace LearningArchitect.UI
         {
             if (performanceHeaderText != null)
             {
-                performanceHeaderText.text = GetPerformanceHeaderText();
+                performanceHeaderText.text = GetDisplayPerformanceHeaderText();
                 performanceHeaderText.color = GetGraphAccentColor();
             }
 
             if (performanceInsightText != null)
             {
-                performanceInsightText.text = BuildPerformanceInsight();
+                performanceInsightText.text = GetDisplayPerformanceInsight();
                 performanceInsightText.color = ShowcasePalette.TextSecondary;
             }
 
@@ -384,22 +368,13 @@ namespace LearningArchitect.UI
             Color metricColor = GetMetricColor(smoothedFps);
             Color accentColor = GetGraphAccentColor();
             SetMetricRow(0, "FPS", smoothedFps.ToString("0"), metricColor);
-            SetMetricRow(1, GetShortFrameLabel(), smoothedFrameMs.ToString("0.0") + " ms");
-            SetMetricRow(2, GetShortVisibleLabel(), FormatCount(GetVisibleCount()));
+            SetMetricRow(1, GetFrameMetricLabel(), smoothedFrameMs.ToString("0.0") + " ms");
+            SetMetricRow(2, GetModuleCpuLabel(), FormatCpuValue(GetModuleCpuMs()));
+            SetMetricRow(3, GetSimulationLabel(), FormatCount(GetSimulationCount()));
+            SetMetricRow(4, GetVisibleLabel(), FormatCount(GetVisibleCount()));
 
-            if (metricRows.Length > 3)
-                SetMetricRow(3, "SIM", FormatCount(GetSimulationCount()));
-
-            if (metricRows.Length > 4)
-                SetMetricRow(4, "OPS/F", GetOperationsPerFrame() >= 0 ? FormatCount(GetOperationsPerFrame()) : "\u2014");
-
-            if (metricRows.Length > 5)
-            {
-                string cpuText = GetSimulationCpuMs() >= 0f
-                    ? GetSimulationCpuMs().ToString("0.00") + " ms"
-                    : "\u2014";
-                SetMetricRow(5, "SIM CPU", cpuText);
-            }
+            for (int i = 0; i < metricRows.Length; i++)
+                SetMetricRowVisible(i, i < VisibleMetricRowCount);
 
             if (chartSummaryText != null)
             {
@@ -447,13 +422,11 @@ namespace LearningArchitect.UI
 
         private string BuildCompactMetricSummary()
         {
-            string summary = "SIM " + FormatCount(GetSimulationCount());
+            string summary = GetVisibleLabel() + " " + FormatCount(GetVisibleCount()) +
+                             "  |  " + GetSimulationLabel() + " " + FormatCount(GetSimulationCount());
 
-            if (GetOperationsPerFrame() >= 0)
-                summary += "  |  OPS " + FormatCount(GetOperationsPerFrame());
-
-            if (GetSimulationCpuMs() >= 0f)
-                summary += "  |  CPU " + GetSimulationCpuMs().ToString("0.00") + " ms";
+            if (GetModuleCpuMs() >= 0f)
+                summary += "  |  CPU " + GetModuleCpuMs().ToString("0.00") + " ms";
 
             return summary;
         }
@@ -493,6 +466,39 @@ namespace LearningArchitect.UI
             return ShowcaseLocalization.CurrentLanguage == ShowcaseLanguage.Russian && !string.IsNullOrWhiteSpace(russian)
                 ? russian
                 : english;
+        }
+
+        private string GetDisplayPerformanceInsight()
+        {
+            if (HasReferenceProfile())
+                return GetLocalized(referenceProfile.InsightEn, referenceProfile.InsightRu);
+
+            return "Live metrics show frame-level behavior and module-local CPU cost.";
+        }
+
+        private static string GetDisplayPerformanceHeaderText()
+        {
+            return "PERFORMANCE";
+        }
+
+        private static string GetFrameMetricLabel()
+        {
+            return "Frame ms";
+        }
+
+        private static string GetModuleCpuLabel()
+        {
+            return "Module CPU";
+        }
+
+        private static string GetSimulationLabel()
+        {
+            return "Simulated";
+        }
+
+        private static string GetVisibleLabel()
+        {
+            return "Visible";
         }
 
         private void TryResolveStructuredCard()
@@ -821,6 +827,28 @@ namespace LearningArchitect.UI
             return new MetricRow(label, value);
         }
 
+        private void SetMetricRowVisible(int index, bool visible)
+        {
+            if (metricRows == null || index < 0 || index >= metricRows.Length)
+                return;
+
+            MetricRow row = metricRows[index];
+            RectTransform rowRoot = GetMetricRowRoot(row);
+            if (rowRoot != null)
+                rowRoot.gameObject.SetActive(visible);
+        }
+
+        private static RectTransform GetMetricRowRoot(MetricRow row)
+        {
+            if (row?.Label != null && row.Label.rectTransform.parent is RectTransform labelParent)
+                return labelParent;
+
+            if (row?.Value != null && row.Value.rectTransform.parent is RectTransform valueParent)
+                return valueParent;
+
+            return null;
+        }
+
         private void UpdateGraph(float fps)
         {
             if (performanceGraph == null)
@@ -862,20 +890,17 @@ namespace LearningArchitect.UI
             return currentMetrics.HasVisibleCount ? currentMetrics.VisibleCount : activeCount;
         }
 
-        private int GetOperationsPerFrame()
+        private float GetModuleCpuMs()
         {
             if (HasReferenceProfile())
-                return referenceProfile.OperationsPerFrame;
+                return referenceProfile.ModuleCpuMs;
 
-            return currentMetrics.HasOperationsPerFrame ? currentMetrics.OperationsPerFrame : -1;
+            return currentMetrics.HasModuleCpuMs ? currentMetrics.ModuleCpuMs : -1f;
         }
 
-        private float GetSimulationCpuMs()
+        private static string FormatCpuValue(float cpuMs)
         {
-            if (HasReferenceProfile())
-                return referenceProfile.SimulationCpuMs;
-
-            return currentMetrics.HasSimulationTimeMs ? currentMetrics.SimulationTimeMs : -1f;
+            return cpuMs >= 0f ? cpuMs.ToString("0.00") + " ms" : "\u2014";
         }
 
         private bool HasReferenceProfile()
@@ -922,21 +947,21 @@ namespace LearningArchitect.UI
             switch (stressLevel)
             {
                 case 25:
-                    return BuildProfile(148f, 6.7f, 25, 25, 145, 0.12f, 165f, 80f, new Color(1f, 0.56f, 0.24f, 1f),
+                    return BuildProfile(148f, 6.7f, 25, 25, 0.12f, 165f, 80f, new Color(1f, 0.56f, 0.24f, 1f),
                         "Readable object ownership. Callback cost is still small at this preset.",
                         "Понятное владение объектами. Цена callback'ов пока почти не видна.",
                         "Trend: stable while callback count stays low.",
                         "Тренд: стабильно, пока callback'ов мало.",
                         154f, 153f, 151f, 149f, 147f, 145f, 143f, 141f, 142f, 144f, 146f, 149f);
                 case 100:
-                    return BuildProfile(86f, 11.6f, 100, 100, 420, 1.08f, 120f, 60f, new Color(1f, 0.56f, 0.24f, 1f),
+                    return BuildProfile(86f, 11.6f, 100, 100, 1.08f, 120f, 60f, new Color(1f, 0.56f, 0.24f, 1f),
                         "Callback fan-out is visible. Each item still owns its own Update path.",
                         "Fan-out callback'ов уже виден. Каждый элемент всё ещё владеет своим Update.",
                         "Trend: frame time rises with object count.",
                         "Тренд: frame time растёт вместе с числом объектов.",
                         104f, 101f, 98f, 95f, 91f, 88f, 84f, 80f, 77f, 79f, 82f, 86f, 89f, 92f);
                 case 250:
-                    return BuildProfile(43f, 23.3f, 250, 250, 1320, 4.62f, 70f, 35f, new Color(1f, 0.56f, 0.24f, 1f),
+                    return BuildProfile(43f, 23.3f, 250, 250, 4.62f, 70f, 35f, new Color(1f, 0.56f, 0.24f, 1f),
                         "Simple ownership becomes expensive: many isolated callbacks now shape the frame.",
                         "Простое владение стало дорогим: кадр формируют сотни отдельных callback'ов.",
                         "Trend: drops below the smooth demo target.",
@@ -952,21 +977,21 @@ namespace LearningArchitect.UI
             switch (stressLevel)
             {
                 case 100:
-                    return BuildProfile(166f, 6.1f, 100, 100, 200, 0.08f, 180f, 90f, new Color(0.24f, 0.86f, 0.82f, 1f),
+                    return BuildProfile(166f, 6.1f, 100, 100, 0.08f, 180f, 90f, new Color(0.24f, 0.86f, 0.82f, 1f),
                         "One owner loop keeps callback overhead flat while behavior stays comparable.",
                         "Один owner loop держит callback overhead ровным при том же поведении.",
                         "Trend: stable baseline for small and medium stress.",
                         "Тренд: стабильный baseline для малой и средней нагрузки.",
                         172f, 171f, 170f, 169f, 168f, 167f, 166f, 165f, 165f, 166f, 167f, 168f);
                 case 1000:
-                    return BuildProfile(124f, 8.0f, 1000, 260, 1260, 0.46f, 150f, 75f, new Color(0.24f, 0.86f, 0.82f, 1f),
+                    return BuildProfile(124f, 8.0f, 1000, 260, 0.46f, 150f, 75f, new Color(0.24f, 0.86f, 0.82f, 1f),
                         "The simulation grows, but presentation stays capped and the update path remains centralized.",
                         "Симуляция растёт, но rendering cap и централизованный update держат картину стабильной.",
                         "Trend: graceful cost growth instead of callback spikes.",
                         "Тренд: плавный рост цены вместо callback spikes.",
                         132f, 131f, 130f, 128f, 126f, 124f, 122f, 121f, 120f, 121f, 123f, 124f, 126f, 127f);
                 case 5000:
-                    return BuildProfile(72f, 13.9f, 5000, 260, 5260, 1.94f, 100f, 50f, new Color(0.24f, 0.86f, 0.82f, 1f),
+                    return BuildProfile(72f, 13.9f, 5000, 260, 1.94f, 100f, 50f, new Color(0.24f, 0.86f, 0.82f, 1f),
                         "Centralized ownership still degrades, but the cost stays legible and easier to tune.",
                         "Централизованный вариант тоже деградирует, но цена читаема и проще тюнится.",
                         "Trend: controlled decline under browser-safe stress.",
@@ -982,8 +1007,7 @@ namespace LearningArchitect.UI
             float frameTimeMs,
             int simulationCount,
             int visibleCount,
-            int operationsPerFrame,
-            float simulationCpuMs,
+            float moduleCpuMs,
             float graphMaxValue,
             float graphMidValue,
             Color accentColor,
@@ -998,8 +1022,7 @@ namespace LearningArchitect.UI
                 frameTimeMs,
                 simulationCount,
                 visibleCount,
-                operationsPerFrame,
-                simulationCpuMs,
+                moduleCpuMs,
                 graphMaxValue,
                 graphMidValue,
                 ExpandAnchors(anchors, 24),

@@ -1,0 +1,6 @@
+{
+  "name": "LearningArchitect.Modules.Effects",
+  "references": [
+    "LearningArchitect.Showcase"
+  ]
+}

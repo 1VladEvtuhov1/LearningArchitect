@@ -202,6 +202,8 @@ namespace LearningArchitect.EditorTools
 
             WriteEntries(englishTable, englishEntries);
             WriteEntries(russianTable, russianEntries);
+
+            AddMissingUiEntries(englishTable, russianTable);
         }
 
         private static void PopulateContentCollection(StringTableCollection collection, Locale english, Locale russian)
@@ -239,6 +241,12 @@ namespace LearningArchitect.EditorTools
                 SetEntry(russianTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantNameRu);
                 SetEntry(englishTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescription);
                 SetEntry(russianTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescriptionRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantDataFlowKey(variant), variant.DataFlow);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantDataFlowKey(variant), variant.DataFlowRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycle);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycleRu);
+                SetEntry(englishTable, ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproach);
+                SetEntry(russianTable, ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproachRu);
                 SetEntry(englishTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummary);
                 SetEntry(russianTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummaryRu);
                 SetEntry(englishTable, ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.Takeaway);
@@ -256,6 +264,60 @@ namespace LearningArchitect.EditorTools
         {
             foreach (KeyValuePair<string, string> pair in entries)
                 SetEntry(table, pair.Key, pair.Value);
+        }
+
+        private static void AddMissingUiEntries(StringTable englishTable, StringTable russianTable)
+        {
+            SetEntry(englishTable, "module_group", "GROUP");
+            SetEntry(russianTable, "module_group", "ГРУППА");
+            SetEntry(englishTable, "module_type", "MODULE TYPE");
+            SetEntry(russianTable, "module_type", "ТИП МОДУЛЯ");
+            SetEntry(englishTable, "variants", "VARIANTS");
+            SetEntry(russianTable, "variants", "ВАРИАНТЫ");
+            SetEntry(englishTable, "guided_demo", "GUIDED DEMO");
+            SetEntry(russianTable, "guided_demo", "ГИД-ДЕМО");
+            SetEntry(englishTable, "start_demo", "START DEMO");
+            SetEntry(russianTable, "start_demo", "ЗАПУСК ДЕМО");
+            SetEntry(englishTable, "stop_demo", "STOP DEMO");
+            SetEntry(russianTable, "stop_demo", "СТОП ДЕМО");
+            SetEntry(englishTable, "demo_complete", "DEMO COMPLETE");
+            SetEntry(russianTable, "demo_complete", "ДЕМО ЗАВЕРШЕНО");
+            SetEntry(englishTable, "step", "STEP");
+            SetEntry(russianTable, "step", "ШАГ");
+            SetEntry(englishTable, "problem", "PROBLEM");
+            SetEntry(russianTable, "problem", "ПРОБЛЕМА");
+            SetEntry(englishTable, "compare", "COMPARE");
+            SetEntry(russianTable, "compare", "СРАВНЕНИЕ");
+            SetEntry(englishTable, "takeaway", "TAKEAWAY");
+            SetEntry(russianTable, "takeaway", "ВЫВОД");
+            SetEntry(englishTable, "webgl_preset", "WEBGL PRESET");
+            SetEntry(russianTable, "webgl_preset", "WEBGL ПРЕСЕТ");
+            SetEntry(englishTable, "core_idea", "Core Idea");
+            SetEntry(russianTable, "core_idea", "Ключевая идея");
+            SetEntry(englishTable, "data_flow", "Data Flow");
+            SetEntry(russianTable, "data_flow", "Поток данных");
+            SetEntry(englishTable, "runtime_lifecycle", "Runtime Lifecycle");
+            SetEntry(russianTable, "runtime_lifecycle", "Жизненный цикл runtime");
+            SetEntry(englishTable, "why_this_approach", "Why This Approach");
+            SetEntry(russianTable, "why_this_approach", "Почему этот подход");
+            SetEntry(englishTable, "active_items", "Active items");
+            SetEntry(russianTable, "active_items", "Активные элементы");
+            SetEntry(englishTable, "no_problem_statement", "No problem statement provided.");
+            SetEntry(russianTable, "no_problem_statement", "Постановка проблемы не указана.");
+            SetEntry(englishTable, "no_compare_summary", "No comparison summary provided.");
+            SetEntry(russianTable, "no_compare_summary", "Сравнение не описано.");
+            SetEntry(englishTable, "no_takeaway", "No takeaway provided.");
+            SetEntry(russianTable, "no_takeaway", "Ключевой вывод не указан.");
+            SetEntry(englishTable, "no_data_flow", "No data flow notes provided.");
+            SetEntry(russianTable, "no_data_flow", "Поток данных не описан.");
+            SetEntry(englishTable, "no_runtime_lifecycle", "No runtime lifecycle notes provided.");
+            SetEntry(russianTable, "no_runtime_lifecycle", "Жизненный цикл runtime не описан.");
+            SetEntry(englishTable, "no_why_this_approach", "No rationale for this approach provided.");
+            SetEntry(russianTable, "no_why_this_approach", "Обоснование выбора подхода не указано.");
+            SetEntry(englishTable, "no_module_type", "No module type specified.");
+            SetEntry(russianTable, "no_module_type", "Тип модуля не указан.");
+            SetEntry(englishTable, "no_webgl_note", "No WebGL note provided.");
+            SetEntry(russianTable, "no_webgl_note", "WebGL-пресет не описан.");
         }
 
         private static void SetEntry(StringTable table, string key, string value)

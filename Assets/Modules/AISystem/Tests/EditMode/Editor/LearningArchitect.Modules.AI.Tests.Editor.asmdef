@@ -1,0 +1,12 @@
+{
+  "name": "LearningArchitect.Modules.AI.Tests.Editor",
+  "references": [
+    "LearningArchitect.Modules.AI"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
