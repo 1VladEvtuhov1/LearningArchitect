@@ -55,6 +55,9 @@ CodeCoverage/
 *.coverage
 *.coveragexml
 
+# Working documentation captures
+Docs/Screenshots/
+
 # Addressables / build cache artifacts
 ServerData/
 Assets/AddressableAssetsData/WebGL.meta
