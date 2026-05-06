@@ -1,4 +1,5 @@
 using System;
+using LearningArchitect.Core;
 using UnityEngine;
 
 namespace LearningArchitect.Modules.AI
@@ -6,7 +7,7 @@ namespace LearningArchitect.Modules.AI
     public sealed class AiViewPresenter : IDisposable
     {
         private Transform parent;
-        private PrimitiveType primitiveType;
+        private GameObject visualPrefab;
         private Vector3 visualScale;
         private string visualNamePrefix;
         private bool orientToTarget;
@@ -19,7 +20,7 @@ namespace LearningArchitect.Modules.AI
 
         public void Configure(
             Transform visualParent,
-            PrimitiveType visualPrimitiveType,
+            GameObject markerPrefab,
             Vector3 scale,
             string namePrefix,
             bool shouldOrientToTarget,
@@ -27,7 +28,7 @@ namespace LearningArchitect.Modules.AI
             int maxVisuals)
         {
             parent = visualParent != null ? visualParent : throw new ArgumentNullException(nameof(visualParent));
-            primitiveType = visualPrimitiveType;
+            visualPrefab = markerPrefab;
             visualScale = scale;
             visualNamePrefix = string.IsNullOrWhiteSpace(namePrefix)
                 ? throw new ArgumentException("Visual name prefix is required.", nameof(namePrefix))
@@ -52,16 +53,12 @@ namespace LearningArchitect.Modules.AI
 
             for (int i = 0; i < visible; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(primitiveType);
-                LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = visualNamePrefix + i;
-                marker.transform.SetParent(parent, false);
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    parent,
+                    visualNamePrefix + i,
+                    visualPrefab,
+                    visualScale);
                 marker.transform.localPosition = world.Positions[i];
-                marker.transform.localScale = visualScale;
-
-                Collider collider = marker.GetComponent<Collider>();
-                if (collider != null)
-                    DestroyObject(collider);
 
                 visuals[i] = marker.transform;
             }

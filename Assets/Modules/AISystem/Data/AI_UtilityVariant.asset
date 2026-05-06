@@ -16,15 +16,15 @@ MonoBehaviour:
   variantName: Utility Scoring Variant
   variantNameRu: "Utility-\u0418\u0418"
   prefab: {fileID: 687801263503201410, guid: d23ab8cdb067c634fa2d18f7608b3bfb, type: 3}
-  stressPresets: f4010000d007000088130000
+  stressPresets: f4010000e8030000d0070000
   stressPresetLabels:
   - 500
+  - 1 000
   - 2 000
-  - 5 000
   stressPresetLabelsRu:
   - 500
+  - 1 000
   - 2 000
-  - 5 000
   architectureDescription: Utility-driven variant. Agents periodically score candidate
     goals and bias movement toward the best option.
   architectureDescriptionRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043D\u0430

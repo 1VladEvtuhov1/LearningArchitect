@@ -8,6 +8,7 @@ using LearningArchitect.Modules.Performance;
 using LearningArchitect.Modules.Pooling;
 using LearningArchitect.Modules.VFX;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 namespace LearningArchitect.Tests.Modules
@@ -78,6 +79,8 @@ namespace LearningArchitect.Tests.Modules
 
             centralized.InvokeLifecycle("Awake");
             perObject.InvokeLifecycle("Awake");
+            centralized.Component.SetStressLevel(5000);
+            perObject.Component.SetStressLevel(5000);
 
             ShowcaseMetricsSnapshot centralizedMetrics = centralized.Component.GetMetricsSnapshot();
             ShowcaseMetricsSnapshot perObjectMetrics = perObject.Component.GetMetricsSnapshot();
@@ -98,6 +101,7 @@ namespace LearningArchitect.Tests.Modules
             using ModuleFixture<ChunkEffectsVariant> fixture = CreateFixture<ChunkEffectsVariant>();
 
             fixture.InvokeLifecycle("Awake");
+            fixture.Component.SetStressLevel(5000);
 
             ShowcaseMetricsSnapshot defaultMetrics = fixture.Component.GetMetricsSnapshot();
             Assert.AreEqual(5000, defaultMetrics.SimulationCount);
@@ -121,6 +125,7 @@ namespace LearningArchitect.Tests.Modules
             indie.InvokeLifecycle("Awake");
 
             batched.Component.SetStressLevel(4800);
+            indie.Component.SetStressLevel(500);
             ShowcaseMetricsSnapshot batchedMetrics = batched.Component.GetMetricsSnapshot();
             ShowcaseMetricsSnapshot indieMetrics = indie.Component.GetMetricsSnapshot();
 
@@ -134,18 +139,20 @@ namespace LearningArchitect.Tests.Modules
         }
 
         [Test]
-        public void HumanoidAnimationVariant_FallbackRigReportsSimulationAndVisibleCounts()
+        public void HumanoidAnimationVariant_ActorPrefabReportsSimulationAndVisibleCounts()
         {
             using ModuleFixture<HumanoidAnimationVariant> fixture = CreateFixture<HumanoidAnimationVariant>();
 
             fixture.InvokeLifecycle("Awake");
+            fixture.Component.SetStressLevel(24);
 
             ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(72, metrics.SimulationCount);
-            Assert.AreEqual(42, metrics.VisibleCount);
+            Assert.AreEqual(24, metrics.SimulationCount);
+            Assert.AreEqual(8, metrics.VisibleCount);
             Assert.AreEqual(fixture.Component.ActiveCount, metrics.VisibleCount);
-            Assert.AreEqual(42, fixture.Root.transform.childCount);
+            Assert.AreEqual(8, fixture.Root.transform.childCount);
+            Assert.IsNotNull(fixture.Root.transform.GetChild(0).GetComponent<HumanoidCrowdActor>());
         }
 
         [Test]
@@ -163,11 +170,109 @@ namespace LearningArchitect.Tests.Modules
             Assert.AreEqual(32, fixture.Root.transform.childCount);
         }
 
+        [TestCase("Assets/Modules/UpdateLoopStrategies/Prefabs/UpdateLoopVariant_PerObject.prefab", nameof(PerObjectUpdateVariant))]
+        [TestCase("Assets/Modules/UpdateLoopStrategies/Prefabs/UpdateLoopVariant_Centralized.prefab", nameof(CentralizedUpdateVariant))]
+        [TestCase("Assets/Modules/ObjectPooling/Prefabs/PoolingVariant_Instantiation.prefab", nameof(InstantiationVariant))]
+        [TestCase("Assets/Modules/ObjectPooling/Prefabs/PoolingVariant_Pooled.prefab", nameof(PooledVariant))]
+        [TestCase("Assets/Modules/InventorySystems/Prefabs/InventoryVariant_PackedSlots.prefab", nameof(InventoryPackedVariant))]
+        [TestCase("Assets/Modules/InventorySystems/Prefabs/InventoryVariant_ObjectSlots.prefab", nameof(InventoryObjectsVariant))]
+        [TestCase("Assets/Modules/AISystem/Prefabs/AiVariant_BehaviorTree.prefab", "BehaviorTreeAiVariant")]
+        [TestCase("Assets/Modules/AISystem/Prefabs/AiVariant_FSM.prefab", "FsmAiVariant")]
+        [TestCase("Assets/Modules/AISystem/Prefabs/AiVariant_Utility.prefab", "UtilityAiVariant")]
+        [TestCase("Assets/Modules/EffectsSystem/Prefabs/EffectsVariant_Chunk.prefab", nameof(ChunkEffectsVariant))]
+        [TestCase("Assets/Modules/EffectsSystem/Prefabs/EffectsVariant_Indie.prefab", nameof(IndieEffectsVariant))]
+        [TestCase("Assets/Modules/VFXDelivery/Prefabs/VfxVariant_BatchedPulses.prefab", nameof(BatchedPulseVfxVariant))]
+        public void ModulePrefabs_AssignVisualPrefabForRuntimeSpawnedVisuals(string prefabPath, string componentTypeName)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            Assert.IsNotNull(prefab, $"Could not load prefab at '{prefabPath}'.");
+
+            MonoBehaviour component = Array.Find(prefab.GetComponents<MonoBehaviour>(), candidate =>
+                candidate != null && candidate.GetType().Name == componentTypeName);
+            Assert.IsNotNull(component, $"Prefab '{prefabPath}' is missing component '{componentTypeName}'.");
+
+            SerializedObject serializedObject = new(component);
+            SerializedProperty visualPrefabProperty = serializedObject.FindProperty("visualPrefab");
+            Assert.IsNotNull(visualPrefabProperty, $"Component '{componentTypeName}' should expose a serialized 'visualPrefab' field.");
+            Assert.IsNotNull(visualPrefabProperty.objectReferenceValue, $"Prefab '{prefabPath}' must assign a runtime visual prefab.");
+        }
+
         private static ModuleFixture<T> CreateFixture<T>() where T : MonoBehaviour
         {
-            GameObject root = new(typeof(T).Name + " Test Root");
-            T component = root.AddComponent<T>();
+            string prefabPath = GetFixturePrefabPath(typeof(T));
+            GameObject root;
+            T component;
+
+            if (!string.IsNullOrEmpty(prefabPath))
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                Assert.IsNotNull(prefab, $"Could not load fixture prefab at '{prefabPath}' for '{typeof(T).Name}'.");
+                root = UnityEngine.Object.Instantiate(prefab);
+                component = root.GetComponent<T>();
+                Assert.IsNotNull(component, $"Instantiated fixture prefab '{prefabPath}' is missing component '{typeof(T).Name}'.");
+                ConfigureVisualPrefabIfPresent(component);
+            }
+            else
+            {
+                root = new(typeof(T).Name + " Test Root");
+                component = root.AddComponent<T>();
+                ConfigureVisualPrefabIfPresent(component);
+            }
+
             return new ModuleFixture<T>(root, component);
+        }
+
+        private static string GetFixturePrefabPath(Type componentType)
+        {
+            return componentType.Name switch
+            {
+                nameof(PerObjectUpdateVariant) => "Assets/Modules/UpdateLoopStrategies/Prefabs/UpdateLoopVariant_PerObject.prefab",
+                nameof(CentralizedUpdateVariant) => "Assets/Modules/UpdateLoopStrategies/Prefabs/UpdateLoopVariant_Centralized.prefab",
+                nameof(InstantiationVariant) => "Assets/Modules/ObjectPooling/Prefabs/PoolingVariant_Instantiation.prefab",
+                nameof(PooledVariant) => "Assets/Modules/ObjectPooling/Prefabs/PoolingVariant_Pooled.prefab",
+                nameof(InventoryPackedVariant) => "Assets/Modules/InventorySystems/Prefabs/InventoryVariant_PackedSlots.prefab",
+                nameof(InventoryObjectsVariant) => "Assets/Modules/InventorySystems/Prefabs/InventoryVariant_ObjectSlots.prefab",
+                nameof(ChunkEffectsVariant) => "Assets/Modules/EffectsSystem/Prefabs/EffectsVariant_Chunk.prefab",
+                nameof(IndieEffectsVariant) => "Assets/Modules/EffectsSystem/Prefabs/EffectsVariant_Indie.prefab",
+                nameof(BatchedPulseVfxVariant) => "Assets/Modules/VFXDelivery/Prefabs/VfxVariant_BatchedPulses.prefab",
+                nameof(HumanoidAnimationVariant) => "Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_Run.prefab",
+                _ => null
+            };
+        }
+
+        private static void ConfigureVisualPrefabIfPresent(MonoBehaviour component)
+        {
+            SerializedObject serializedObject = new(component);
+            SerializedProperty visualPrefabProperty = serializedObject.FindProperty("visualPrefab");
+            if (visualPrefabProperty == null || visualPrefabProperty.propertyType != SerializedPropertyType.ObjectReference)
+                return;
+
+            string prefabPath = component.GetType().Name switch
+            {
+                nameof(PerObjectUpdateVariant) => "Assets/Showcase/Art/ModuleCarriers/PerObjectCarrier.prefab",
+                nameof(CentralizedUpdateVariant) => "Assets/Showcase/Art/ModuleCarriers/CentralizedCarrier.prefab",
+                nameof(InstantiationVariant) => "Assets/Showcase/Art/ModuleCarriers/ProjectileCarrier.prefab",
+                nameof(PooledVariant) => "Assets/Showcase/Art/ModuleCarriers/ProjectileCarrier.prefab",
+                nameof(InventoryPackedVariant) => "Assets/Showcase/Art/ModuleCarriers/InventoryCellCarrier.prefab",
+                nameof(InventoryObjectsVariant) => "Assets/Showcase/Art/ModuleCarriers/InventoryCellCarrier.prefab",
+                nameof(ChunkEffectsVariant) => "Assets/Showcase/Art/ModuleCarriers/ChunkCarrier.prefab",
+                nameof(IndieEffectsVariant) => "Assets/Showcase/Art/ModuleCarriers/PulseCarrier.prefab",
+                nameof(BatchedPulseVfxVariant) => "Assets/Showcase/Art/ModuleCarriers/PulseCarrier.prefab",
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(prefabPath))
+                return;
+
+            GameObject visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            Assert.IsNotNull(visualPrefab, $"Required visual prefab at '{prefabPath}' could not be loaded for test fixture '{component.GetType().Name}'.");
+            visualPrefabProperty.objectReferenceValue = visualPrefab;
+
+            SerializedProperty visualScaleProperty = serializedObject.FindProperty("visualScale");
+            if (visualScaleProperty != null && visualScaleProperty.propertyType == SerializedPropertyType.Vector3)
+                visualScaleProperty.vector3Value = Vector3.one;
+
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private sealed class ModuleFixture<T> : IDisposable where T : MonoBehaviour

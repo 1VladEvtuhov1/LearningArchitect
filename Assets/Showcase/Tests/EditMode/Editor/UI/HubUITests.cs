@@ -27,9 +27,9 @@ namespace LearningArchitect.Tests.UI
                 variantA = ScriptableObject.CreateInstance<VariantDefinitionSO>();
                 variantB = ScriptableObject.CreateInstance<VariantDefinitionSO>();
 
-                module.name = "EffectsModule";
-                variantA.name = "EffectsVariantA";
-                variantB.name = "EffectsVariantB";
+                module.name = "SyntheticEffectsModule";
+                variantA.name = "SyntheticEffectsVariantA";
+                variantB.name = "SyntheticEffectsVariantB";
 
                 SetField(module, "moduleName", "Effects");
                 SetField(module, "categoryLabel", "Simulation Module");

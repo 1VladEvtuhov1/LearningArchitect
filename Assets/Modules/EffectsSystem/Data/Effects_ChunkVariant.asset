@@ -17,15 +17,15 @@ MonoBehaviour:
   variantNameRu: "\u0427\u0430\u043D\u043A\u043E\u0432\u044B\u0439 \u043F\u0430\u043A\u0435\u0442\u043D\u044B\u0439
     \u0432\u0430\u0440\u0438\u0430\u043D\u0442"
   prefab: {fileID: 3416184046040021404, guid: 80c41fc68de9ab24b817bf9a6f8573a2, type: 3}
-  stressPresets: fa000000c409000010270000
+  stressPresets: fa000000e8030000c4090000
   stressPresetLabels:
   - 250
+  - 1 000
   - 2 500
-  - 10 000
   stressPresetLabelsRu:
   - 250
+  - 1 000
   - 2 500
-  - 10 000
   architectureDescription: Batched data-oriented variant. Stores positions and velocities
     in arrays and updates them with a simple for loop.
   architectureDescriptionRu: "\u041F\u0430\u043A\u0435\u0442\u043D\u044B\u0439 data-oriented

@@ -11,9 +11,9 @@ namespace LearningArchitect.Modules.AI
         private readonly AiViewPresenter presenter = new();
 
         private Transform parent;
+        private GameObject visualPrefab;
         private IAiDecisionModel model;
         private Action<AiWorld> worldInitializer;
-        private PrimitiveType primitiveType;
         private Vector3 visualScale;
         private string visualNamePrefix;
         private bool orientToTarget;
@@ -39,7 +39,7 @@ namespace LearningArchitect.Modules.AI
             int count,
             int requestedVisibleCount,
             int maxVisuals,
-            PrimitiveType visualPrimitive,
+            GameObject markerPrefab,
             Vector3 scale,
             string namePrefix,
             bool shouldOrientToTarget,
@@ -50,16 +50,16 @@ namespace LearningArchitect.Modules.AI
                 throw new InvalidOperationException($"{nameof(AiSimulationHost)} is already initialized.");
 
             parent = simulationParent != null ? simulationParent : throw new ArgumentNullException(nameof(simulationParent));
+            visualPrefab = markerPrefab;
             model = decisionModel ?? throw new ArgumentNullException(nameof(decisionModel));
             worldInitializer = initializeWorld ?? throw new ArgumentNullException(nameof(initializeWorld));
-            primitiveType = visualPrimitive;
             visualScale = scale;
             visualNamePrefix = namePrefix;
             orientToTarget = shouldOrientToTarget;
             visibleCount = requestedVisibleCount;
             visualLimit = maxVisuals;
 
-            presenter.Configure(parent, primitiveType, visualScale, visualNamePrefix, orientToTarget, visibleCount, visualLimit);
+            presenter.Configure(parent, visualPrefab, visualScale, visualNamePrefix, orientToTarget, visibleCount, visualLimit);
             Rebuild(count);
             initialized = true;
         }
@@ -84,7 +84,7 @@ namespace LearningArchitect.Modules.AI
             visibleCount = requestedVisibleCount >= 0 ? requestedVisibleCount : throw new ArgumentOutOfRangeException(nameof(requestedVisibleCount));
             visualLimit = maxVisuals >= 0 ? maxVisuals : throw new ArgumentOutOfRangeException(nameof(maxVisuals));
 
-            presenter.Configure(parent, primitiveType, visualScale, visualNamePrefix, orientToTarget, visibleCount, visualLimit);
+            presenter.Configure(parent, visualPrefab, visualScale, visualNamePrefix, orientToTarget, visibleCount, visualLimit);
         }
 
         public void Dispose()

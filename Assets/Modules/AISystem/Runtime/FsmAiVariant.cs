@@ -18,6 +18,8 @@ namespace LearningArchitect.Modules.AI
         [SerializeField] private float moveSpeed = 1.8f;
         [SerializeField] private float idleDuration = 0.6f;
         [SerializeField] private float targetReachDistance = 0.35f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = new(0.12f, 0.22f, 0.12f);
 
         private readonly AiSimulationHost simulationHost = new();
 
@@ -31,8 +33,8 @@ namespace LearningArchitect.Modules.AI
                 count,
                 ResolveVisibleCount(count),
                 visualLimit,
-                PrimitiveType.Capsule,
-                new Vector3(0.12f, 0.22f, 0.12f),
+                visualPrefab,
+                visualScale,
                 "FSM Agent ",
                 true,
                 model,

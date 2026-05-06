@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using LearningArchitect.Core;
+using LearningArchitect.Modules.Animation3D;
 using LearningArchitect.UI;
 using UnityEditor;
 using UnityEditor.Localization;
 using UnityEngine;
 using UnityEngine.Localization.Tables;
+using UnityEngine.UI;
 
 namespace LearningArchitect.EditorTools
 {
@@ -86,6 +88,8 @@ namespace LearningArchitect.EditorTools
 
     public static class ShowcaseValidator
     {
+        internal const string HubPrefabPath = "Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab";
+
         private static readonly string[] DefinitionSearchFolders =
         {
             "Assets/Showcase/Data",
@@ -173,6 +177,7 @@ namespace LearningArchitect.EditorTools
             VariantDefinitionSO[] variants = LoadAssets<VariantDefinitionSO>();
             ShowcaseLocalizationSnapshot localization = CaptureLocalizationSnapshot();
             ShowcaseValidationReport report = ValidateDefinitions(modules, variants, localization);
+            ValidateHubPrefabLayout(AssetDatabase.LoadAssetAtPath<GameObject>(HubPrefabPath), report);
 
             LogReport(report, modules.Length, variants.Length);
         }
@@ -466,6 +471,149 @@ namespace LearningArchitect.EditorTools
 
             if (prefab.GetComponent<IShowcaseMetricsSource>() == null)
                 report.AddWarning("Variant prefab root does not implement IShowcaseMetricsSource.", prefab);
+
+            ValidateRequiredVisualPrefabs(prefab, report);
+            ValidateRequiredAnimationProfiles(prefab, report);
+        }
+
+        private static void ValidateRequiredVisualPrefabs(GameObject prefab, ShowcaseValidationReport report)
+        {
+            MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour == null)
+                    continue;
+
+                SerializedObject serializedObject = new(behaviour);
+                SerializedProperty visualPrefabProperty = serializedObject.FindProperty("visualPrefab");
+                if (visualPrefabProperty == null)
+                    continue;
+
+                if (visualPrefabProperty.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    report.AddError($"Component '{behaviour.GetType().Name}' has a non-object 'visualPrefab' field.", prefab);
+                    continue;
+                }
+
+                if (visualPrefabProperty.objectReferenceValue == null)
+                    report.AddError($"Component '{behaviour.GetType().Name}' requires an assigned visualPrefab.", prefab);
+            }
+        }
+
+        private static void ValidateRequiredAnimationProfiles(GameObject prefab, ShowcaseValidationReport report)
+        {
+            MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour == null)
+                    continue;
+
+                SerializedObject serializedObject = new(behaviour);
+                SerializedProperty animationProfileProperty = serializedObject.FindProperty("animationProfile");
+                if (animationProfileProperty == null)
+                    continue;
+
+                if (animationProfileProperty.propertyType != SerializedPropertyType.ObjectReference)
+                {
+                    report.AddError($"Component '{behaviour.GetType().Name}' has a non-object 'animationProfile' field.", prefab);
+                    continue;
+                }
+
+                if (animationProfileProperty.objectReferenceValue == null)
+                {
+                    report.AddError($"Component '{behaviour.GetType().Name}' requires an assigned animationProfile.", prefab);
+                    continue;
+                }
+
+                if (animationProfileProperty.objectReferenceValue is HumanoidAnimationProfileSO profile && !profile.HasActorPrefab)
+                    report.AddError($"Animation profile '{profile.name}' requires an assigned actorPrefab.", profile);
+            }
+        }
+
+        internal static void ValidateHubPrefabLayout(GameObject hubPrefab, ShowcaseValidationReport report)
+        {
+            if (hubPrefab == null)
+            {
+                report.AddError($"Could not load showcase hub prefab at '{HubPrefabPath}'.", null);
+                return;
+            }
+
+            DescriptionPanel descriptionPanel = hubPrefab.GetComponent<DescriptionPanel>();
+            if (descriptionPanel == null)
+            {
+                report.AddError("Showcase hub prefab is missing DescriptionPanel on the root object.", hubPrefab);
+                return;
+            }
+
+            ScrollRect scrollRect = descriptionPanel.ScrollRect != null
+                ? descriptionPanel.ScrollRect
+                : descriptionPanel.GetComponent<ScrollRect>();
+            if (scrollRect == null)
+            {
+                report.AddError("DescriptionPanel requires a ScrollRect component.", descriptionPanel);
+                return;
+            }
+
+            RectTransform viewport = scrollRect.viewport;
+            if (viewport == null)
+            {
+                report.AddError("DescriptionPanel ScrollRect is missing its viewport reference.", scrollRect);
+                return;
+            }
+
+            if (FindDeep(descriptionPanel.transform, "TabsBar") == null &&
+                FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
+            {
+                report.AddError("DescriptionPanel is missing its tabs root.", descriptionPanel);
+            }
+
+            if (FindDeep(descriptionPanel.transform, "ActiveTabUnderline") == null)
+                report.AddError("DescriptionPanel is missing ActiveTabUnderline.", descriptionPanel);
+
+            bool hasLegacyDescriptionText = FindDeep(viewport, "DescriptionText") != null;
+            bool hasCompositeLayout = FindDeep(viewport, "Container - AboutInfo") != null ||
+                                      FindDeep(viewport, "Container - ArchitectureInfo") != null ||
+                                      FindDeep(viewport, "Container - Trade-OffsInfo") != null ||
+                                      FindDeep(viewport, "Container - ProsCons") != null;
+
+            if (hasCompositeLayout)
+            {
+                ValidateRequiredSection(viewport, "Container - AboutInfo", report);
+                ValidateRequiredSection(viewport, "Container - ArchitectureInfo", report);
+                ValidateRequiredSection(viewport, "Container - Trade-OffsInfo", report);
+
+                Transform prosConsRoot = FindDeep(viewport, "Container - ProsCons");
+                if (prosConsRoot == null)
+                {
+                    report.AddError("DescriptionPanel viewport is missing Container - ProsCons.", viewport);
+                    return;
+                }
+
+                ValidateRequiredSection(prosConsRoot, "Container - Pros", report);
+                ValidateRequiredSection(prosConsRoot, "Container - Cons", report);
+                return;
+            }
+
+            if (!hasLegacyDescriptionText)
+                report.AddError("DescriptionPanel viewport must provide either composite sections or legacy DescriptionText.", viewport);
+        }
+
+        private static void ValidateRequiredSection(Transform parent, string sectionName, ShowcaseValidationReport report)
+        {
+            Transform section = FindDeep(parent, sectionName);
+            if (section == null)
+            {
+                report.AddError($"DescriptionPanel is missing required section '{sectionName}'.", parent as UnityEngine.Object);
+                return;
+            }
+
+            if (FindDeep(section, "Text - Header") == null)
+                report.AddError($"DescriptionPanel section '{sectionName}' is missing 'Text - Header'.", section as UnityEngine.Object);
+
+            if (FindDeep(section, "Text - Description") == null)
+                report.AddError($"DescriptionPanel section '{sectionName}' is missing 'Text - Description'.", section as UnityEngine.Object);
         }
 
         private static bool HasSerializedPresetLabels(VariantDefinitionSO variant, ShowcaseLanguage language)
@@ -498,6 +646,24 @@ namespace LearningArchitect.EditorTools
 
                 if (table.LocaleIdentifier.Code.StartsWith(localeCode, StringComparison.OrdinalIgnoreCase))
                     return table;
+            }
+
+            return null;
+        }
+
+        private static Transform FindDeep(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+
+            if (root.name == name)
+                return root;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform match = FindDeep(root.GetChild(i), name);
+                if (match != null)
+                    return match;
             }
 
             return null;

@@ -62,3 +62,5 @@ MonoBehaviour:
   spawnRadius: 1
   projectileSpeed: 4.5
   projectileLifetime: 1.8
+  visualPrefab: {fileID: 8699583720825761638, guid: 3032ac952ec11494fac720d4e01432cc, type: 3}
+  visualScale: {x: 1, y: 1, z: 1}

@@ -16,15 +16,15 @@ MonoBehaviour:
   variantName: Instantiation / Destroy Variant
   variantNameRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 Instantiate / Destroy"
   prefab: {fileID: 624674788007679013, guid: f6b719e1277e24340b1d89232994a114, type: 3}
-  stressPresets: f4010000d0070000a00f0000
+  stressPresets: f4010000e8030000d0070000
   stressPresetLabels:
   - 500
+  - 1 000
   - 2 000
-  - 4 000
   stressPresetLabelsRu:
   - 500
+  - 1 000
   - 2 000
-  - 4 000
   architectureDescription: Naive lifecycle variant. Visual markers are created and
     destroyed continuously as the simulation churns.
   architectureDescriptionRu: "\u041D\u0430\u0438\u0432\u043D\u044B\u0439 \u0432\u0430\u0440\u0438\u0430\u043D\u0442

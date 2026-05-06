@@ -17,15 +17,15 @@ MonoBehaviour:
   variantNameRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u0441 \u043F\u0435\u0440\u0435\u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u043C
     \u043F\u0443\u043B\u043E\u043C"
   prefab: {fileID: 8110489015359679957, guid: 1ae0e5bb2b374fa4498ea767db142afa, type: 3}
-  stressPresets: f4010000d0070000c0120000
+  stressPresets: f4010000e8030000d0070000
   stressPresetLabels:
   - 500
+  - 1 000
   - 2 000
-  - 4 800
   stressPresetLabelsRu:
   - 500
+  - 1 000
   - 2 000
-  - 4 800
   architectureDescription: Pool-backed variant. A fixed set of markers is created
     once and then recycled for subsequent emissions.
   architectureDescriptionRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043D\u0430

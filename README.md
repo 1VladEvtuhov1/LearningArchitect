@@ -25,36 +25,14 @@ Legacy standalone effect demos and the old separate VFX scene were removed in fa
 
 ## Current Module Set
 
-The showcase currently contains 7 modules and 15 variants.
+The showcase currently contains 7 modules and 16 variants.
 
-### Architecture Pattern Modules
+Active module groups:
 
-1. `Update Loop Strategies`
-   - `Per-Object`
-   - `Centralized`
-2. `Object Pooling`
-   - `Instantiation`
-   - `Reusable Pool`
-3. `VFX Delivery`
-   - `Emitter Bursts`
-   - `Batched Pulses`
+- architecture-pattern modules: `Update Loop Strategies`, `Object Pooling`, `VFX Delivery`
+- simulation modules: `Effects System`, `AI System`, `Inventory Systems`, `Layered Character Animation`
 
-### Simulation Modules
-
-4. `Effects System`
-   - `Indie`
-   - `Chunk`
-5. `AI System`
-   - `FSM`
-   - `Utility`
-   - `Behavior Tree`
-6. `Inventory Systems`
-   - `Object Slots`
-   - `Packed Slots`
-7. `Layered Character Animation`
-   - `Run`
-   - `Shoot`
-   - `Run + Shoot`
+The full module taxonomy and per-variant breakdown live in `Docs/Architecture.md`.
 
 ## Core Ideas
 
@@ -94,38 +72,14 @@ For public browser delivery the project now also prefers:
 
 ## Content Authoring
 
-Module and variant information is authored in two layers.
+Module and variant information is authored in two layers:
 
-- `ModuleDefinitionSO` assets store module-level fallback content:
-  - category
-  - display name
-  - thesis
-  - description
-  - problem statement
-  - WebGL note
-  - active item label
-  - referenced variants
-- `VariantDefinitionSO` assets store variant-level fallback content:
-  - display name
-  - prefab reference
-  - stress presets
-  - architecture description
-  - comparison summary
-  - takeaway
-  - trade-offs
-  - pros
-  - cons
+- `ModuleDefinitionSO` / `VariantDefinitionSO` assets keep fallback content and prefab wiring under `Assets/Modules/*/Data`
+- `ShowcaseContent` localization tables override visible hub copy when a localized entry exists
 
-These assets now live in feature-owned folders under `Assets/Modules/*/Data`.
+If project text appears out of sync, check `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset` and `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset` before assuming the ScriptableObject asset is unused.
 
-Runtime UI does not read those fields directly first. `ShowcaseLocalization` resolves content through the `ShowcaseContent` localization table and uses the ScriptableObject fields as fallback values when a localized entry is missing.
-
-That means:
-
-- if a key exists in `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset` or `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`, that text wins;
-- if a localized entry is missing, the value from `ModuleDefinitionSO` or `VariantDefinitionSO` is used instead.
-
-When project content appears out of sync, check the localization tables before assuming the ScriptableObject asset is unused.
+The full content source-of-truth rules live in `Docs/Architecture.md`.
 
 ## How To Open The Showcase
 
@@ -150,6 +104,7 @@ The embedded demo is meant to support interview review, not to act like a produc
 
 ## Documentation
 
+- Documentation index and reading order: `Docs/README.md`
 - Project architecture: `Docs/Architecture.md`
 - Web runbook and deployment: `Docs/WebDeployment.md`
 - Testing strategy: `Docs/TestingStrategy.md`

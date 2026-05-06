@@ -70,3 +70,7 @@ MonoBehaviour:
   inspectDuration: 1.2
   inspectChance: 0.18
   targetReachDistance: 0.4
+  patrolRadiusScale: 0.95
+  inspectRadiusScale: 0.28
+  visualPrefab: {fileID: 4137646169018597124, guid: c199add9d5e2d3c4cb3e63a9f7ff33e5, type: 3}
+  visualScale: {x: 1, y: 1, z: 1}

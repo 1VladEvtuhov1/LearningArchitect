@@ -15,6 +15,8 @@ namespace LearningArchitect.Modules.VFX
         [SerializeField] private float radius = 6.8f;
         [SerializeField] private float pulseLifetime = 1.05f;
         [SerializeField] private float driftSpeed = 0.42f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.16f;
 
         private MaterialPropertyBlock propertyBlock;
 
@@ -101,12 +103,13 @@ namespace LearningArchitect.Modules.VFX
             renderers = new Renderer[visible];
             for (int i = 0; i < visible; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = "Batched Pulse " + i;
-                marker.transform.SetParent(transform, false);
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    transform,
+                    "Batched Pulse " + i,
+                    visualPrefab,
+                    visualScale);
                 visuals[i] = marker.transform;
-                renderers[i] = marker.GetComponent<Renderer>();
+                renderers[i] = ShowcaseVisualInstanceFactory.FindPrimaryRenderer(marker);
                 ApplyVisual(i);
             }
         }

@@ -8,9 +8,11 @@ namespace LearningArchitect.Modules.Effects
     public sealed class IndieEffectsVariant : MonoBehaviour, IShowcaseStressTarget, IShowcaseMetricsSource
     {
         [SerializeField] private GameObject effectPrefab;
+        [SerializeField] private GameObject visualPrefab;
         [SerializeField] private int count = 500;
         [SerializeField] private float radius = 6f;
         [SerializeField] private float rotateSpeed = 40f;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.14f;
 
         private readonly List<GameObject> effects = new List<GameObject>(512);
         private float moduleCpuMs;
@@ -68,16 +70,17 @@ namespace LearningArchitect.Modules.Effects
                 Vector3 position = ShowcaseSpawnLayout.RandomPointOnPlatform(radius, 0.3f);
 
                 GameObject instance = effectPrefab == null
-                    ? GameObject.CreatePrimitive(PrimitiveType.Sphere)
-                    : Instantiate(effectPrefab);
-
-                if (effectPrefab == null)
-                    LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(instance);
+                    ? ShowcaseVisualInstanceFactory.CreateMarker(
+                        transform,
+                        "Indie Effect " + i,
+                        visualPrefab,
+                        visualScale)
+                    : Instantiate(effectPrefab, transform, false);
 
                 instance.name = "Indie Effect " + i;
-                instance.transform.SetParent(transform, false);
                 instance.transform.localPosition = position;
-                instance.transform.localScale = Vector3.one * 0.14f;
+                if (effectPrefab != null)
+                    instance.transform.localScale = visualScale;
                 effects.Add(instance);
             }
         }

@@ -20,6 +20,8 @@ namespace LearningArchitect.Modules.Pooling
         [SerializeField] private float spawnRadius = 1.2f;
         [SerializeField] private float projectileSpeed = 4.5f;
         [SerializeField] private float projectileLifetime = 1.8f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.12f;
 
         private Projectile[] projectiles;
         private int targetVisualCount;
@@ -98,11 +100,11 @@ namespace LearningArchitect.Modules.Pooling
             projectiles = new Projectile[visualLimit];
             for (int i = 0; i < visualLimit; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = "Pooled Projectile " + i;
-                marker.transform.SetParent(transform, false);
-                marker.transform.localScale = Vector3.one * 0.12f;
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    transform,
+                    "Pooled Projectile " + i,
+                    visualPrefab,
+                    visualScale);
                 marker.SetActive(false);
                 projectiles[i] = new Projectile
                 {

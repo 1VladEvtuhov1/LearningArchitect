@@ -63,7 +63,7 @@ This architecture keeps domain code out of the scene control flow.
 
 ## Contracts
 
-Two small interfaces define the runtime contract for every loaded variant.
+Three small interfaces define the runtime contract for every loaded variant.
 
 ### `IModule`
 
@@ -90,6 +90,19 @@ Responsibilities:
 - report the visible or active count through `ActiveCount`.
 
 This keeps stress UI generic and reusable across unrelated systems.
+
+### `IShowcaseMetricsSource`
+
+Purpose:
+
+- expose a normalized metrics snapshot to the shared shell.
+
+Responsibilities:
+
+- return `ShowcaseMetricsSnapshot` with simulation count, visible count, and optional module CPU time;
+- let the shell compare very different modules without baking metrics rules into presenters.
+
+In practice this is now part of the real contract even if a module can fall back to partial metrics.
 
 ## Data Layer
 
@@ -260,6 +273,21 @@ Contains:
 
 This layer does not replace the Unity runtime. It wraps it in a browser-friendly review experience.
 
+## Assembly Boundaries
+
+The project is also split at the assembly level.
+
+- `LearningArchitect.Showcase`
+  - shared runtime shell, UI, data definitions, localization, and common contracts.
+- `LearningArchitect.Modules.*`
+  - feature-owned module implementations such as AI, pooling, inventory, VFX, and update-loop strategies.
+- `LearningArchitect.Editor`
+  - editor tooling such as validation and layout helpers.
+- `*.Tests.Editor`
+  - isolated EditMode suites for showcase shell, AI logic, and module contract coverage.
+
+This matters for learning value because the repository teaches not only scene composition, but also how to keep a Unity codebase segmented without overcomplicating the runtime.
+
 ## Current Module Taxonomy
 
 The project currently separates modules into two categories.
@@ -291,11 +319,33 @@ Every module follows the same high-level pattern:
 2. Each variant has a `VariantDefinitionSO`.
 3. Each variant definition points to one prefab.
 4. That prefab contains:
-   - a module component implementing `IModule`
-   - a variant component implementing `IShowcaseStressTarget`
-5. The variant component owns the actual runtime behavior and visible subset.
+   - a module root implementing `IModule`
+   - a stress-facing implementation of `IShowcaseStressTarget`
+   - a metrics-facing implementation of `IShowcaseMetricsSource`
+5. Most variants now author runtime visuals through an assigned `visualPrefab` carrier instead of creating ad-hoc primitives directly inside the module.
+6. The variant component owns the actual runtime behavior and visible subset.
 
 This makes module creation predictable and repeatable.
+
+## Runtime Visual Authoring
+
+One of the newer architectural shifts is that module visuals are being pushed into reusable carrier prefabs under:
+
+- `Assets/Showcase/Art/ModuleCarriers`
+
+The pattern is:
+
+1. simulation code decides count, position, and state;
+2. `ShowcaseVisualInstanceFactory` instantiates the assigned visual carrier;
+3. the module updates only the visible subset and reports metrics separately from simulation scale.
+
+This is important for the educational story because it keeps three concerns visible and separate:
+
+- simulation ownership;
+- showcase-facing metrics;
+- visual representation used for comparison.
+
+The animation module was the last major holdout here and now also requires a real actor-prefab profile instead of procedural placeholder rigs. The remaining cleanup is mostly about documenting and validating the authoring contract, not about keeping hidden fallback rendering paths alive.
 
 ## WebGL Demo Architecture
 
@@ -395,6 +445,7 @@ Current validation approach:
 
 - compile through Unity and `dotnet build`;
 - run Unity EditMode tests;
+- run `Tools/LearningArchitect/Validate Showcase Configuration` when module data, prefab wiring, or localization tables change;
 - verify the active scene and generated module assets;
 - verify module switching in play mode through the shared runtime controller.
 

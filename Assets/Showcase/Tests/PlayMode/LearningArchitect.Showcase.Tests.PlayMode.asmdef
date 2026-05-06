@@ -1,0 +1,9 @@
+{
+  "name": "LearningArchitect.Showcase.Tests.PlayMode",
+  "references": [
+    "LearningArchitect.Showcase"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

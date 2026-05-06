@@ -24,6 +24,8 @@ namespace LearningArchitect.Modules.AI
         [SerializeField] private float targetReachDistance = 0.4f;
         [SerializeField] [Range(0.1f, 2f)] private float patrolRadiusScale = 0.95f;
         [SerializeField] [Range(0.05f, 1f)] private float inspectRadiusScale = 0.28f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = new(0.08f, 0.14f, 0.08f);
 
         private readonly AiSimulationHost simulationHost = new();
 
@@ -48,8 +50,8 @@ namespace LearningArchitect.Modules.AI
                 count,
                 ResolveVisibleCount(count),
                 visualLimit,
-                PrimitiveType.Cylinder,
-                new Vector3(0.08f, 0.14f, 0.08f),
+                visualPrefab,
+                visualScale,
                 "BT Agent ",
                 true,
                 model,

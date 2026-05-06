@@ -65,3 +65,5 @@ MonoBehaviour:
   radius: 6.8
   pulseLifetime: 1.05
   driftSpeed: 0.42
+  visualPrefab: {fileID: 3213271236736364038, guid: b5de1e6f06f85a3449faa174adab7925, type: 3}
+  visualScale: {x: 1, y: 1, z: 1}

@@ -76,7 +76,10 @@ namespace LearningArchitect.UI
 
         private static bool ShouldUseReferenceMetrics()
         {
-            return Application.platform == RuntimePlatform.WebGLPlayer;
+            // Performance should always reflect the live runtime stream.
+            // Static WebGL reference profiles freeze the graph and conflict with the
+            // current "one source of truth" telemetry model.
+            return false;
         }
     }
 }

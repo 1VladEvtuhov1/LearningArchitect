@@ -540,6 +540,27 @@ namespace LearningArchitect.UI
 
         private static string GetUiFallbackText(ShowcaseLanguage language, string key)
         {
+            if (language == ShowcaseLanguage.Russian)
+            {
+                switch (key)
+                {
+                    case "core_idea":
+                        return "Основная идея";
+                    case "data_flow":
+                        return "Поток данных";
+                    case "runtime_lifecycle":
+                        return "Жизненный цикл runtime";
+                    case "why_this_approach":
+                        return "Почему этот подход";
+                    case "no_data_flow":
+                        return "Поток данных не описан.";
+                    case "no_runtime_lifecycle":
+                        return "Жизненный цикл runtime не описан.";
+                    case "no_why_this_approach":
+                        return "Обоснование выбора подхода не указано.";
+                }
+            }
+
             switch (key)
             {
                 case "breadcrumb":

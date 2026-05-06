@@ -3,6 +3,9 @@
   "references": [
     "LearningArchitect.Showcase",
     "LearningArchitect.Editor",
+    "LearningArchitect.Modules.Animation3D",
+    "Unity.Localization",
+    "Unity.ResourceManager",
     "UnityEngine.UI",
     "Unity.TextMeshPro"
   ],

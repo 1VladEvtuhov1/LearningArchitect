@@ -17,6 +17,8 @@ namespace LearningArchitect.Modules.AI
         [SerializeField] private float moveSpeed = 2f;
         [SerializeField] private float retargetInterval = 0.4f;
         [SerializeField] private float centerBiasDistance = 2.4f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.14f;
 
         private readonly AiSimulationHost simulationHost = new();
 
@@ -30,8 +32,8 @@ namespace LearningArchitect.Modules.AI
                 count,
                 ResolveVisibleCount(count),
                 visualLimit,
-                PrimitiveType.Sphere,
-                Vector3.one * 0.14f,
+                visualPrefab,
+                visualScale,
                 "Utility Agent ",
                 false,
                 model,

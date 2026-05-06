@@ -12,6 +12,8 @@ namespace LearningArchitect.Modules.Effects
         [SerializeField] [Range(0.01f, 1f)] private float visibleFraction = 0.12f;
         [SerializeField] private float radius = 7f;
         [SerializeField] private float speed = 0.8f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.12f;
 
         private Vector3[] positions;
         private Vector3[] velocities;
@@ -100,12 +102,12 @@ namespace LearningArchitect.Modules.Effects
 
             for (int i = 0; i < visible; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = "Chunk Effect Visual " + i;
-                marker.transform.SetParent(transform, false);
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    transform,
+                    "Chunk Effect Visual " + i,
+                    visualPrefab,
+                    visualScale);
                 marker.transform.localPosition = positions[i];
-                marker.transform.localScale = Vector3.one * 0.12f;
                 visuals[i] = marker.transform;
             }
         }

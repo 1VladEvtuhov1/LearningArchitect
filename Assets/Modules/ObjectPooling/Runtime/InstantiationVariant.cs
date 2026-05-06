@@ -20,6 +20,8 @@ namespace LearningArchitect.Modules.Pooling
         [SerializeField] private float spawnRadius = 1.2f;
         [SerializeField] private float projectileSpeed = 4.5f;
         [SerializeField] private float projectileLifetime = 1.8f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.12f;
 
         private readonly List<Projectile> activeProjectiles = new(256);
         private int targetVisualCount;
@@ -87,11 +89,11 @@ namespace LearningArchitect.Modules.Pooling
 
         private void SpawnProjectile()
         {
-            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-            marker.name = "Instantiation Projectile " + nextSpawnIndex++;
-            marker.transform.SetParent(transform, false);
-            marker.transform.localScale = Vector3.one * 0.12f;
+            GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                transform,
+                "Instantiation Projectile " + nextSpawnIndex++,
+                visualPrefab,
+                visualScale);
             marker.transform.localPosition = ShowcaseSpawnLayout.RandomPointOnPlatform(spawnRadius, 0.25f);
 
             Vector3 velocity = ShowcaseSpawnLayout.RandomVelocity(projectileSpeed, 0.25f);

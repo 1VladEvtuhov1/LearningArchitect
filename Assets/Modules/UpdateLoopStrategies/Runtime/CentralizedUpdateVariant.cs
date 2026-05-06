@@ -12,6 +12,8 @@ namespace LearningArchitect.Modules.Performance
         [SerializeField] private int visualLimit = 420;
         [SerializeField] private float radius = 7f;
         [SerializeField] private float speed = 0.85f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.1f;
 
         private Vector3[] positions;
         private Vector3[] velocities;
@@ -87,12 +89,12 @@ namespace LearningArchitect.Modules.Performance
 
             for (int i = 0; i < visible; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = "Centralized Mover " + i;
-                marker.transform.SetParent(transform, false);
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    transform,
+                    "Centralized Mover " + i,
+                    visualPrefab,
+                    visualScale);
                 marker.transform.localPosition = positions[i];
-                marker.transform.localScale = Vector3.one * 0.1f;
                 visuals[i] = marker.transform;
             }
         }

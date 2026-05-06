@@ -17,15 +17,15 @@ MonoBehaviour:
   variantNameRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u0441 \u0446\u0435\u043D\u0442\u0440\u0430\u043B\u0438\u0437\u043E\u0432\u0430\u043D\u043D\u044B\u043C
     \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0435\u043C"
   prefab: {fileID: 4490641148498380399, guid: 65a9ae7f1f1db1941aee47dab02e933b, type: 3}
-  stressPresets: 64000000e803000088130000
+  stressPresets: 64000000e8030000c4090000
   stressPresetLabels:
   - 100
   - 1 000
-  - 5 000
+  - 2 500
   stressPresetLabelsRu:
   - 100
   - 1 000
-  - 5 000
+  - 2 500
   architectureDescription: Central loop variant. Positions and velocities are updated
     in one owner loop while only a subset is rendered.
   architectureDescriptionRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u0441 \u0446\u0435\u043D\u0442\u0440\u0430\u043B\u044C\u043D\u044B\u043C

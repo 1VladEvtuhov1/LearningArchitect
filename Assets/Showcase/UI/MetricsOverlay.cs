@@ -90,12 +90,7 @@ namespace LearningArchitect.UI
         private TextMeshProUGUI chartSummaryText;
         private TextMeshProUGUI[] chartValueTexts;
         private MetricRow[] metricRows;
-        private RectTransform performanceCardRect;
-        private RectTransform performanceHeaderRect;
-        private RectTransform performanceStatsRect;
-        private RectTransform performanceIconRect;
         private RectTransform chartPlaceholder;
-        private RectTransform chartValueRect;
         private Image chartBackgroundImage;
         private PerformanceGraph performanceGraph;
         private int activeCount;
@@ -233,7 +228,6 @@ namespace LearningArchitect.UI
         {
             if (isInitialized)
             {
-                // NewUIManager can build the visual card after this component's Awake.
                 if (!HasStructuredCardUi())
                     TryResolveStructuredCard();
 
@@ -317,15 +311,6 @@ namespace LearningArchitect.UI
             Transform graphTransform = placeholder.Find("PerformanceGraph");
             if (graphTransform == null)
                 return;
-
-            RectTransform graphRect = graphTransform as RectTransform;
-            if (graphRect == null)
-                return;
-
-            graphRect.anchorMin = Vector2.zero;
-            graphRect.anchorMax = Vector2.one;
-            graphRect.offsetMin = new Vector2(12f, 12f);
-            graphRect.offsetMax = new Vector2(-56f, -14f);
 
             performanceGraph = graphTransform.GetComponent<PerformanceGraph>();
             if (performanceGraph == null)
@@ -507,21 +492,12 @@ namespace LearningArchitect.UI
             if (performanceCard == null)
                 return;
 
-            performanceCardRect = performanceCard as RectTransform;
             performanceHeaderText = FindDeep(performanceCard, "Text - Header")?.GetComponent<TextMeshProUGUI>();
-            performanceHeaderRect = performanceHeaderText != null ? performanceHeaderText.rectTransform : null;
             performanceInsightText = FindDeep(performanceCard, "Text - PerformanceInsight")?.GetComponent<TextMeshProUGUI>();
-            performanceIconRect = FindDeep(performanceCard, "Image - PerformanceIcon") as RectTransform;
             chartPlaceholder = FindDeep(performanceCard, "Container - ChartPlaceholder") as RectTransform;
             chartSummaryText = FindDeep(chartPlaceholder, "Label")?.GetComponent<TextMeshProUGUI>();
             chartValueTexts = ResolveChartValueTexts(chartPlaceholder);
-            chartValueRect = FindDeep(chartPlaceholder, "Container - PerformanceValue") as RectTransform;
             metricRows = ResolveMetricRows(performanceCard);
-            performanceStatsRect =
-                (FindDeep(performanceCard, "Container - PerformanceStats") ??
-                 FindDeep(performanceCard, "Container - PerfomanceStats")) as RectTransform;
-
-            ApplyStructuredCardPresentation();
         }
 
         private void UpdateChartValueTexts()
@@ -605,190 +581,6 @@ namespace LearningArchitect.UI
                 compactRows[i] = rows[i];
 
             return compactRows;
-        }
-
-        private void ApplyStructuredCardPresentation()
-        {
-            if (performanceCardRect != null)
-            {
-                performanceCardRect.anchoredPosition = new Vector2(18f, 228f);
-                performanceCardRect.sizeDelta = new Vector2(440f, 438f);
-            }
-
-            if (performanceIconRect != null)
-            {
-                performanceIconRect.anchorMin = new Vector2(0f, 1f);
-                performanceIconRect.anchorMax = new Vector2(0f, 1f);
-                performanceIconRect.pivot = new Vector2(0f, 1f);
-                performanceIconRect.anchoredPosition = new Vector2(24f, -22f);
-                performanceIconRect.sizeDelta = new Vector2(18f, 18f);
-            }
-
-            if (performanceHeaderRect != null)
-            {
-                performanceHeaderRect.anchorMin = new Vector2(0f, 1f);
-                performanceHeaderRect.anchorMax = new Vector2(0f, 1f);
-                performanceHeaderRect.pivot = new Vector2(0f, 1f);
-                performanceHeaderRect.anchoredPosition = new Vector2(54f, -20f);
-                performanceHeaderRect.sizeDelta = new Vector2(270f, 24f);
-            }
-
-            if (performanceHeaderText != null)
-            {
-                performanceHeaderText.fontSize = 16.5f;
-                performanceHeaderText.enableAutoSizing = false;
-                performanceHeaderText.alignment = TextAlignmentOptions.Left;
-                performanceHeaderText.characterSpacing = 1.4f;
-            }
-
-            if (performanceInsightText != null)
-            {
-                RectTransform insightRect = performanceInsightText.rectTransform;
-                insightRect.anchorMin = new Vector2(0f, 1f);
-                insightRect.anchorMax = new Vector2(1f, 1f);
-                insightRect.pivot = new Vector2(0f, 1f);
-                insightRect.anchoredPosition = new Vector2(24f, -50f);
-                insightRect.sizeDelta = new Vector2(-48f, 46f);
-
-                performanceInsightText.fontSize = 11.8f;
-                performanceInsightText.enableAutoSizing = false;
-                performanceInsightText.alignment = TextAlignmentOptions.TopLeft;
-                performanceInsightText.lineSpacing = 4f;
-                performanceInsightText.raycastTarget = false;
-            }
-
-            if (performanceStatsRect != null)
-            {
-                performanceStatsRect.anchorMin = new Vector2(0f, 1f);
-                performanceStatsRect.anchorMax = new Vector2(0f, 1f);
-                performanceStatsRect.pivot = new Vector2(0f, 1f);
-                performanceStatsRect.anchoredPosition = new Vector2(24f, -108f);
-                performanceStatsRect.sizeDelta = new Vector2(348f, 150f);
-
-                VerticalLayoutGroup statsLayout = performanceStatsRect.GetComponent<VerticalLayoutGroup>();
-                if (statsLayout != null)
-                {
-                    statsLayout.padding.left = 0;
-                    statsLayout.padding.right = 0;
-                    statsLayout.padding.top = 0;
-                    statsLayout.padding.bottom = 0;
-                    statsLayout.spacing = 3f;
-                    statsLayout.childAlignment = TextAnchor.UpperLeft;
-                    statsLayout.childControlWidth = true;
-                    statsLayout.childControlHeight = false;
-                    statsLayout.childForceExpandWidth = true;
-                    statsLayout.childForceExpandHeight = false;
-                }
-            }
-
-            if (metricRows != null)
-            {
-                for (int i = 0; i < metricRows.Length; i++)
-                    ApplyMetricRowPresentation(metricRows[i], i == 0);
-            }
-
-            if (chartPlaceholder != null)
-            {
-                chartPlaceholder.anchorMin = new Vector2(0f, 0f);
-                chartPlaceholder.anchorMax = new Vector2(1f, 0f);
-                chartPlaceholder.pivot = new Vector2(0.5f, 0f);
-                chartPlaceholder.anchoredPosition = new Vector2(0f, 18f);
-                chartPlaceholder.sizeDelta = new Vector2(-36f, 136f);
-            }
-
-            if (chartValueRect != null)
-            {
-                chartValueRect.anchorMin = new Vector2(1f, 0.5f);
-                chartValueRect.anchorMax = new Vector2(1f, 0.5f);
-                chartValueRect.pivot = new Vector2(1f, 0.5f);
-                chartValueRect.anchoredPosition = new Vector2(-6f, 0f);
-                chartValueRect.sizeDelta = new Vector2(44f, 136f);
-
-                VerticalLayoutGroup valueLayout = chartValueRect.GetComponent<VerticalLayoutGroup>();
-                if (valueLayout != null)
-                {
-                    valueLayout.childAlignment = TextAnchor.UpperLeft;
-                    valueLayout.spacing = 22f;
-                    valueLayout.childControlWidth = true;
-                    valueLayout.childControlHeight = false;
-                    valueLayout.childForceExpandHeight = false;
-                }
-            }
-
-            if (chartSummaryText != null)
-            {
-                RectTransform summaryRect = chartSummaryText.rectTransform;
-                summaryRect.anchorMin = new Vector2(0f, 0f);
-                summaryRect.anchorMax = new Vector2(1f, 0f);
-                summaryRect.pivot = new Vector2(0f, 0f);
-                summaryRect.anchoredPosition = new Vector2(14f, 10f);
-                summaryRect.sizeDelta = new Vector2(-72f, 34f);
-
-                chartSummaryText.fontSize = 10.8f;
-                chartSummaryText.enableAutoSizing = false;
-                chartSummaryText.alignment = TextAlignmentOptions.BottomLeft;
-                chartSummaryText.characterSpacing = 0.4f;
-                chartSummaryText.lineSpacing = 3f;
-            }
-
-            if (chartValueTexts != null)
-            {
-                for (int i = 0; i < chartValueTexts.Length; i++)
-                {
-                    TextMeshProUGUI text = chartValueTexts[i];
-                    if (text == null)
-                        continue;
-
-                    text.fontSize = i == 0 ? 13.2f : 12f;
-                    text.enableAutoSizing = false;
-                    text.alignment = TextAlignmentOptions.Left;
-                    text.fontStyle = i == 0 ? FontStyles.Bold : FontStyles.Normal;
-                }
-            }
-        }
-
-        private void ApplyMetricRowPresentation(MetricRow row, bool emphasizeValue)
-        {
-            if (row == null)
-                return;
-
-            if (row.Label != null)
-            {
-                RectTransform labelRect = row.Label.rectTransform;
-                labelRect.anchorMin = new Vector2(0f, 0f);
-                labelRect.anchorMax = new Vector2(0f, 1f);
-                labelRect.pivot = new Vector2(0f, 0.5f);
-                labelRect.anchoredPosition = new Vector2(0f, 0f);
-                labelRect.sizeDelta = new Vector2(148f, 0f);
-
-                row.Label.fontSize = 12.6f;
-                row.Label.enableAutoSizing = false;
-                row.Label.alignment = TextAlignmentOptions.Left;
-                row.Label.characterSpacing = 0.6f;
-            }
-
-            if (row.Value != null)
-            {
-                RectTransform valueRect = row.Value.rectTransform;
-                valueRect.anchorMin = new Vector2(1f, 0f);
-                valueRect.anchorMax = new Vector2(1f, 1f);
-                valueRect.pivot = new Vector2(1f, 0.5f);
-                valueRect.anchoredPosition = new Vector2(0f, 0f);
-                valueRect.sizeDelta = new Vector2(164f, 0f);
-
-                row.Value.fontSize = emphasizeValue ? 17.2f : 14.2f;
-                row.Value.enableAutoSizing = false;
-                row.Value.alignment = TextAlignmentOptions.Right;
-                row.Value.fontStyle = emphasizeValue ? FontStyles.Bold : FontStyles.Normal;
-            }
-
-            if (row.Label != null && row.Label.rectTransform.parent is RectTransform rowRect)
-            {
-                rowRect.anchorMin = new Vector2(0f, 1f);
-                rowRect.anchorMax = new Vector2(0f, 1f);
-                rowRect.pivot = new Vector2(0f, 1f);
-                rowRect.sizeDelta = new Vector2(348f, 22f);
-            }
         }
 
         private static MetricRow ResolveMetricRow(Transform rowRoot)

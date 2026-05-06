@@ -97,13 +97,15 @@ namespace LearningArchitect.Tests.AI
             {
                 AiWorld world = new(6);
                 AiViewPresenter presenter = new();
-                presenter.Configure(root.transform, PrimitiveType.Sphere, Vector3.one, "AI Agent ", false, 4, 2);
+                GameObject markerPrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                presenter.Configure(root.transform, markerPrefab, Vector3.one, "AI Agent ", false, 4, 2);
                 presenter.Rebuild(world);
 
                 Assert.AreEqual(2, root.transform.childCount);
 
                 presenter.Dispose();
                 Assert.AreEqual(0, root.transform.childCount);
+                Object.DestroyImmediate(markerPrefab);
             }
             finally
             {

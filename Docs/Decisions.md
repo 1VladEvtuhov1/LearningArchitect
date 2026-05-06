@@ -82,7 +82,7 @@ Touches:
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset`
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`
 
-### D-004: Description Panel Uses Section-Based Composition
+### D-004: Description Panel Uses Section-Based Composite Content
 
 Status:
 
@@ -90,20 +90,21 @@ Status:
 
 Decision:
 
-- the right-side description area is moving away from one monolithic `DescriptionText` block and toward section-based content composition inside the panel viewport.
+- the right-side description area is authored and rendered as section-based composite content inside `DescriptionPanel`, and the legacy `DescriptionText` runtime path is no longer part of the active architecture.
 
 Why:
 
 - a single rich-text dump is weak both visually and structurally;
 - different tabs need different card composition, not just differently formatted paragraphs;
-- section-based UI gives better control over empty-state hiding, localization growth, and future card-specific styling.
+- section-based UI gives better control over empty-state hiding, localization growth, and future card-specific styling;
+- tests can reason about section visibility and ordering much more reliably than about one large formatted string.
 
 Touches:
 
 - `Assets/Showcase/UI/DescriptionPanel.cs`
-- `Assets/Showcase/UI/NewUIManager.cs`
 - `Assets/Editor/ShowcaseLayoutTool.cs`
 - `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
+- `Assets/Showcase/Tests/EditMode/Editor/UI/DescriptionPanelTests.cs`
 
 ### D-005: Repo-Native Memory Before External Memory Tooling
 
@@ -126,3 +127,26 @@ Touches:
 - `Docs/Decisions.md`
 - `Docs/OpenThreads.md`
 - `Docs/WorkingMemory.md`
+
+### D-006: Runtime Visuals Use Assigned Carrier Prefabs
+
+Status:
+
+- active
+
+Decision:
+
+- runtime variants should prefer assigned `visualPrefab` carriers and `ShowcaseVisualInstanceFactory` over inline primitive construction for their showcase-facing visuals.
+
+Why:
+
+- simulation logic should stay independent from how the marker looks in the scene;
+- prefab-driven visuals make module variants easier to inspect, swap, and validate;
+- module contract tests can verify visual wiring directly instead of relying on hidden runtime defaults.
+
+Touches:
+
+- `Assets/Showcase/Runtime/ShowcaseVisualInstanceFactory.cs`
+- `Assets/Showcase/Art/ModuleCarriers`
+- `Assets/Modules/*/Prefabs`
+- `Assets/Modules/Tests/EditMode/Editor/ModuleContractTests.cs`

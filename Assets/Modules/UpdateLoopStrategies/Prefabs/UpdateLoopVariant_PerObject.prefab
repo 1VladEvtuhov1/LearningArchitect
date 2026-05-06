@@ -62,3 +62,5 @@ MonoBehaviour:
   visualLimit: 420
   radius: 4.75
   speed: 0.85
+  visualPrefab: {fileID: 4137646169018597124, guid: c199add9d5e2d3c4cb3e63a9f7ff33e5, type: 3}
+  visualScale: {x: 1, y: 1, z: 1}

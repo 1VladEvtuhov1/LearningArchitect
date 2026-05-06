@@ -16,15 +16,15 @@ MonoBehaviour:
   variantName: FSM Decision Variant
   variantNameRu: "\u041A\u043E\u043D\u0435\u0447\u043D\u044B\u0439 \u0430\u0432\u0442\u043E\u043C\u0430\u0442"
   prefab: {fileID: 1718115676741377603, guid: 2a0cf882a111d1e458d859422b3bacc2, type: 3}
-  stressPresets: f4010000d007000088130000
+  stressPresets: f4010000e8030000d0070000
   stressPresetLabels:
   - 500
+  - 1 000
   - 2 000
-  - 5 000
   stressPresetLabelsRu:
   - 500
+  - 1 000
   - 2 000
-  - 5 000
   architectureDescription: Finite-state variant. Every agent tracks a tiny explicit
     state and transitions between idle and move phases.
   architectureDescriptionRu: "\u0412\u0430\u0440\u0438\u0430\u043D\u0442 \u043D\u0430

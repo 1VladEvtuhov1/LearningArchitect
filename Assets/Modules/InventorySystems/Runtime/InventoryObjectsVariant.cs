@@ -24,6 +24,8 @@ namespace LearningArchitect.Modules.Inventory
         [SerializeField] private int visualLimit = 280;
         [SerializeField] private float slotSpacing = 0.48f;
         [SerializeField] private float visualRefreshInterval = 0.08f;
+        [SerializeField] private GameObject visualPrefab;
+        [SerializeField] private Vector3 visualScale = Vector3.one * 0.26f;
 
         private MaterialPropertyBlock propertyBlock;
 
@@ -90,12 +92,13 @@ namespace LearningArchitect.Modules.Inventory
             renderers = new Renderer[visibleSlots];
             for (int i = 0; i < visibleSlots; i++)
             {
-                GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                LearningArchitect.Core.ShowcasePrimitiveMaterialUtility.Apply(marker);
-                marker.name = "Inventory Slot Object " + i;
-                marker.transform.SetParent(transform, false);
+                GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
+                    transform,
+                    "Inventory Slot Object " + i,
+                    visualPrefab,
+                    visualScale);
                 visuals[i] = marker.transform;
-                renderers[i] = marker.GetComponent<Renderer>();
+                renderers[i] = ShowcaseVisualInstanceFactory.FindPrimaryRenderer(marker);
             }
 
             operationsCursor = 0;

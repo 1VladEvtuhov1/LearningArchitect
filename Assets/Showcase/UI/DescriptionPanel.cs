@@ -145,7 +145,6 @@ namespace LearningArchitect.UI
             }
         }
 
-        [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private float fadeDuration = 0.16f;
         [SerializeField] private Color activeTabColor = default;
@@ -154,7 +153,6 @@ namespace LearningArchitect.UI
         [SerializeField] private Color positiveTextColor = default;
         [SerializeField] private Color negativeTextColor = default;
 
-        private readonly StringBuilder builder = new(1024);
         private readonly TextMeshProUGUI[] tabLabels = new TextMeshProUGUI[3];
         private readonly List<SectionView> sectionPool = new(6);
         private readonly List<SectionDefinition> sectionDefinitions = new(6);
@@ -166,19 +164,13 @@ namespace LearningArchitect.UI
         private CanvasGroup contentCanvasGroup;
         private int currentTabIndex;
         private ModuleDefinitionSO currentModule;
-        private bool isCompositeMode;
         private bool isInitialized;
-        private RectTransform legacyDescriptionRoot;
         private float fadeTimer;
+        private TextMeshProUGUI legacyDescriptionText;
         private RectTransform tabsBar;
         private VariantDefinitionSO currentVariant;
         private float lastKnownLayoutWidth = -1f;
-
-        public TextMeshProUGUI DescriptionText
-        {
-            get => descriptionText;
-            set => descriptionText = value;
-        }
+        private bool useLegacyDescriptionText;
 
         public ScrollRect ScrollRect
         {
@@ -217,7 +209,7 @@ namespace LearningArchitect.UI
             EnsureTabLayout();
             RefreshTabVisuals();
 
-            if (!isCompositeMode || contentRoot == null)
+            if (contentRoot == null)
                 return;
 
             float currentWidth = contentRoot.rect.width;
@@ -238,19 +230,11 @@ namespace LearningArchitect.UI
             float normalized = fadeDuration <= 0f ? 1f : 1f - Mathf.Clamp01(fadeTimer / fadeDuration);
             float eased = normalized * normalized * (3f - 2f * normalized);
 
-            if (isCompositeMode)
-            {
-                if (contentCanvasGroup != null)
-                    contentCanvasGroup.alpha = eased;
+            if (contentCanvasGroup != null)
+                contentCanvasGroup.alpha = eased;
 
-                if (contentRoot != null)
-                    contentRoot.localScale = baseScale * Mathf.Lerp(0.985f, 1f, eased);
-            }
-            else if (descriptionText != null)
-            {
-                descriptionText.alpha = eased;
-                descriptionText.rectTransform.localScale = baseScale * Mathf.Lerp(0.985f, 1f, eased);
-            }
+            if (contentRoot != null)
+                contentRoot.localScale = baseScale * Mathf.Lerp(0.985f, 1f, eased);
         }
 
         public void SetVariant(VariantDefinitionSO variant)
@@ -321,18 +305,9 @@ namespace LearningArchitect.UI
             if (!TryResolveUi())
                 return false;
 
-            if (isCompositeMode)
-            {
-                baseScale = contentRoot == null ? Vector3.one : contentRoot.localScale;
-                if (contentCanvasGroup == null && contentRoot != null)
-                    contentCanvasGroup = contentRoot.gameObject.AddComponent<CanvasGroup>();
-            }
-            else
-            {
-                baseScale = descriptionText.rectTransform.localScale;
-                descriptionText.textWrappingMode = TextWrappingModes.Normal;
-                descriptionText.overflowMode = TextOverflowModes.Overflow;
-            }
+            baseScale = contentRoot == null ? Vector3.one : contentRoot.localScale;
+            if (contentCanvasGroup == null && contentRoot != null)
+                contentCanvasGroup = contentRoot.gameObject.AddComponent<CanvasGroup>();
 
             isInitialized = true;
             return true;
@@ -377,10 +352,9 @@ namespace LearningArchitect.UI
                 return false;
 
             EnsureTabLayout();
-            legacyDescriptionRoot = descriptionText == null ? null : descriptionText.rectTransform;
-            isCompositeMode = TryResolveCompositeUi(scrollRect.viewport);
+            bool resolvedCompositeUi = TryResolveCompositeUi(scrollRect.viewport) || TryResolveLegacyUi(scrollRect.viewport);
             RefreshTabVisuals();
-            return isCompositeMode || TryResolveLegacyUi();
+            return resolvedCompositeUi;
         }
 
         private RectTransform ResolveTabsBar(RectTransform panelRoot)
@@ -509,33 +483,28 @@ namespace LearningArchitect.UI
             for (int i = 0; i < sectionPool.Count; i++)
                 sectionPool[i].Root.SetParent(contentRoot, false);
 
-            if (legacyDescriptionRoot != null)
-            {
-                legacyDescriptionRoot.SetParent(contentRoot, false);
-                legacyDescriptionRoot.gameObject.SetActive(false);
-            }
-
             scrollRect.content = contentRoot;
             contentCanvasGroup = contentRoot.GetComponent<CanvasGroup>();
             if (contentCanvasGroup == null)
                 contentCanvasGroup = contentRoot.gameObject.AddComponent<CanvasGroup>();
 
             lastKnownLayoutWidth = contentRoot.rect.width;
+            legacyDescriptionText = null;
+            useLegacyDescriptionText = false;
 
             return true;
         }
 
-        private bool TryResolveLegacyUi()
+        private bool TryResolveLegacyUi(RectTransform viewport)
         {
-            if (descriptionText == null)
+            TextMeshProUGUI legacyText = FindDeep(viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
+            if (legacyText == null)
                 return false;
 
-            if (scrollRect.content != descriptionText.rectTransform)
-                return false;
-
-            if (descriptionText.GetComponent<ContentSizeFitter>() == null)
-                return false;
-
+            legacyDescriptionText = legacyText;
+            contentRoot = null;
+            contentCanvasGroup = null;
+            useLegacyDescriptionText = true;
             return true;
         }
 
@@ -555,13 +524,13 @@ namespace LearningArchitect.UI
 
         private void RebuildContent()
         {
-            if (isCompositeMode)
+            if (useLegacyDescriptionText)
             {
-                RebuildCompositeContent();
+                RebuildLegacyContent();
                 return;
             }
 
-            RebuildLegacyContent();
+            RebuildCompositeContent();
         }
 
         private void RebuildCompositeContent()
@@ -626,6 +595,73 @@ namespace LearningArchitect.UI
             RefreshTabVisuals();
         }
 
+        private void RebuildLegacyContent()
+        {
+            if (legacyDescriptionText == null)
+                return;
+
+            if (currentVariant == null)
+            {
+                legacyDescriptionText.text = BuildLegacyFallback();
+                ResetScroll();
+                RefreshTabVisuals();
+                return;
+            }
+
+            string moduleDescription = ShowcaseLocalization.GetModuleDescription(currentModule);
+            string moduleCategory = ShowcaseLocalization.GetModuleCategory(currentModule);
+            string moduleProblem = ShowcaseLocalization.GetModuleProblemStatement(currentModule);
+            string compareSummary = ShowcaseLocalization.GetVariantCompareSummary(currentVariant);
+            string takeaway = ShowcaseLocalization.GetVariantTakeaway(currentVariant);
+            string webGlPreset = ShowcaseLocalization.GetModuleWebGlPresetNote(currentModule);
+            string architectureDescription = ShowcaseLocalization.GetVariantArchitectureDescription(currentVariant);
+            string dataFlow = ShowcaseLocalization.GetVariantDataFlow(currentVariant);
+            string runtimeLifecycle = ShowcaseLocalization.GetVariantRuntimeLifecycle(currentVariant);
+            string whyThisApproach = ShowcaseLocalization.GetVariantWhyThisApproach(currentVariant);
+            string tradeOffs = ShowcaseLocalization.GetVariantTradeOffs(currentVariant);
+            string pros = ShowcaseLocalization.GetVariantPros(currentVariant);
+            string cons = ShowcaseLocalization.GetVariantCons(currentVariant);
+
+            sectionDefinitions.Clear();
+
+            switch (currentTabIndex)
+            {
+                case 0:
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("about"), moduleDescription, ShowcaseLocalization.GetText("realtime_preview"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("compare"), compareSummary, ShowcaseLocalization.GetText("no_compare_summary"));
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("webgl_preset"), webGlPreset);
+                    break;
+
+                case 1:
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("core_idea"), architectureDescription, ShowcaseLocalization.GetText("no_architecture_notes"));
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("data_flow"), dataFlow);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("runtime_lifecycle"), runtimeLifecycle);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("why_this_approach"), string.IsNullOrWhiteSpace(whyThisApproach) ? compareSummary : whyThisApproach);
+                    AddOptionalListSection(ShowcaseLocalization.GetText("strengths"), pros, positiveTextColor);
+                    AddRequiredListSection(ShowcaseLocalization.GetText("watch_out"), cons, ShowcaseLocalization.GetText("no_constraints"), negativeTextColor);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
+                    break;
+
+                default:
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("compare"), compareSummary, ShowcaseLocalization.GetText("no_compare_summary"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("trade_offs"), tradeOffs, ShowcaseLocalization.GetText("no_tradeoffs"));
+                    AddOptionalListSection(ShowcaseLocalization.GetText("pros"), pros, positiveTextColor);
+                    AddOptionalListSection(ShowcaseLocalization.GetText("cons"), cons, negativeTextColor);
+                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
+                    break;
+            }
+
+            legacyDescriptionText.text = BuildLegacyBody();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(legacyDescriptionText.rectTransform);
+            ResetScroll();
+            RefreshTabVisuals();
+        }
+
         private void ApplySection(SectionView section, int siblingIndex, string title, string body)
         {
             if (section == null)
@@ -649,6 +685,40 @@ namespace LearningArchitect.UI
             PlayCompositeFade();
             ResetScroll();
             RefreshTabVisuals();
+        }
+
+        private string BuildLegacyFallback()
+        {
+            return BuildLegacySection(
+                ShowcaseLocalization.GetText("overview"),
+                ShowcaseLocalization.GetText("no_variant"),
+                sectionTitleColor);
+        }
+
+        private string BuildLegacyBody()
+        {
+            StringBuilder builder = new();
+
+            for (int i = 0; i < sectionDefinitions.Count; i++)
+            {
+                if (!TryResolveSectionBody(sectionDefinitions[i], out string body))
+                    continue;
+
+                if (builder.Length > 0)
+                    builder.Append("\n\n");
+
+                builder.Append(BuildLegacySection(
+                    sectionDefinitions[i].Title,
+                    body,
+                    ResolveSectionTitleColor(sectionDefinitions[i].Title)));
+            }
+
+            return builder.ToString();
+        }
+
+        private static string BuildLegacySection(string title, string body, Color titleColor)
+        {
+            return "<color=" + ToHex(titleColor) + "><b>" + title + "</b></color>\n" + body;
         }
 
         private void PlayCompositeFade()
@@ -678,99 +748,6 @@ namespace LearningArchitect.UI
 
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = preservedScroll;
-        }
-
-        private void RebuildLegacyContent()
-        {
-            if (currentVariant == null)
-            {
-                descriptionText.text = ShowcaseLocalization.GetText("no_variant");
-                descriptionText.alpha = 1f;
-                ResetScroll();
-                RefreshTabVisuals();
-                return;
-            }
-
-            builder.Length = 0;
-
-            switch (currentTabIndex)
-            {
-                case 0:
-                    AppendSection(
-                        ShowcaseLocalization.GetText("about"),
-                        FallbackTo(ShowcaseLocalization.GetModuleDescription(currentModule), ShowcaseLocalization.GetText("realtime_preview")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("module_type"),
-                        FallbackTo(ShowcaseLocalization.GetModuleCategory(currentModule), ShowcaseLocalization.GetText("no_module_type")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("problem"),
-                        FallbackTo(ShowcaseLocalization.GetModuleProblemStatement(currentModule), ShowcaseLocalization.GetText("no_problem_statement")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("compare"),
-                        FallbackTo(ShowcaseLocalization.GetVariantCompareSummary(currentVariant), ShowcaseLocalization.GetText("no_compare_summary")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("takeaway"),
-                        FallbackTo(ShowcaseLocalization.GetVariantTakeaway(currentVariant), ShowcaseLocalization.GetText("no_takeaway")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("webgl_preset"),
-                        FallbackTo(ShowcaseLocalization.GetModuleWebGlPresetNote(currentModule), ShowcaseLocalization.GetText("no_webgl_note")));
-                    break;
-
-                case 1:
-                    AppendSection(
-                        ShowcaseLocalization.GetText("architecture"),
-                        FallbackTo(ShowcaseLocalization.GetVariantArchitectureDescription(currentVariant), ShowcaseLocalization.GetText("no_architecture_notes")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("strengths"),
-                        FormatListBody(ShowcaseLocalization.GetVariantPros(currentVariant), ShowcaseLocalization.GetText("no_strengths"), positiveTextColor),
-                        false);
-                    break;
-
-                default:
-                    AppendSection(
-                        ShowcaseLocalization.GetText("trade_offs"),
-                        FallbackTo(ShowcaseLocalization.GetVariantTradeOffs(currentVariant), ShowcaseLocalization.GetText("no_tradeoffs")));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("pros"),
-                        FormatListBody(ShowcaseLocalization.GetVariantPros(currentVariant), ShowcaseLocalization.GetText("no_pros"), positiveTextColor),
-                        false,
-                        ToHex(positiveTextColor));
-                    builder.Append("\n\n");
-                    AppendSection(
-                        ShowcaseLocalization.GetText("cons"),
-                        FormatListBody(ShowcaseLocalization.GetVariantCons(currentVariant), ShowcaseLocalization.GetText("no_cons"), negativeTextColor),
-                        false,
-                        ToHex(negativeTextColor));
-                    break;
-            }
-
-            descriptionText.alpha = 0f;
-            descriptionText.rectTransform.localScale = baseScale * 0.985f;
-            descriptionText.text = builder.ToString();
-            fadeTimer = fadeDuration;
-            ResetScroll();
-            RefreshTabVisuals();
-        }
-
-        private void AppendSection(string title, string body, bool preserveSpacing = true, string titleColor = null)
-        {
-            titleColor ??= ToHex(sectionTitleColor);
-
-            builder
-                .Append("<color=")
-                .Append(titleColor)
-                .Append("><size=76%><b>")
-                .Append(title)
-                .Append("</b></size></color>\n");
-
-            builder.Append(preserveSpacing ? body : body.Trim());
         }
 
         private void RefreshTabVisuals()
@@ -809,11 +786,6 @@ namespace LearningArchitect.UI
                 return negativeTextColor;
 
             return sectionTitleColor;
-        }
-
-        private static string FallbackTo(string value, string fallback)
-        {
-            return string.IsNullOrWhiteSpace(value) ? fallback : value;
         }
 
         private void AddRequiredTextSection(string title, string value, string fallback)

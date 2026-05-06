@@ -132,7 +132,7 @@ Recommended initial categories:
 - `LearningArchitect.Core.Edit`
 - `LearningArchitect.AI.Edit`
 - `LearningArchitect.UI.Edit`
-- `LearningArchitect.Showcase.Play`
+- `LearningArchitect.Showcase.PlayMode`
 
 Future module-specific categories:
 
@@ -166,26 +166,38 @@ If those rules are followed:
 
 ## Current Baseline
 
-Current automated coverage is still small:
+Current automated coverage is no longer just a tiny seed:
 
-- `ModuleRuntimeHostTests`
-- `AiSimulationTests`
+- `LearningArchitect.Core.Edit`
+  - `ModuleRuntimeHostTests`
+  - `ShowcaseCoordinatorTests`
+  - `ShowcaseLayoutToolTests`
+  - `ShowcaseRuntimeControllerTests`
+  - `ShowcaseValidatorTests`
+- `LearningArchitect.UI.Edit`
+  - `DescriptionPanelTests`
+  - `HubUITests`
+- `LearningArchitect.Modules.Edit`
+  - `ModuleContractTests`
+- `LearningArchitect.AI.Edit`
+  - `AiSimulationTests`
+- `LearningArchitect.Showcase.PlayMode`
+  - `ShowcaseRuntimePlayModeTests`
 
-This is acceptable for the current stage, but it means the biggest risk areas are still under-covered:
+That is a meaningful baseline for shell behavior and module contract safety, but the remaining risk areas are still real:
 
-- coordinator and selection transitions;
-- runtime controller behavior;
-- localization fallback behavior;
-- `DescriptionPanel` content composition;
-- stress preset propagation across modules.
+- PlayMode coverage is intentionally thin and focused on orchestration smoke, not presenter-heavy UI behavior;
+- localization coverage now proves real `ShowcaseContent` lookup and fallback for a narrow slice, but not every visible content surface;
+- validator and rebuild-tool coverage now guard the hub `DescriptionPanel` hierarchy and key authoring contracts, but broader asset-graph drift can still happen outside those checks;
+- deeper asset-level validation around broader authoring contracts is still lighter than the runtime shell coverage.
 
 ## Recommended Next Steps
 
 1. Keep existing tests in EditMode.
-2. Add category attributes to current tests.
-3. Add core tests for coordinator/runtime-controller selection flow.
-4. Add focused `DescriptionPanel` EditMode tests for tab composition and empty-section behavior.
-5. Add only 2-4 PlayMode smoke tests for runtime integration.
+2. Keep PlayMode smoke intentionally small and focused on runtime integration seams.
+3. Expand validator-focused tests and checks only where authoring rules are teaching-critical.
+4. Expand localization tests only to the next highest-value content surfaces after module description and architecture body.
+5. Keep test-only code in editor/test assemblies and out of runtime modules.
 6. Consider a custom Test Center only after the suite taxonomy is stable.
 
 The project needs a better test model before it needs a heavier test-running framework.

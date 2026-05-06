@@ -10,47 +10,30 @@ namespace LearningArchitect.Editor
     public static class ShowcaseLayoutTool
     {
         private const string PrefabPath = "Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab";
+        private const string SafeModeMessage = "Showcase layout rebuild is disabled in safe mode. Use the PreReorganize visual baseline and adjust wiring manually until the tool is rewritten.";
 
         [MenuItem("Tools/LearningArchitect/Rebuild Showcase Layout")]
         public static void RebuildMenu()
         {
-            Rebuild();
+            Debug.LogWarning(SafeModeMessage);
         }
 
         [MenuItem("Tools/LearningArchitect/Apply Showcase Layout To Scene")]
         public static void ApplyToSceneMenu()
         {
-            ApplyToScene();
+            Debug.LogWarning(SafeModeMessage);
         }
 
         public static string Rebuild()
         {
-            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PrefabPath);
-
-            try
-            {
-                ApplyLayout(prefabRoot);
-                EditorUtility.SetDirty(prefabRoot);
-                PrefabUtility.SaveAsPrefabAsset(prefabRoot, PrefabPath);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                return "Rebuilt showcase layout.";
-            }
-            finally
-            {
-                PrefabUtility.UnloadPrefabContents(prefabRoot);
-            }
+            Debug.LogWarning(SafeModeMessage);
+            return SafeModeMessage;
         }
 
         public static string ApplyToScene()
         {
-            GameObject sceneRoot = GameObject.Find("ArchitectureShowcaseHub");
-            if (sceneRoot == null)
-                return "ArchitectureShowcaseHub not found in scene.";
-
-            ApplyLayout(sceneRoot);
-            EditorUtility.SetDirty(sceneRoot);
-            return "Applied showcase layout to scene.";
+            Debug.LogWarning(SafeModeMessage);
+            return SafeModeMessage;
         }
 
         private static void ApplyLayout(GameObject prefabRoot)
@@ -81,32 +64,28 @@ namespace LearningArchitect.Editor
             Sprite lineSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Lines/Line.png");
             Sprite lineGreenSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Shared/UI/Lines/LineGreen.png");
 
-            RectTransform tint = Rect(canvas.transform, "ShowcaseBackgroundTint");
-            RectTransform rootFrame = Rect(canvas.transform, "RootFrame");
-            RectTransform headerLine = Rect(canvas.transform, "HeaderLine");
-            RectTransform breadcrumb = Rect(canvas.transform, "Breadcrumb");
-            RectTransform headerPanel = Rect(canvas.transform, "HeaderPanel");
-            RectTransform moduleIcon = Rect(canvas.transform, "ModuleIcon");
-            RectTransform moduleName = Rect(canvas.transform, "ModuleName");
-            RectTransform variantName = Rect(canvas.transform, "VariantName");
-            RectTransform inputHints = Rect(canvas.transform, "InputHints");
-            RectTransform infoDivider = Rect(canvas.transform, "InfoDivider");
-            RectTransform performanceCard = Rect(canvas.transform, "PerformanceCard");
-            RectTransform metricsOverlay = Rect(canvas.transform, "MetricsOverlay");
-            RectTransform chartPlaceholder = Rect(canvas.transform, "ChartPlaceholder");
-            RectTransform previewFrame = Rect(canvas.transform, "PreviewFrame");
-            RectTransform previewLabel = Rect(canvas.transform, "PreviewLabel");
-            RectTransform descriptionPanel = Rect(canvas.transform, "DescriptionPanel");
-            RectTransform tabsBar = Rect(canvas.transform, "TabsBar");
-            RectTransform activeTabUnderline = Rect(canvas.transform, "ActiveTabUnderline");
-            RectTransform bodyDivider = Rect(canvas.transform, "BodyDivider");
-            RectTransform viewport = Rect(canvas.transform, "Viewport");
-            RectTransform descriptionText = Rect(canvas.transform, "DescriptionText");
-            RectTransform stressPanel = Rect(canvas.transform, "StressControlsPanel");
-            RectTransform systemStatusCard = Rect(canvas.transform, "SystemStatusCard");
-            RectTransform navPanel = Rect(canvas.transform, "NavigationControlsPanel");
-            RectTransform transitionOverlay = Rect(canvas.transform, "TransitionOverlay");
-            bool hasCompositeDescription = HasCompositeDescriptionContent(viewport);
+            RectTransform tint = EnsureRect(canvas.transform, canvas.transform, "ShowcaseBackgroundTint");
+            RectTransform rootFrame = EnsureRect(canvas.transform, canvas.transform, "RootFrame");
+            RectTransform headerLine = EnsureRect(rootFrame, rootFrame, "HeaderLine");
+            RectTransform breadcrumb = EnsureRect(headerLine, headerLine, "Breadcrumb");
+            RectTransform headerPanel = EnsureRect(rootFrame, rootFrame, "ModuleInfoPanel", "HeaderPanel");
+            RectTransform moduleIcon = EnsureRect(headerPanel, headerPanel, "Image - ModuleIcon", "ModuleIcon");
+            RectTransform moduleName = EnsureRect(headerPanel, headerPanel, "Text - ModuleName", "ModuleName");
+            RectTransform variantName = EnsureRect(headerPanel, headerPanel, "Text - VariantName", "VariantName");
+            RectTransform inputHints = EnsureRect(headerPanel, headerPanel, "Text - InputHints", "InputHints");
+            RectTransform infoDivider = EnsureRect(headerPanel, headerPanel, "InfoDivider");
+            RectTransform performanceCard = EnsureRect(rootFrame, rootFrame, "PerformanceCard");
+            RectTransform previewFrame = EnsureRect(rootFrame, rootFrame, "PreviewFrame");
+            RectTransform previewLabel = EnsureRect(previewFrame, previewFrame, "PreviewLabel");
+            RectTransform descriptionPanel = EnsureRect(rootFrame, rootFrame, "DescriptionPanel");
+            RectTransform tabsBar = EnsureRect(descriptionPanel, descriptionPanel, "Container - DescriptionCharacters", "TabsBar");
+            RectTransform activeTabUnderline = EnsureRect(tabsBar, tabsBar, "ActiveTabUnderline");
+            RectTransform bodyDivider = EnsureRect(descriptionPanel, descriptionPanel, "BodyDivider");
+            RectTransform viewport = EnsureRect(descriptionPanel, descriptionPanel, "Viewport");
+            RectTransform stressPanel = EnsureRect(rootFrame, rootFrame, "StressControlsPanel");
+            RectTransform systemStatusCard = EnsureRect(rootFrame, rootFrame, "SystemStatusCard");
+            RectTransform navPanel = EnsureRect(headerPanel, headerPanel, "NavigationControlsPanel");
+            RectTransform transitionOverlay = EnsureRect(canvas.transform, canvas.transform, "TransitionOverlay");
 
             StretchFull(tint);
             ConfigureImage(GetOrAdd<Image>(tint.gameObject), null, ShowcasePalette.WithAlpha(ShowcasePalette.BgDeep, 0.32f), Image.Type.Simple, false);
@@ -124,7 +103,7 @@ namespace LearningArchitect.Editor
             ConfigureLanguageToggle(canvas, headerLine, frame8WhiteSprite, frame8YellowSprite);
 
             SetRect(breadcrumb, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(34f, 0f), new Vector2(420f, 20f));
-            ConfigureText(breadcrumb.GetComponent<TextMeshProUGUI>(), "ENGINE SYSTEMS / <color=#" + ShowcasePalette.AccentHex + ">VISUALIZER</color>", 18f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(breadcrumb.gameObject), "ENGINE SYSTEMS / <color=#" + ShowcasePalette.AccentHex + ">VISUALIZER</color>", 18f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
 
             SetRect(headerPanel, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(18f, -48f), new Vector2(622f, 214f));
             ConfigureCard(headerPanel, frame16Sprite, new Color(0.050f, 0.061f, 0.075f, 0.94f), 0.035f, 0.28f);
@@ -134,16 +113,16 @@ namespace LearningArchitect.Editor
             Outline moduleIconOutline = GetOrAdd<Outline>(moduleIcon.gameObject);
             moduleIconOutline.effectColor = ShowcasePalette.AccentSoft(0.10f);
             moduleIconOutline.effectDistance = new Vector2(0f, -1f);
-            RectTransform iconGlyph = Rect(canvas.transform, "IconGlyph");
+            RectTransform iconGlyph = Rect(headerPanel, "IconGlyph");
             if (iconGlyph != null)
                 iconGlyph.gameObject.SetActive(false);
 
             SetRect(moduleName, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(116f, -18f), new Vector2(320f, 42f));
-            ConfigureText(moduleName.GetComponent<TextMeshProUGUI>(), "Effects System", 28f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(moduleName.gameObject), "Effects System", 28f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
             SetRect(variantName, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(116f, -58f), new Vector2(360f, 28f));
-            ConfigureText(variantName.GetComponent<TextMeshProUGUI>(), "<b>Chunk-based Variant</b>", 18f, ShowcasePalette.AccentMain, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(variantName.gameObject), "<b>Chunk-based Variant</b>", 18f, ShowcasePalette.AccentMain, TextAlignmentOptions.Left);
             SetRect(inputHints, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(116f, -88f), new Vector2(240f, 18f));
-            ConfigureText(inputHints.GetComponent<TextMeshProUGUI>(), "Realtime architecture preview", 12f, ShowcasePalette.TextMuted, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(inputHints.gameObject), "Realtime architecture preview", 12f, ShowcasePalette.TextMuted, TextAlignmentOptions.Left);
 
             SetRect(infoDivider, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 60f), new Vector2(-44f, 1f));
             ConfigureImage(GetOrAdd<Image>(infoDivider.gameObject), lineSprite, ShowcasePalette.BorderMain(0.075f), Image.Type.Sliced, false);
@@ -151,32 +130,11 @@ namespace LearningArchitect.Editor
             string[] statLabels = { "MODULE", "VARIANT", "LOADED", "ORBIT", "ZOOM" };
             string[] statValues = { "Effects", "Chunk-based", "12 / 25", "RMB", "Wheel" };
             Sprite[] statIcons = { moduleIconSprite, variantIconSprite, loadedIconSprite, orbitIconSprite, zoomIconSprite };
-            for (int i = 0; i < statLabels.Length; i++)
-            {
-                RectTransform labelRect = Rect(canvas.transform, "StatLabel_" + i);
-                RectTransform valueRect = Rect(canvas.transform, "StatValue_" + i);
-                float x = 30f + i * 108f;
-                SetRect(labelRect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(x + 20f, 22f), new Vector2(86f, 14f));
-                ConfigureText(labelRect.GetComponent<TextMeshProUGUI>(), statLabels[i], 11f, ShowcasePalette.TextMuted, TextAlignmentOptions.Left);
-                SetRect(valueRect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(x + 20f, 6f), new Vector2(92f, 20f));
-                ConfigureText(valueRect.GetComponent<TextMeshProUGUI>(), statValues[i], 15f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
-
-                GameObject icon = EnsureChild(headerPanel, "StatIcon_" + i, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-                SetRect(icon.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(x, 18f), new Vector2(14f, 14f));
-                ConfigureImage(icon.GetComponent<Image>(), statIcons[i], ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.68f), Image.Type.Simple, false);
-            }
+            ConfigureModuleStats(headerPanel, statLabels, statValues, statIcons);
 
             SetRect(performanceCard, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(18f, 196f), new Vector2(398f, 334f));
             ConfigureCard(performanceCard, frame16Sprite, new Color(0.050f, 0.061f, 0.075f, 0.94f), 0.030f, 0.28f);
-            SetRect(metricsOverlay, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(20f, -18f), new Vector2(-40f, 148f));
-            ConfigureText(metricsOverlay.GetComponent<TextMeshProUGUI>(), "<size=72%><color=#" + ShowcasePalette.AccentHex + "><b>PERFORMANCE</b></color></size>\n\n<color=#" + ShowcasePalette.TextSecondaryHex + ">FPS</color>               <size=140%><b>142</b></size>  <size=75%>FPS</size>\n\n<color=#" + ShowcasePalette.TextSecondaryHex + ">Frame ms</color>       7.0 ms\n<color=#" + ShowcasePalette.TextSecondaryHex + ">Module CPU</color>   1.4 ms\n<color=#" + ShowcasePalette.TextSecondaryHex + ">Simulated</color>    10,000\n<color=#" + ShowcasePalette.TextSecondaryHex + ">Visible</color>      320", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.TopLeft);
-            GameObject perfIcon = EnsureChild(performanceCard, "PerformanceIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            SetRect(perfIcon.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(18f, -18f), new Vector2(14f, 14f));
-            ConfigureImage(perfIcon.GetComponent<Image>(), perfIconSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.78f), Image.Type.Simple, false);
-            SetRect(chartPlaceholder, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(-36f, 102f));
-            ConfigureImage(GetOrAdd<Image>(chartPlaceholder.gameObject), lineSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f), Image.Type.Simple, false);
-            GameObject performanceGraph = EnsureChild(chartPlaceholder, "PerformanceGraph", typeof(RectTransform), typeof(CanvasRenderer), typeof(PerformanceGraph));
-            SetRect(performanceGraph.GetComponent<RectTransform>(), Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            ConfigureStructuredPerformanceCard(performanceCard, perfIconSprite, lineSprite);
 
             StretchInside(previewFrame, 286f, 514f, 138f, 74f);
             ConfigureImage(GetOrAdd<Image>(previewFrame.gameObject), null, new Color(1f, 1f, 1f, 0f), Image.Type.Simple, false);
@@ -189,14 +147,16 @@ namespace LearningArchitect.Editor
             descriptionPanel.offsetMax = new Vector2(-18f, -48f);
             ConfigureCard(descriptionPanel, frame16Sprite, new Color(0.050f, 0.061f, 0.075f, 0.95f), 0.030f, 0.30f);
 
+            tabsBar.name = "Container - DescriptionCharacters";
             StretchTop(tabsBar, 12f, 12f, 12f, 76f);
             ConfigureImage(GetOrAdd<Image>(tabsBar.gameObject), frame8WhiteSprite, new Color(0.043f, 0.053f, 0.067f, 0.94f), Image.Type.Sliced, false);
+            CleanupTabsBarChildren(tabsBar);
             string[] tabs = { "Overview", "Architecture", "Trade-offs" };
             for (int i = 0; i < 3; i++)
             {
-                RectTransform tabRect = Rect(canvas.transform, "Tab_" + i);
+                RectTransform tabRect = EnsureRect(tabsBar, tabsBar, "Tab_" + i);
                 SetRect(tabRect, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(24f + 138f * i, -2f), new Vector2(126f, 28f));
-                ConfigureText(tabRect.GetComponent<TextMeshProUGUI>(), tabs[i], 16f, i == 0 ? ShowcasePalette.AccentMain : ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(tabRect.gameObject), tabs[i], 16f, i == 0 ? ShowcasePalette.AccentMain : ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
             }
 
             SetRect(activeTabUnderline, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(22f, 10f), new Vector2(130f, 3f));
@@ -212,20 +172,6 @@ namespace LearningArchitect.Editor
             viewport.offsetMax = new Vector2(-22f, -94f);
             ConfigureImage(GetOrAdd<Image>(viewport.gameObject), null, new Color(1f, 1f, 1f, 0.001f), Image.Type.Simple, true);
             GetOrAdd<RectMask2D>(viewport.gameObject);
-
-            if (descriptionText != null)
-            {
-                descriptionText.anchorMin = new Vector2(0f, 1f);
-                descriptionText.anchorMax = new Vector2(1f, 1f);
-                descriptionText.pivot = new Vector2(0.5f, 1f);
-                descriptionText.anchoredPosition = Vector2.zero;
-                descriptionText.sizeDelta = new Vector2(0f, 1200f);
-
-                if (!hasCompositeDescription)
-                {
-                    ConfigureText(descriptionText.GetComponent<TextMeshProUGUI>(), "<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ABOUT</b></size></color>\nChunk-based processing groups particles into spatial chunks to improve cache locality and reduce draw calls.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>ARCHITECTURE</b></size></color>\nBatched data-oriented variant. Stores positions and velocities in arrays and updates them with a simple for loop.\n\n<color=#" + ShowcasePalette.AccentHex + "><size=74%><b>TRADE-OFFS</b></size></color>\nMuch better scaling than per-object behaviour, but less direct to inspect in the hierarchy.\n\n<color=#" + ShowcasePalette.SuccessHex + "><size=74%><b>PROS</b></size></color>\n\u2022 One batched update loop\n\u2022 Simulates more effects than it renders\n\u2022 Clearer path toward data-oriented optimization\n\n<color=#" + ShowcasePalette.ErrorHex + "><size=74%><b>CONS</b></size></color>\n\u2022 Less direct than object-per-effect\n\u2022 Needs custom visualization\n\u2022 More bookkeeping than the indie variant", 18f, new Color(0.830f, 0.850f, 0.880f, 1f), TextAlignmentOptions.TopLeft);
-                }
-            }
 
             stressPanel.anchorMin = new Vector2(0f, 0f);
             stressPanel.anchorMax = new Vector2(1f, 0f);
@@ -245,19 +191,19 @@ namespace LearningArchitect.Editor
             ShowcaseCompositionRoot compositionRoot = GetOrAdd<ShowcaseCompositionRoot>(prefabRoot);
             ShowcaseCommandRouter commandRouter = GetOrAdd<ShowcaseCommandRouter>(prefabRoot);
             ShowcaseStateHub stateHub = GetOrAdd<ShowcaseStateHub>(prefabRoot);
-            HubUI hubUI = prefabRoot.GetComponent<HubUI>();
-            DescriptionPanel description = prefabRoot.GetComponent<DescriptionPanel>();
-            MetricsOverlay metrics = prefabRoot.GetComponent<MetricsOverlay>();
-            StressTestControls stress = prefabRoot.GetComponent<StressTestControls>();
-            ModuleNavigationControls navigation = prefabRoot.GetComponent<ModuleNavigationControls>();
+            HubUI hubUI = GetOrAdd<HubUI>(prefabRoot);
+            DescriptionPanel description = GetOrAdd<DescriptionPanel>(prefabRoot);
+            MetricsOverlay metrics = GetOrAdd<MetricsOverlay>(prefabRoot);
+            StressTestControls stress = GetOrAdd<StressTestControls>(prefabRoot);
+            ModuleNavigationControls navigation = GetOrAdd<ModuleNavigationControls>(prefabRoot);
             ShowcaseTransitionController transitionController = GetOrAdd<ShowcaseTransitionController>(prefabRoot);
             GetOrAdd<ShowcaseLocalization>(prefabRoot);
 
-            hubUI.ModuleName = moduleName.GetComponent<TextMeshProUGUI>();
-            hubUI.VariantName = variantName.GetComponent<TextMeshProUGUI>();
-            hubUI.InputHints = inputHints.GetComponent<TextMeshProUGUI>();
-            hubUI.ModuleSelectorName = Rect(canvas.transform, "Text - ModuleValue").GetComponent<TextMeshProUGUI>();
-            hubUI.VariantSelectorName = Rect(canvas.transform, "Text - VariantValue").GetComponent<TextMeshProUGUI>();
+            hubUI.ModuleName = GetOrAdd<TextMeshProUGUI>(moduleName.gameObject);
+            hubUI.VariantName = GetOrAdd<TextMeshProUGUI>(variantName.gameObject);
+            hubUI.InputHints = GetOrAdd<TextMeshProUGUI>(inputHints.gameObject);
+            hubUI.ModuleSelectorName = GetOrAdd<TextMeshProUGUI>(EnsureRect(stressPanel, stressPanel, "Text - ModuleValue").gameObject);
+            hubUI.VariantSelectorName = GetOrAdd<TextMeshProUGUI>(EnsureRect(stressPanel, stressPanel, "Text - VariantValue").gameObject);
             hubUI.ModuleColor = ShowcasePalette.TextPrimary;
             hubUI.VariantColor = ShowcasePalette.AccentMain;
             hubUI.HintColor = ShowcasePalette.TextMuted;
@@ -274,34 +220,33 @@ namespace LearningArchitect.Editor
             description.PositiveTextColor = ShowcasePalette.Success;
             description.NegativeTextColor = ShowcasePalette.Error;
 
-            if (!TryWireCompositeDescriptionContent(viewport, scrollRect, description, descriptionText))
-            {
-                scrollRect.content = descriptionText;
-                if (descriptionText != null)
-                    description.DescriptionText = descriptionText.GetComponent<TextMeshProUGUI>();
-            }
+            ResetDescriptionViewport(viewport);
+            EnsureCompositeDescriptionSections(viewport);
 
-            metrics.FpsText = metricsOverlay.GetComponent<TextMeshProUGUI>();
+            if (!TryWireCompositeDescriptionContent(viewport, scrollRect))
+                throw new System.InvalidOperationException("DescriptionPanel requires composite section content under Viewport.");
+
+            metrics.FpsText = null;
             metrics.TitleColor = ShowcasePalette.AccentMain;
             metrics.LabelColor = ShowcasePalette.TextSecondary;
             metrics.ValueColor = ShowcasePalette.TextPrimary;
             metrics.GraphBackgroundColor = ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f);
-            stress.OneKButton = Rect(canvas.transform, "Button - StressPreset01").GetComponent<Button>();
-            stress.FiveKButton = Rect(canvas.transform, "Button - StressPreset02").GetComponent<Button>();
-            stress.TenKButton = Rect(canvas.transform, "Button - StressPreset03").GetComponent<Button>();
-            stress.StatusText = Rect(canvas.transform, "Text - StressSummary").GetComponent<TextMeshProUGUI>();
+            stress.OneKButton = GetOrAdd<Button>(EnsureRect(stressPanel, stressPanel, "Button - StressPreset01").gameObject);
+            stress.FiveKButton = GetOrAdd<Button>(EnsureRect(stressPanel, stressPanel, "Button - StressPreset02").gameObject);
+            stress.TenKButton = GetOrAdd<Button>(EnsureRect(stressPanel, stressPanel, "Button - StressPreset03").gameObject);
+            stress.StatusText = GetOrAdd<TextMeshProUGUI>(EnsureRect(stressPanel, stressPanel, "Text - StressSummary").gameObject);
             stress.InactiveLabelColor = ShowcasePalette.TextSecondary;
             stress.HoverBackgroundColor = new Color(0.070f, 0.083f, 0.102f, 0.96f);
             stress.PressedBackgroundColor = new Color(0.145f, 0.083f, 0.045f, 0.98f);
             navigation.panelSprite = frame8WhiteSprite;
             navigation.buttonSprite = frame8WhiteSprite;
-            transitionController.transitionOverlay = transitionOverlay.GetComponent<CanvasGroup>();
+            transitionController.transitionOverlay = GetOrAdd<CanvasGroup>(transitionOverlay.gameObject);
             transitionController.transitionDuration = 0.16f;
             compositionRoot.RuntimeController = runtimeController;
             compositionRoot.CommandRouter = commandRouter;
             compositionRoot.TransitionController = transitionController;
             compositionRoot.StateHub = stateHub;
-            compositionRoot.ModuleRoot = Rect(prefabRoot.transform, "ModuleRoot");
+            compositionRoot.ModuleRoot = EnsureTransformChild(prefabRoot.transform, "ModuleRoot");
             compositionRoot.Modules = ResolveModules(compositionRoot.Modules);
             commandRouter.RuntimeController = runtimeController;
         }
@@ -334,20 +279,20 @@ namespace LearningArchitect.Editor
 
         private static void ConfigureFooter(Canvas canvas, Sprite moduleIconSprite, Sprite variantIconSprite, Sprite stressIconSprite, Sprite frame8WhiteSprite, Sprite frame8YellowSprite)
         {
-            RectTransform stressPanel = Rect(canvas.transform, "StressControlsPanel");
-            RectTransform moduleTitle = Rect(canvas.transform, "Text - ModuleHeader");
-            RectTransform moduleSelector = Rect(canvas.transform, "ModuleSelector");
-            RectTransform moduleSelectorName = Rect(canvas.transform, "Text - ModuleValue");
-            RectTransform variantTitle = Rect(canvas.transform, "Text - VariantHeader");
-            RectTransform variantSelector = Rect(canvas.transform, "VariantSelector");
-            RectTransform variantSelectorName = Rect(canvas.transform, "Text - VariantValue");
+            RectTransform stressPanel = EnsureRect(canvas.transform, canvas.transform, "StressControlsPanel");
+            RectTransform moduleTitle = EnsureRect(stressPanel, stressPanel, "Text - ModuleHeader");
+            RectTransform moduleSelector = EnsureRect(stressPanel, stressPanel, "ModuleSelector");
+            RectTransform moduleSelectorName = EnsureRect(moduleSelector, moduleSelector, "Text - ModuleValue");
+            RectTransform variantTitle = EnsureRect(stressPanel, stressPanel, "Text - VariantHeader");
+            RectTransform variantSelector = EnsureRect(stressPanel, stressPanel, "VariantSelector");
+            RectTransform variantSelectorName = EnsureRect(variantSelector, variantSelector, "Text - VariantValue");
             RectTransform variantSelectorIcon = FindDeep(variantSelector, "Image - VariantSelectorIcon") as RectTransform
-                                                ?? FindDeep(variantSelector, "Image") as RectTransform;
-            RectTransform previousVariantButton = FindDeep(variantSelector, "PreviousVariantButton") as RectTransform;
-            RectTransform nextVariantButton = FindDeep(variantSelector, "NextVariantButton") as RectTransform;
-            RectTransform stressTitle = Rect(canvas.transform, "Text - StressHeader");
-            RectTransform stressRow = Rect(canvas.transform, "HorizontalLayout - StressPresets");
-            RectTransform stressStatusText = Rect(canvas.transform, "Text - StressSummary");
+                                                ?? EnsureRect(variantSelector, variantSelector, "Image - VariantSelectorIcon", "Image");
+            RectTransform previousVariantButton = EnsureRect(variantSelector, variantSelector, "PreviousVariantButton");
+            RectTransform nextVariantButton = EnsureRect(variantSelector, variantSelector, "NextVariantButton");
+            RectTransform stressTitle = EnsureRect(stressPanel, stressPanel, "Text - StressHeader");
+            RectTransform stressRow = EnsureRect(stressPanel, stressPanel, "HorizontalLayout - StressPresets");
+            RectTransform stressStatusText = EnsureRect(stressPanel, stressPanel, "Text - StressSummary");
             RectTransform stressStatusIcon = FindDeep(stressPanel, "Image - StressStatusIcon") as RectTransform
                                              ?? FindDeep(stressPanel, "StressStatusIcon") as RectTransform;
 
@@ -355,7 +300,19 @@ namespace LearningArchitect.Editor
             RectTransform variantSection = EnsureRectChild(stressPanel, "Container - VariantSection");
             RectTransform stressSection = EnsureRectChild(stressPanel, "Container - StressSection");
             RectTransform stressContent = EnsureRectChild(stressSection, "Container - StressContent");
-            RectTransform stressStatus = EnsureRectChild(stressContent, "Container - StressSummary");
+            RectTransform stressStatus = stressContent.Find("Container - StressSummary") as RectTransform;
+            RectTransform legacyStressStatus = stressSection.Find("Container - StressSummary") as RectTransform;
+            if (stressStatus == null && legacyStressStatus != null)
+            {
+                stressStatus = legacyStressStatus;
+            }
+            else if (stressStatus != null && legacyStressStatus != null)
+            {
+                Object.DestroyImmediate(legacyStressStatus.gameObject);
+            }
+
+            if (stressStatus == null)
+                stressStatus = EnsureRectChild(stressContent, "Container - StressSummary");
 
             SetRect(moduleSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(332f, -36f));
             SetRect(variantSection, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(372f, 0f), new Vector2(332f, -36f));
@@ -374,34 +331,34 @@ namespace LearningArchitect.Editor
                 stressStatusIcon.SetParent(stressStatus, false);
 
             SetRect(moduleTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
-            ConfigureText(moduleTitle.GetComponent<TextMeshProUGUI>(), "SELECT MODULE", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(moduleTitle.gameObject), "SELECT MODULE", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
 
             SetRect(moduleSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 18f), new Vector2(0f, 58f));
             ConfigureImage(GetOrAdd<Image>(moduleSelector.gameObject), frame8WhiteSprite, new Color(0.070f, 0.083f, 0.102f, 0.96f), Image.Type.Sliced, false);
             SetRect(moduleSelectorName, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(52f, 0f), new Vector2(210f, 22f));
-            ConfigureText(moduleSelectorName.GetComponent<TextMeshProUGUI>(), "Effects", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(moduleSelectorName.gameObject), "Effects", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
             GameObject moduleSelectIcon = EnsureChild(moduleSelector, "Image - ModuleSelectorIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             SetRect(moduleSelectIcon.GetComponent<RectTransform>(), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(16f, 0f), new Vector2(20f, 20f));
             ConfigureImage(moduleSelectIcon.GetComponent<Image>(), moduleIconSprite, ShowcasePalette.TextPrimary, Image.Type.Simple, false);
 
             SetRect(variantTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
-            ConfigureText(variantTitle.GetComponent<TextMeshProUGUI>(), "SELECT VARIANT", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(variantTitle.gameObject), "SELECT VARIANT", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
             SetRect(variantSelector, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 18f), new Vector2(0f, 58f));
             ConfigureImage(GetOrAdd<Image>(variantSelector.gameObject), frame8WhiteSprite, new Color(0.070f, 0.083f, 0.102f, 0.96f), Image.Type.Sliced, false);
             SetRect(variantSelectorName, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(52f, 0f), new Vector2(180f, 22f));
-            ConfigureText(variantSelectorName.GetComponent<TextMeshProUGUI>(), "Chunk-based", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(variantSelectorName.gameObject), "Chunk-based", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
             SetRect(variantSelectorIcon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(16f, 0f), new Vector2(20f, 20f));
             ConfigureImage(GetOrAdd<Image>(variantSelectorIcon.gameObject), variantIconSprite, ShowcasePalette.TextPrimary, Image.Type.Simple, false);
 
             SetRect(previousVariantButton, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-68f, 0f), new Vector2(36f, 36f));
             ConfigureImage(GetOrAdd<Image>(previousVariantButton.gameObject), frame8WhiteSprite, new Color(0.045f, 0.055f, 0.070f, 0.96f), Image.Type.Sliced, true);
-            ConfigureText(previousVariantButton.Find("Label").GetComponent<TextMeshProUGUI>(), "\u2039", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(EnsureRect(previousVariantButton, previousVariantButton, "Label", "Text - Label").gameObject), "\u2039", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
             SetRect(nextVariantButton, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-24f, 0f), new Vector2(36f, 36f));
             ConfigureImage(GetOrAdd<Image>(nextVariantButton.gameObject), frame8WhiteSprite, new Color(0.045f, 0.055f, 0.070f, 0.96f), Image.Type.Sliced, true);
-            ConfigureText(nextVariantButton.Find("Label").GetComponent<TextMeshProUGUI>(), "\u203A", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(EnsureRect(nextVariantButton, nextVariantButton, "Label", "Text - Label").gameObject), "\u203A", 18f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
 
             SetRect(stressTitle, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(0f, -18f), new Vector2(0f, 18f));
-            ConfigureText(stressTitle.GetComponent<TextMeshProUGUI>(), "STRESS TEST", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(stressTitle.gameObject), "STRESS TEST", 16f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
 
             stressContent.anchorMin = new Vector2(0f, 0f);
             stressContent.anchorMax = new Vector2(1f, 1f);
@@ -457,7 +414,7 @@ namespace LearningArchitect.Editor
 
             SetRect(stressStatus, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 0f), new Vector2(286f, 50f));
             SetRect(stressStatusText, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0.5f), new Vector2(30f, 0f), new Vector2(-30f, 0f));
-            ConfigureText(stressStatusText.GetComponent<TextMeshProUGUI>(), "<size=72%><color=#" + ShowcasePalette.TextSecondaryHex + ">Stress Load</color></size>\n<color=#" + ShowcasePalette.AccentHex + "><size=118%><b>10K</b></size></color>  <size=84%>Active items 10K</size>", 17f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(stressStatusText.gameObject), "<size=72%><color=#" + ShowcasePalette.TextSecondaryHex + ">Stress Load</color></size>\n<color=#" + ShowcasePalette.AccentHex + "><size=118%><b>10K</b></size></color>  <size=84%>Active items 10K</size>", 17f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
 
             if (stressStatusIcon == null)
                 stressStatusIcon = EnsureRectChild(stressStatus, "Image - StressStatusIcon");
@@ -471,9 +428,9 @@ namespace LearningArchitect.Editor
             SetRect(systemStatusCard, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-18f, 18f), new Vector2(500f, 118f));
             ConfigureCard(systemStatusCard, frame16Sprite, new Color(0.050f, 0.061f, 0.075f, 0.95f), 0.025f, 0.28f, false);
 
-            RectTransform statusTitle = Rect(canvas.transform, "StatusTitle");
+            RectTransform statusTitle = EnsureRect(systemStatusCard, systemStatusCard, "StatusTitle");
             SetRect(statusTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(44f, -18f), new Vector2(220f, 18f));
-            ConfigureText(statusTitle.GetComponent<TextMeshProUGUI>(), "SYSTEM STATUS", 16f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(statusTitle.gameObject), "SYSTEM STATUS", 16f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
 
             GameObject statusDot = EnsureChild(systemStatusCard, "StatusDot", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             SetRect(statusDot.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(18f, -20f), new Vector2(12f, 12f));
@@ -482,12 +439,12 @@ namespace LearningArchitect.Editor
             string[] statusTexts = { "CPU 38%", "GPU 52%", "MEM 6.1 GB" };
             for (int i = 0; i < statusTexts.Length; i++)
             {
-                RectTransform metric = Rect(canvas.transform, "StatusMetric_" + i);
-                RectTransform bar = Rect(canvas.transform, "StatusBar_" + i);
-                RectTransform fill = bar.Find("Fill") as RectTransform;
+                RectTransform metric = EnsureRect(systemStatusCard, systemStatusCard, "StatusMetric_" + i);
+                RectTransform bar = EnsureRect(systemStatusCard, systemStatusCard, "StatusBar_" + i);
+                RectTransform fill = EnsureRect(bar, bar, "Fill");
                 float startX = 18f + i * 154f;
                 SetRect(metric, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(startX, -42f), new Vector2(132f, 16f));
-                ConfigureText(metric.GetComponent<TextMeshProUGUI>(), statusTexts[i], 14f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(metric.gameObject), statusTexts[i], 14f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
 
                 SetRect(bar, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(startX, -66f), new Vector2(110f, 8f));
                 ConfigureImage(GetOrAdd<Image>(bar.gameObject), frame8WhiteSprite, new Color(0.070f, 0.083f, 0.102f, 0.90f), Image.Type.Sliced, false);
@@ -502,16 +459,160 @@ namespace LearningArchitect.Editor
             StretchTop(navPanel, 18f, 18f, 48f, 214f);
             ConfigureImage(GetOrAdd<Image>(navPanel.gameObject), null, new Color(1f, 1f, 1f, 0f), Image.Type.Simple, false);
 
-            RectTransform previousModuleButton = Rect(canvas.transform, "PreviousModuleButton");
-            RectTransform nextModuleButton = Rect(canvas.transform, "NextModuleButton");
+            RectTransform previousModuleButton = EnsureRect(navPanel, navPanel, "PreviousModuleButton");
+            RectTransform nextModuleButton = EnsureRect(navPanel, navPanel, "NextModuleButton");
             SetRect(previousModuleButton, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(510f, -28f), new Vector2(44f, 44f));
             ConfigureImage(GetOrAdd<Image>(previousModuleButton.gameObject), frame8WhiteSprite, new Color(0.055f, 0.067f, 0.082f, 0.96f), Image.Type.Sliced, true);
-            ConfigureText(previousModuleButton.Find("Label").GetComponent<TextMeshProUGUI>(), "\u2039", 22f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(EnsureRect(previousModuleButton, previousModuleButton, "Text - Label", "Label").gameObject), "\u2039", 22f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Center);
 
             SetRect(nextModuleButton, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(562f, -28f), new Vector2(44f, 44f));
             ConfigureImage(GetOrAdd<Image>(nextModuleButton.gameObject), frame8YellowSprite, new Color(0.110f, 0.071f, 0.047f, 0.98f), Image.Type.Sliced, true);
-            ConfigureText(nextModuleButton.Find("Label").GetComponent<TextMeshProUGUI>(), "\u203A", 22f, ShowcasePalette.AccentMain, TextAlignmentOptions.Center);
-            AddAccentGlow(nextModuleButton, "ActiveGlow", ShowcasePalette.AccentSoft(0.28f), new Vector2(58f, 58f));
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(EnsureRect(nextModuleButton, nextModuleButton, "Text - Label", "Label").gameObject), "\u203A", 22f, ShowcasePalette.AccentMain, TextAlignmentOptions.Center);
+            AddAccentGlow(nextModuleButton, "Image - ActiveGlow", ShowcasePalette.AccentSoft(0.28f), new Vector2(58f, 58f));
+
+            Transform legacyGlow = nextModuleButton.Find("ActiveGlow");
+            if (legacyGlow != null)
+                Object.DestroyImmediate(legacyGlow.gameObject);
+        }
+
+        private static void ConfigureModuleStats(RectTransform headerPanel, string[] labels, string[] values, Sprite[] icons)
+        {
+            RectTransform statsRow = EnsureRect(headerPanel, headerPanel, "HorizontalLayout - ModuleStats");
+            SetRect(statsRow, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(28f, 8f), new Vector2(-56f, 54f));
+
+            HorizontalLayoutGroup layoutGroup = GetOrAdd<HorizontalLayoutGroup>(statsRow.gameObject);
+            layoutGroup.padding = new RectOffset(0, 0, 0, 0);
+            layoutGroup.spacing = 12f;
+            layoutGroup.childAlignment = TextAnchor.LowerLeft;
+            layoutGroup.childControlWidth = false;
+            layoutGroup.childControlHeight = true;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandHeight = false;
+
+            for (int i = 0; i < labels.Length; i++)
+            {
+                string containerName = i == 0 ? "Container - ModuleStat" : $"Container - ModuleStat ({i})";
+                RectTransform container = EnsureRect(statsRow, statsRow, containerName);
+                LayoutElement element = GetOrAdd<LayoutElement>(container.gameObject);
+                element.minWidth = 102f;
+                element.preferredWidth = 102f;
+                element.minHeight = 40f;
+                element.preferredHeight = 40f;
+
+                RectTransform icon = EnsureRect(container, container, "Image - StatIcon");
+                RectTransform label = EnsureRect(container, container, "Text - StatLabel");
+                RectTransform value = EnsureRect(container, container, "Text - StatValue");
+
+                SetRect(icon, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 8f), new Vector2(14f, 14f));
+                ConfigureImage(GetOrAdd<Image>(icon.gameObject), icons[i], ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.68f), Image.Type.Simple, false);
+
+                SetRect(label, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(20f, 22f), new Vector2(-20f, 14f));
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(label.gameObject), labels[i], 11f, ShowcasePalette.TextMuted, TextAlignmentOptions.Left);
+
+                SetRect(value, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(20f, 6f), new Vector2(-20f, 20f));
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(value.gameObject), values[i], 15f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Left);
+            }
+        }
+
+        private static void ConfigureStructuredPerformanceCard(RectTransform performanceCard, Sprite perfIconSprite, Sprite lineSprite)
+        {
+            RectTransform header = EnsureRect(performanceCard, performanceCard, "Text - Header");
+            RectTransform insight = EnsureRect(performanceCard, performanceCard, "Text - PerformanceInsight", "MetricsOverlay");
+            RectTransform chartPlaceholder = EnsureRect(performanceCard, performanceCard, "Container - ChartPlaceholder", "ChartPlaceholder");
+            RectTransform performanceGraph = EnsureRect(chartPlaceholder, chartPlaceholder, "PerformanceGraph");
+            RectTransform performanceValues = EnsureRect(chartPlaceholder, chartPlaceholder, "Container - PerformanceValue");
+            RectTransform chartSummary = EnsureRect(chartPlaceholder, chartPlaceholder, "Label");
+            RectTransform statsRoot = EnsureRect(performanceCard, performanceCard, "Container - PerformanceStats", "Container - PerfomanceStats");
+
+            GameObject perfIcon = EnsureChild(performanceCard, "Image - PerformanceIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            SetRect(perfIcon.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(18f, -18f), new Vector2(14f, 14f));
+            ConfigureImage(perfIcon.GetComponent<Image>(), perfIconSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.78f), Image.Type.Simple, false);
+
+            SetRect(header, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(42f, -18f), new Vector2(220f, 18f));
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(header.gameObject), "PERFORMANCE", 16f, ShowcasePalette.AccentMain, TextAlignmentOptions.Left);
+
+            SetRect(insight, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(18f, -44f), new Vector2(-36f, 38f));
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(insight.gameObject), "Live metrics show frame-level behavior and module-local CPU cost.", 13f, ShowcasePalette.TextSecondary, TextAlignmentOptions.TopLeft);
+
+            SetRect(chartPlaceholder, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(18f, 138f), new Vector2(-36f, 84f));
+            ConfigureImage(GetOrAdd<Image>(chartPlaceholder.gameObject), lineSprite, ShowcasePalette.WithAlpha(ShowcasePalette.AccentMain, 0.055f), Image.Type.Sliced, false);
+
+            SetRect(performanceGraph, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            GetOrAdd<PerformanceGraph>(performanceGraph.gameObject);
+
+            SetRect(chartSummary, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(8f, -8f), new Vector2(180f, 16f));
+            ConfigureText(GetOrAdd<TextMeshProUGUI>(chartSummary.gameObject), "Realtime chart", 12f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+
+            performanceValues.anchorMin = new Vector2(1f, 0f);
+            performanceValues.anchorMax = new Vector2(1f, 1f);
+            performanceValues.pivot = new Vector2(1f, 0.5f);
+            performanceValues.offsetMin = new Vector2(-48f, 8f);
+            performanceValues.offsetMax = new Vector2(-8f, -8f);
+            performanceValues.localScale = Vector3.one;
+            performanceValues.localRotation = Quaternion.identity;
+
+            VerticalLayoutGroup valuesLayout = GetOrAdd<VerticalLayoutGroup>(performanceValues.gameObject);
+            valuesLayout.padding = new RectOffset(0, 0, 0, 0);
+            valuesLayout.spacing = 6f;
+            valuesLayout.childAlignment = TextAnchor.UpperRight;
+            valuesLayout.childControlWidth = true;
+            valuesLayout.childControlHeight = false;
+            valuesLayout.childForceExpandWidth = false;
+            valuesLayout.childForceExpandHeight = false;
+
+            string[] chartValues = { "144", "72", "0" };
+            for (int i = 0; i < chartValues.Length; i++)
+            {
+                RectTransform value = EnsureRect(performanceValues, performanceValues, $"Text - Value{i}");
+                LayoutElement element = GetOrAdd<LayoutElement>(value.gameObject);
+                element.minHeight = 16f;
+                element.preferredHeight = 16f;
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(value.gameObject), chartValues[i], 12f, i == 0 ? ShowcasePalette.AccentMain : ShowcasePalette.TextSecondary, TextAlignmentOptions.Right);
+            }
+
+            statsRoot.anchorMin = new Vector2(0f, 0f);
+            statsRoot.anchorMax = new Vector2(1f, 0f);
+            statsRoot.pivot = new Vector2(0.5f, 0f);
+            statsRoot.offsetMin = new Vector2(18f, 18f);
+            statsRoot.offsetMax = new Vector2(-18f, 120f);
+            statsRoot.localScale = Vector3.one;
+            statsRoot.localRotation = Quaternion.identity;
+
+            VerticalLayoutGroup statsLayout = GetOrAdd<VerticalLayoutGroup>(statsRoot.gameObject);
+            statsLayout.padding = new RectOffset(0, 0, 0, 0);
+            statsLayout.spacing = 8f;
+            statsLayout.childAlignment = TextAnchor.UpperLeft;
+            statsLayout.childControlWidth = true;
+            statsLayout.childControlHeight = false;
+            statsLayout.childForceExpandWidth = true;
+            statsLayout.childForceExpandHeight = false;
+
+            string[] labels = { "FPS", "Frame ms", "Module CPU", "Simulated", "Visible" };
+            string[] values = { "142 FPS", "7.0 ms", "1.4 ms", "10,000", "320" };
+            for (int i = 0; i < labels.Length; i++)
+            {
+                string rowName = $"Container - Stat ({i + 1})";
+                RectTransform row = EnsureRect(statsRoot, statsRoot, rowName);
+                row.anchorMin = new Vector2(0f, 1f);
+                row.anchorMax = new Vector2(1f, 1f);
+                row.pivot = new Vector2(0.5f, 1f);
+                row.sizeDelta = new Vector2(0f, 18f);
+                LayoutElement rowLayout = GetOrAdd<LayoutElement>(row.gameObject);
+                rowLayout.minWidth = 0f;
+                rowLayout.preferredWidth = 0f;
+                rowLayout.flexibleWidth = 1f;
+                rowLayout.minHeight = 18f;
+                rowLayout.preferredHeight = 18f;
+
+                RectTransform label = EnsureRect(row, row, "Text -StatName", "Text - StatName");
+                RectTransform value = EnsureRect(row, row, "Text -StatValue", "Text - StatValue");
+
+                SetRect(label, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(140f, 18f));
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(label.gameObject), labels[i], 14f, ShowcasePalette.TextSecondary, TextAlignmentOptions.Left);
+
+                SetRect(value, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0f, 0f), new Vector2(140f, 18f));
+                ConfigureText(GetOrAdd<TextMeshProUGUI>(value.gameObject), values[i], 14f, ShowcasePalette.TextPrimary, TextAlignmentOptions.Right);
+            }
         }
 
         private static void ConfigureAccent(RectTransform parent, string name, Vector2 anchoredPosition, Vector2 size, float alpha, bool right = false)
@@ -611,6 +712,15 @@ namespace LearningArchitect.Editor
             return FindDeep(root, name) as RectTransform;
         }
 
+        private static RectTransform EnsureRect(Transform searchRoot, Transform createParent, string primaryName, params string[] aliases)
+        {
+            Transform match = FindDeepAny(searchRoot, primaryName, aliases);
+            if (match is RectTransform rect)
+                return rect;
+
+            return EnsureRectChild(createParent, primaryName);
+        }
+
         private static Canvas FindCanvasByChild(Transform root, string childName)
         {
             Canvas[] canvases = root.GetComponentsInChildren<Canvas>(true);
@@ -641,6 +751,55 @@ namespace LearningArchitect.Editor
             return null;
         }
 
+        private static Transform FindDeepAny(Transform root, string primaryName, params string[] aliases)
+        {
+            Transform match = FindDeep(root, primaryName);
+            if (match != null)
+                return match;
+
+            if (aliases == null)
+                return null;
+
+            for (int i = 0; i < aliases.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(aliases[i]))
+                    continue;
+
+                match = FindDeep(root, aliases[i]);
+                if (match != null)
+                    return match;
+            }
+
+            return null;
+        }
+
+        private static void CleanupTabsBarChildren(RectTransform tabsBar)
+        {
+            if (tabsBar == null)
+                return;
+
+            for (int i = tabsBar.childCount - 1; i >= 0; i--)
+            {
+                Transform child = tabsBar.GetChild(i);
+                if (child.name == "ActiveTabUnderline")
+                    continue;
+
+                if (child.name == "Tab_0" || child.name == "Tab_1" || child.name == "Tab_2")
+                    continue;
+
+                Object.DestroyImmediate(child.gameObject);
+            }
+        }
+
+        private static void ResetDescriptionViewport(RectTransform viewport)
+        {
+            if (viewport == null)
+                return;
+
+            for (int i = viewport.childCount - 1; i >= 0; i--)
+                Object.DestroyImmediate(viewport.GetChild(i).gameObject);
+        }
+
         private static bool HasCompositeDescriptionContent(RectTransform viewport)
         {
             return viewport != null &&
@@ -650,7 +809,82 @@ namespace LearningArchitect.Editor
                    FindDeep(viewport, "Container - ProsCons") != null;
         }
 
-        private static bool TryWireCompositeDescriptionContent(RectTransform viewport, ScrollRect scrollRect, DescriptionPanel description, RectTransform legacyDescriptionText)
+        private static void EnsureCompositeDescriptionSections(RectTransform viewport)
+        {
+            if (viewport == null)
+                return;
+
+            RectTransform aboutInfo = EnsureDescriptionSection(viewport, "Container - AboutInfo", 156f);
+            RectTransform architectureInfo = EnsureDescriptionSection(viewport, "Container - ArchitectureInfo", 176f);
+            RectTransform tradeOffsInfo = EnsureDescriptionSection(viewport, "Container - Trade-OffsInfo", 156f);
+            RectTransform prosCons = EnsureRectChild(viewport, "Container - ProsCons");
+
+            prosCons.anchorMin = new Vector2(0f, 1f);
+            prosCons.anchorMax = new Vector2(1f, 1f);
+            prosCons.pivot = new Vector2(0.5f, 1f);
+            prosCons.sizeDelta = new Vector2(0f, 286f);
+
+            LayoutElement prosConsLayout = GetOrAdd<LayoutElement>(prosCons.gameObject);
+            prosConsLayout.minWidth = 0f;
+            prosConsLayout.preferredWidth = 0f;
+            prosConsLayout.flexibleWidth = 1f;
+            prosConsLayout.minHeight = 286f;
+            prosConsLayout.preferredHeight = 286f;
+
+            VerticalLayoutGroup prosConsGroup = GetOrAdd<VerticalLayoutGroup>(prosCons.gameObject);
+            prosConsGroup.padding = new RectOffset(0, 0, 0, 0);
+            prosConsGroup.spacing = 14f;
+            prosConsGroup.childAlignment = TextAnchor.UpperLeft;
+            prosConsGroup.childControlWidth = true;
+            prosConsGroup.childControlHeight = false;
+            prosConsGroup.childForceExpandWidth = true;
+            prosConsGroup.childForceExpandHeight = false;
+
+            EnsureDescriptionSection(prosCons, "Container - Pros", 136f);
+            EnsureDescriptionSection(prosCons, "Container - Cons", 136f);
+
+            aboutInfo.SetAsFirstSibling();
+            architectureInfo.SetAsLastSibling();
+            architectureInfo.SetSiblingIndex(1);
+            tradeOffsInfo.SetSiblingIndex(2);
+            prosCons.SetSiblingIndex(3);
+        }
+
+        private static RectTransform EnsureDescriptionSection(Transform parent, string sectionName, float preferredHeight)
+        {
+            RectTransform section = EnsureRectChild(parent, sectionName);
+            section.anchorMin = new Vector2(0f, 1f);
+            section.anchorMax = new Vector2(1f, 1f);
+            section.pivot = new Vector2(0.5f, 1f);
+            section.sizeDelta = new Vector2(0f, preferredHeight);
+
+            LayoutElement layout = GetOrAdd<LayoutElement>(section.gameObject);
+            layout.minWidth = 0f;
+            layout.preferredWidth = 0f;
+            layout.flexibleWidth = 1f;
+            layout.minHeight = preferredHeight;
+            layout.preferredHeight = preferredHeight;
+
+            Image background = GetOrAdd<Image>(section.gameObject);
+            ConfigureImage(background, null, new Color(0.065f, 0.078f, 0.097f, 0.86f), Image.Type.Simple, false);
+
+            RectTransform header = EnsureTextChild(section, "Text - Header", 13f, ShowcasePalette.AccentMain, TextAlignmentOptions.TopLeft);
+            RectTransform body = EnsureTextChild(section, "Text - Description", 16f, ShowcasePalette.TextPrimary, TextAlignmentOptions.TopLeft);
+
+            StretchTop(header, 14f, 14f, 12f, 18f);
+            StretchInside(body, 14f, 14f, 12f, 40f);
+            return section;
+        }
+
+        private static RectTransform EnsureTextChild(Transform parent, string name, float fontSize, Color color, TextAlignmentOptions alignment)
+        {
+            GameObject textObject = EnsureChild(parent, name, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            TextMeshProUGUI text = GetOrAdd<TextMeshProUGUI>(textObject);
+            ConfigureText(text, name == "Text - Header" ? "SECTION" : "Description placeholder", fontSize, color, alignment);
+            return text.rectTransform;
+        }
+
+        private static bool TryWireCompositeDescriptionContent(RectTransform viewport, ScrollRect scrollRect)
         {
             if (!HasCompositeDescriptionContent(viewport) || scrollRect == null)
                 return false;
@@ -675,7 +909,7 @@ namespace LearningArchitect.Editor
             layoutGroup.childAlignment = TextAnchor.UpperLeft;
             layoutGroup.childControlWidth = true;
             layoutGroup.childControlHeight = false;
-            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandWidth = true;
             layoutGroup.childForceExpandHeight = false;
 
             ContentSizeFitter fitter = GetOrAdd<ContentSizeFitter>(contentRoot.gameObject);
@@ -697,18 +931,7 @@ namespace LearningArchitect.Editor
                     section.SetParent(contentRoot, false);
             }
 
-            if (legacyDescriptionText != null)
-            {
-                legacyDescriptionText.gameObject.SetActive(false);
-                legacyDescriptionText.SetParent(contentRoot, false);
-                legacyDescriptionText.SetAsLastSibling();
-            }
-
             scrollRect.content = contentRoot;
-
-            if (description != null)
-                description.DescriptionText = null;
-
             return true;
         }
 
@@ -726,6 +949,17 @@ namespace LearningArchitect.Editor
         private static RectTransform EnsureRectChild(Transform parent, string name)
         {
             return EnsureChild(parent, name, typeof(RectTransform)).GetComponent<RectTransform>();
+        }
+
+        private static Transform EnsureTransformChild(Transform parent, string name)
+        {
+            Transform child = parent.Find(name);
+            if (child != null)
+                return child;
+
+            GameObject go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            return go.transform;
         }
 
         private static T GetOrAdd<T>(GameObject go) where T : Component

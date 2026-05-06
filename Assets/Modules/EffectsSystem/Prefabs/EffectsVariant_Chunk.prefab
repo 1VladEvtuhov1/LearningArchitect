@@ -59,5 +59,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Effects.ChunkEffectsVariant
   count: 250
   visualCount: 240
+  visualLimit: 420
+  visibleFraction: 0.12
   radius: 4.75
   speed: 0.8
+  visualPrefab: {fileID: 3320826328376428070, guid: 19798d38d93fd9f44a48ca7d92d712b3, type: 3}
+  visualScale: {x: 1, y: 1, z: 1}

@@ -106,7 +106,6 @@ namespace LearningArchitect.UI
     [RequireComponent(typeof(HubUI))]
     public sealed class RecruiterDemoController : MonoBehaviour
     {
-        private const int BrowserSafeStressCap = 5000;
         private const float CharacterAnimationYawOffset = 180f;
         private const float CharacterAnimationPitchOffset = -7f;
         private const float CharacterAnimationDistanceOffset = -4.5f;
@@ -416,15 +415,7 @@ namespace LearningArchitect.UI
                 return 1000;
 
             if (preferHighStress)
-            {
-                for (int i = presets.Length - 1; i >= 0; i--)
-                {
-                    if (presets[i] <= BrowserSafeStressCap)
-                        return presets[i];
-                }
-
                 return presets[presets.Length - 1];
-            }
 
             if (presets.Length >= 2)
                 return presets[1];

@@ -21,10 +21,19 @@ Review it regularly and trim anything that has become a stable decision or a res
 
 ### UI State
 
-- the old single `DescriptionText` approach is no longer the preferred direction;
+- the old single `DescriptionText` approach has now been removed from the active hub prefab and runtime path;
 - the active direction is a section-based right-side description panel;
-- `DescriptionPanel`, `NewUIManager`, and `ShowcaseLayoutTool` were already moved toward the composite viewport model;
-- the next quality step is stronger per-card behavior and cleaner tests around tab composition.
+- `DescriptionPanel`, `ShowcaseLayoutTool`, and the hub prefab are aligned on the composite viewport model;
+- validator checks now enforce the required composite `DescriptionPanel` subtree on the real hub prefab;
+- `DescriptionPanelTests` now cover tab composition, optional-section hiding, and legacy tab-container fallback;
+- the remaining UI question is card specialization depth, while the remaining tooling question is how robustly `ShowcaseLayoutTool` should recover from broader layout drift.
+
+### Module Visual State
+
+- most runtime variants now instantiate shared carrier prefabs through serialized `visualPrefab` references;
+- `Assets/Showcase/Art/ModuleCarriers` is the visual source of truth for showcase markers across the active runtime modules;
+- the AI module has already been reduced to the same prefab-driven marker path as the other active runtime modules;
+- the layered animation module now also requires a configured actor-prefab profile instead of procedural placeholder rigs.
 
 ### Content Authoring Rule
 
@@ -34,9 +43,11 @@ Review it regularly and trim anything that has become a stable decision or a res
 
 ### Testing State
 
-- baseline EditMode coverage exists for `ModuleRuntimeHost`, `ShowcaseCoordinator`, `ShowcaseRuntimeController`, and AI simulation logic;
-- `LearningArchitect.Core.Edit` currently passes in Unity Test Framework;
-- the next missing layer is `LearningArchitect.UI.Edit`, especially for `DescriptionPanel`.
+- baseline EditMode coverage exists for `ModuleRuntimeHost`, `ShowcaseCoordinator`, `ShowcaseRuntimeController`, `ShowcaseValidator`, `DescriptionPanel`, `HubUI`, module contracts, and AI simulation logic;
+- a thin PlayMode smoke layer now covers end-to-end module activation and stress propagation through the real runtime shell;
+- localization tests now touch real `ShowcaseContent_en` / `ShowcaseContent_ru` assets and prove both lookup and fallback behavior against configured tables;
+- validator coverage now guards the required `DescriptionPanel` prefab hierarchy in addition to module authoring contracts;
+- validator-driven checks are now an important part of prefab/data confidence, not just manual play-mode inspection.
 
 ### Memory Workflow Rule
 

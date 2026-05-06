@@ -29,21 +29,22 @@ Known State:
 
 - the panel already supports composite section UI;
 - tabs are auto-laid out instead of relying on old absolute positions;
+- `DescriptionPanelTests` already cover section visibility, tab structure, and legacy-tab fallback;
 - optional sections can now hide;
-- the implementation is still closer to dynamic section remapping than to fully specialized card views.
+- the implementation no longer keeps the old `DescriptionText` compatibility path and remains closer to dynamic section remapping than to fully specialized card views.
 
 Next Useful Steps:
 
-1. add EditMode coverage for tab composition and hidden empty sections;
-2. verify panel behavior in Unity for long RU and EN strings;
-3. decide whether `pros/cons` should stay text-backed or become row-based list items.
+1. verify panel behavior in Unity for long `RU` and `EN` strings after recent prefab changes;
+2. decide whether `pros/cons` should stay text-backed or become row-based list items;
+3. decide how far the panel should move from section remapping toward truly distinct card layouts.
 
 Primary Files:
 
 - `Assets/Showcase/UI/DescriptionPanel.cs`
 - `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
 
-### T-002: Align Prefab, Runtime UI Builder, And Editor Tooling
+### T-002: Align Prefab, Description Panel, And Editor Tooling
 
 Status:
 
@@ -51,23 +52,26 @@ Status:
 
 Goal:
 
-- keep prefab structure, `NewUIManager`, and `ShowcaseLayoutTool` consistent so the project does not silently drift back toward legacy `DescriptionText` assumptions.
+- keep prefab structure, `DescriptionPanel`, and `ShowcaseLayoutTool` consistent so the project does not silently drift away from the composite section model.
 
 Known State:
 
 - code paths already prefer the new section-based viewport structure;
-- prefab cleanup removed old serialized `DescriptionText` references;
-- this area remains fragile because layout can still be changed both manually and through tooling.
+- `NewUIManager` has been removed from the current tree;
+- the hub prefab no longer contains `DescriptionText`, and validator coverage now checks the required composite `DescriptionPanel` hierarchy;
+- `ShowcaseLayoutTool` can restore missing `DescriptionPanel` composite section skeletons instead of only assuming they already exist;
+- the broader rebuild flow now survives the current alias-heavy hub layout and has dedicated EditMode regression coverage through `ShowcaseLayoutToolTests`;
+- this area still matters because prefab layout, rebuild tooling, and validator expectations are all part of the same teaching-critical contract.
 
 Next Useful Steps:
 
-1. verify the current prefab hierarchy after manual editor changes;
-2. reduce legacy fallback paths once the new hierarchy is stable;
-3. decide whether the prefab or tooling is the long-term source of truth for UI layout.
+1. decide whether the prefab or tooling is the long-term source of truth for UI layout;
+2. verify whether other UI cards need the same validator-style structural contract;
+3. decide how much non-description card structure the rebuild tool should actively normalize versus only preserve.
 
 Primary Files:
 
-- `Assets/Showcase/UI/NewUIManager.cs`
+- `Assets/Showcase/UI/DescriptionPanel.cs`
 - `Assets/Editor/ShowcaseLayoutTool.cs`
 - `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
 
@@ -83,15 +87,22 @@ Goal:
 
 Known State:
 
-- `LearningArchitect.Core.Edit` now covers `ModuleRuntimeHost`, `ShowcaseCoordinator`, and `ShowcaseRuntimeController`;
+- `LearningArchitect.Core.Edit` now covers `ModuleRuntimeHost`, `ShowcaseCoordinator`, `ShowcaseRuntimeController`, and `ShowcaseValidator`;
+- `LearningArchitect.UI.Edit` already covers `DescriptionPanel` and `HubUI`;
+- `LearningArchitect.Modules.Edit` covers runtime visual-prefab wiring and visible-vs-simulated metric contracts across modules;
 - `LearningArchitect.AI.Edit` covers current AI simulation logic;
-- there is still no focused coverage for `DescriptionPanel` composition or localization fallback.
+- `LearningArchitect.Showcase.PlayMode` now adds a thin runtime smoke layer for activation and stress propagation;
+- validator coverage now includes missing `animationProfile` and missing humanoid `actorPrefab` authoring failures;
+- validator coverage also includes the required `DescriptionPanel` prefab hierarchy;
+- `ShowcaseLayoutToolTests` now cover the rebuild flow against the current prefab naming scheme and drift-cleanup scenarios;
+- `ShowcaseLocalizationTableTests` now exercise both real table lookups and fallback behavior against configured localization assets;
+- the remaining gap is broader localization/asset-graph coverage, not the absence of baseline runtime smoke.
 
 Next Useful Steps:
 
-1. add `LearningArchitect.UI.Edit` tests for `DescriptionPanel`;
-2. add a small PlayMode smoke layer for variant activation and stress propagation;
-3. keep all test-only code in `Editor` or test-only assemblies.
+1. decide whether `ShowcaseValidator` should become part of a pre-release checklist or editor automation step;
+2. add only the next most valuable PlayMode smoke case if it closes a real orchestration blind spot;
+3. extend localization checks to more content surfaces than module description and architecture body.
 
 Primary Files:
 
@@ -112,7 +123,7 @@ Goal:
 Known State:
 
 - the project now has scaffold code for a humanoid animation profile and animator-driven actor runtime;
-- the current showcase can still fall back to the procedural placeholder if no real actor profile is assigned;
+- the current showcase no longer falls back to a procedural placeholder and now requires a valid actor profile;
 - the remaining dependency is content authoring: model import, avatar validation, controller setup, and prefab wiring.
 
 Next Useful Steps:
@@ -128,3 +139,32 @@ Primary Files:
 - `Assets/Modules/LayeredCharacterAnimation/Runtime/HumanoidCrowdActor.cs`
 - `Assets/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
 - `Docs/HumanoidAnimationSetup.md`
+
+### T-005: Finish Carrier-Prefab Cleanup Across Modules
+
+Status:
+
+- in progress
+
+Goal:
+
+- make the module prefab pattern consistently teachable by separating simulation code from showcase visuals everywhere practical.
+
+Known State:
+
+- most active modules now assign `visualPrefab` carriers through their variant prefabs;
+- `ShowcaseVisualInstanceFactory` centralizes runtime marker instantiation and collider stripping;
+- AI runtime has already been reduced to the prefab-driven path and no longer carries dead `PrimitiveType` configuration through the simulation host;
+- layered animation now also uses the real actor-prefab path and no longer keeps procedural fallback visuals.
+
+Next Useful Steps:
+
+1. document the expected `visualPrefab` contract near module authoring guidance;
+2. decide whether emitter-heavy VFX variants should also converge on reusable carrier-style authoring where it improves teaching clarity;
+3. consider validator coverage for missing visual-prefab or actor-profile assignments on teaching-critical variants.
+
+Primary Files:
+
+- `Assets/Showcase/Runtime/ShowcaseVisualInstanceFactory.cs`
+- `Assets/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
+- `Assets/Editor/ShowcaseValidator.cs`
