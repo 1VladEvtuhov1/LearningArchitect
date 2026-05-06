@@ -82,7 +82,7 @@ Touches:
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset`
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`
 
-### D-004: Description Panel Uses Section-Based Composite Content
+### D-004: Hub Prefab Visual Baseline Takes Priority Over UI Normalization
 
 Status:
 
@@ -90,23 +90,46 @@ Status:
 
 Decision:
 
-- the right-side description area is authored and rendered as section-based composite content inside `DescriptionPanel`, and the legacy `DescriptionText` runtime path is no longer part of the active architecture.
+- `ArchitectureShowcaseHub.prefab` is the visual source of truth for the showcase shell, and tooling should not regenerate or normalize that layout at the cost of changing the shipped baseline.
 
 Why:
 
-- a single rich-text dump is weak both visually and structurally;
-- different tabs need different card composition, not just differently formatted paragraphs;
-- section-based UI gives better control over empty-state hiding, localization growth, and future card-specific styling;
-- tests can reason about section visibility and ordering much more reliably than about one large formatted string.
+- the project already had a stronger hand-authored UI composition than the generated rebuild path;
+- preserving a good baseline is more important than enforcing internal naming purity;
+- the hub is teaching-critical, so accidental editor-tool layout rewrites are worse than carrying temporary compatibility code.
+
+Touches:
+
+- `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
+- `Assets/Editor/ShowcaseLayoutTool.cs`
+- `Docs/HubAndCarrierAuthoring.md`
+
+### D-005: Description Panel Supports Both Legacy And Composite Viewports
+
+Status:
+
+- active
+
+Decision:
+
+- `DescriptionPanel` runtime and validation support both:
+  - the legacy `Viewport -> DescriptionText` baseline;
+  - the composite section-based viewport model.
+
+Why:
+
+- the restored shipped hub prefab still uses the legacy text viewport;
+- the composite model remains useful for future richer card composition;
+- dual support avoids another forced migration where tooling and validator get ahead of the actual prefab baseline.
 
 Touches:
 
 - `Assets/Showcase/UI/DescriptionPanel.cs`
-- `Assets/Editor/ShowcaseLayoutTool.cs`
+- `Assets/Editor/ShowcaseValidator.cs`
 - `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
-- `Assets/Showcase/Tests/EditMode/Editor/UI/DescriptionPanelTests.cs`
+- `Docs/HubAndCarrierAuthoring.md`
 
-### D-005: Repo-Native Memory Before External Memory Tooling
+### D-006: Repo-Native Memory Before External Memory Tooling
 
 Status:
 
@@ -128,7 +151,7 @@ Touches:
 - `Docs/OpenThreads.md`
 - `Docs/WorkingMemory.md`
 
-### D-006: Runtime Visuals Use Assigned Carrier Prefabs
+### D-007: Runtime Visuals Use Assigned Carrier Prefabs
 
 Status:
 

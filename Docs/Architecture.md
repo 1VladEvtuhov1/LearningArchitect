@@ -37,6 +37,12 @@ The hub is driven by:
 
 These components are not domain modules themselves. They are the shell that hosts modules.
 
+The current visual shell source of truth is still the hand-authored hub prefab:
+
+- `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
+
+That prefab is the thing to preserve first. Tooling should validate or lightly assist it, not silently regenerate its layout.
+
 For browser delivery, the runtime is embedded into the static site host instead of being opened as a standalone Unity page.
 
 ## Main Flow
@@ -346,6 +352,19 @@ This is important for the educational story because it keeps three concerns visi
 - visual representation used for comparison.
 
 The animation module was the last major holdout here and now also requires a real actor-prefab profile instead of procedural placeholder rigs. The remaining cleanup is mostly about documenting and validating the authoring contract, not about keeping hidden fallback rendering paths alive.
+
+The practical authoring contract for the hub prefab, `DescriptionPanel`, and reusable carriers lives in:
+
+- `Docs/HubAndCarrierAuthoring.md`
+
+## Hub UI Authoring
+
+The hub shell currently keeps two truths that matter:
+
+- the shipped visual baseline is the restored hand-authored prefab layout;
+- runtime support now accepts both the old single-text `DescriptionPanel` viewport path and the newer composite section path.
+
+In other words, the runtime is more flexible than the current shipped prefab. That flexibility exists to prevent breakage during migration, not to justify automatic layout rebuilding.
 
 ## WebGL Demo Architecture
 

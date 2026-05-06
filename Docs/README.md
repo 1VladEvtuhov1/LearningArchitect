@@ -10,10 +10,11 @@ If you are new to the repository:
 
 1. `../README.md`
 2. `Architecture.md`
-3. `TestingStrategy.md`
-4. `Decisions.md`
-5. `OpenThreads.md`
-6. `WorkingMemory.md`
+3. `HubAndCarrierAuthoring.md`
+4. `TestingStrategy.md`
+5. `Decisions.md`
+6. `OpenThreads.md`
+7. `WorkingMemory.md`
 
 If you are returning to active work:
 
@@ -60,6 +61,8 @@ If you are preparing delivery or a demo:
 
 ### Feature-Specific Setup
 
+- `HubAndCarrierAuthoring.md`
+  - the prefab and authoring contract for `ArchitectureShowcaseHub`, `DescriptionPanel`, and reusable module carriers.
 - `HumanoidAnimationSetup.md`
   - the current setup and regeneration workflow for the layered humanoid animation module.
 
@@ -84,3 +87,4 @@ Use these boundaries to avoid document drift:
 - update `TestingStrategy.md` when suite taxonomy, confidence boundaries, or validation rules change;
 - update `WebDeployment.md` when the build/deploy flow changes;
 - update feature docs like `HumanoidAnimationSetup.md` when their asset/setup contract changes.
+- update `HubAndCarrierAuthoring.md` when the hub prefab contract, description-panel layout contract, or carrier-prefab authoring pattern changes.

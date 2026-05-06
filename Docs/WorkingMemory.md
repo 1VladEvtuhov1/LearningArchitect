@@ -21,12 +21,11 @@ Review it regularly and trim anything that has become a stable decision or a res
 
 ### UI State
 
-- the old single `DescriptionText` approach has now been removed from the active hub prefab and runtime path;
-- the active direction is a section-based right-side description panel;
-- `DescriptionPanel`, `ShowcaseLayoutTool`, and the hub prefab are aligned on the composite viewport model;
-- validator checks now enforce the required composite `DescriptionPanel` subtree on the real hub prefab;
-- `DescriptionPanelTests` now cover tab composition, optional-section hiding, and legacy tab-container fallback;
-- the remaining UI question is card specialization depth, while the remaining tooling question is how robustly `ShowcaseLayoutTool` should recover from broader layout drift.
+- the shipped `ArchitectureShowcaseHub` baseline has been restored to the older hand-authored visual layout;
+- `DescriptionPanel` runtime now supports both the legacy `DescriptionText` viewport path and the composite section path;
+- validator also accepts both layouts instead of enforcing composite-only assumptions;
+- `ShowcaseLayoutTool` public rebuild/apply entrypoints are intentionally left in safe mode so the tool does not silently rewrite the hub again;
+- the remaining UI question is still card specialization depth, but it now sits behind a stable visual baseline instead of replacing it.
 
 ### Module Visual State
 
@@ -34,6 +33,13 @@ Review it regularly and trim anything that has become a stable decision or a res
 - `Assets/Showcase/Art/ModuleCarriers` is the visual source of truth for showcase markers across the active runtime modules;
 - the AI module has already been reduced to the same prefab-driven marker path as the other active runtime modules;
 - the layered animation module now also requires a configured actor-prefab profile instead of procedural placeholder rigs.
+
+### Authoring Contract State
+
+- `Docs/HubAndCarrierAuthoring.md` is now the explicit contract doc for:
+  - the hub prefab baseline;
+  - `DescriptionPanel` viewport layouts;
+  - reusable carrier-prefab wiring.
 
 ### Content Authoring Rule
 

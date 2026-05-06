@@ -23,21 +23,21 @@ Status:
 
 Goal:
 
-- move `DescriptionPanel` from section remapping to a cleaner per-card model with stronger tab composition and card-specific behavior.
+- move `DescriptionPanel` toward a cleaner per-card model with stronger tab composition and card-specific behavior without destabilizing the restored hub baseline.
 
 Known State:
 
-- the panel already supports composite section UI;
+- the panel already supports both the legacy text viewport and the composite section UI;
 - tabs are auto-laid out instead of relying on old absolute positions;
 - `DescriptionPanelTests` already cover section visibility, tab structure, and legacy-tab fallback;
 - optional sections can now hide;
-- the implementation no longer keeps the old `DescriptionText` compatibility path and remains closer to dynamic section remapping than to fully specialized card views.
+- the current shipped prefab still uses the legacy `DescriptionText` baseline, so richer card work is no longer allowed to assume composite-only authoring.
 
 Next Useful Steps:
 
-1. verify panel behavior in Unity for long `RU` and `EN` strings after recent prefab changes;
-2. decide whether `pros/cons` should stay text-backed or become row-based list items;
-3. decide how far the panel should move from section remapping toward truly distinct card layouts.
+1. verify panel behavior in Unity for long `RU` and `EN` strings on the restored baseline;
+2. decide whether `pros/cons` should stay text-backed or become row-based list items if the project returns to card-specialized layouts;
+3. decide how far the panel should move from section remapping toward truly distinct card layouts before another prefab migration is attempted.
 
 Primary Files:
 
@@ -52,22 +52,21 @@ Status:
 
 Goal:
 
-- keep prefab structure, `DescriptionPanel`, and `ShowcaseLayoutTool` consistent so the project does not silently drift away from the composite section model.
+- keep prefab structure, `DescriptionPanel`, validator rules, and `ShowcaseLayoutTool` consistent around the real shipped hub baseline.
 
 Known State:
 
-- code paths already prefer the new section-based viewport structure;
+- the current hub prefab is again the visual source of truth;
 - `NewUIManager` has been removed from the current tree;
-- the hub prefab no longer contains `DescriptionText`, and validator coverage now checks the required composite `DescriptionPanel` hierarchy;
-- `ShowcaseLayoutTool` can restore missing `DescriptionPanel` composite section skeletons instead of only assuming they already exist;
-- the broader rebuild flow now survives the current alias-heavy hub layout and has dedicated EditMode regression coverage through `ShowcaseLayoutToolTests`;
-- this area still matters because prefab layout, rebuild tooling, and validator expectations are all part of the same teaching-critical contract.
+- the hub prefab currently uses the legacy `DescriptionText` viewport path while runtime and validator accept both legacy and composite layouts;
+- `ShowcaseLayoutTool` public rebuild/apply entrypoints are intentionally in safe mode because automatic normalization already proved too destructive;
+- this area still matters because prefab layout, compatibility code, and validator expectations are all part of the same teaching-critical contract.
 
 Next Useful Steps:
 
-1. decide whether the prefab or tooling is the long-term source of truth for UI layout;
-2. verify whether other UI cards need the same validator-style structural contract;
-3. decide how much non-description card structure the rebuild tool should actively normalize versus only preserve.
+1. keep the prefab, not the rebuild tool, as the long-term source of truth unless there is a very strong reason to reverse that;
+2. verify whether other UI cards need validator-style structural contracts without introducing another auto-rebuild path;
+3. decide whether `ShowcaseLayoutTool` should stay limited to safe helpers or be redesigned from scratch around preservation instead of regeneration.
 
 Primary Files:
 
@@ -156,12 +155,13 @@ Known State:
 - `ShowcaseVisualInstanceFactory` centralizes runtime marker instantiation and collider stripping;
 - AI runtime has already been reduced to the prefab-driven path and no longer carries dead `PrimitiveType` configuration through the simulation host;
 - layered animation now also uses the real actor-prefab path and no longer keeps procedural fallback visuals.
+- the contract is now documented explicitly in `Docs/HubAndCarrierAuthoring.md`.
 
 Next Useful Steps:
 
-1. document the expected `visualPrefab` contract near module authoring guidance;
-2. decide whether emitter-heavy VFX variants should also converge on reusable carrier-style authoring where it improves teaching clarity;
-3. consider validator coverage for missing visual-prefab or actor-profile assignments on teaching-critical variants.
+1. decide whether emitter-heavy VFX variants should also converge on reusable carrier-style authoring where it improves teaching clarity;
+2. consider whether carrier-prefab naming/material conventions need their own lightweight doc or editor helper;
+3. keep validator coverage focused on missing visual-prefab or actor-profile assignments for teaching-critical variants.
 
 Primary Files:
 
