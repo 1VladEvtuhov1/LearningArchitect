@@ -9,7 +9,26 @@
     buildRoot: "./webgl/Build",
     streamingAssetsUrl: "./webgl/StreamingAssets",
     matchWebGLToCanvasSize: true,
-    devicePixelRatio: 1
+    devicePixelRatio: 1.25,
+    defaultQualityMode: "balanced",
+    maxDevicePixelRatio: 1.5,
+    qualityModes: {
+      performance: {
+        width: 1280,
+        height: 720,
+        maxDpr: 1.0
+      },
+      balanced: {
+        width: 1600,
+        height: 900,
+        maxDpr: 1.25
+      },
+      quality: {
+        width: 1920,
+        height: 1080,
+        maxDpr: 1.5
+      }
+    }
   };
 
   siteConfig.demo = Object.assign({}, demoDefaults, siteConfig.demo || {});
@@ -36,10 +55,17 @@
     preloadPill: document.getElementById("preload-pill"),
     preloadCopy: document.getElementById("preload-copy"),
     launchButton: document.getElementById("launch-demo"),
-    fullscreenButton: document.getElementById("toggle-fullscreen"),
+    presentationButton: document.getElementById("toggle-presentation"),
+    qualityLabel: document.getElementById("demo-quality-label"),
+    qualityCopy: document.getElementById("demo-quality-copy"),
+    qualityNote: document.getElementById("demo-quality-note"),
+    qualityPerformance: document.getElementById("quality-performance"),
+    qualityBalanced: document.getElementById("quality-balanced"),
+    qualityQuality: document.getElementById("quality-quality"),
     demoStage: document.getElementById("demo-stage"),
     demoSupporting: document.getElementById("demo-supporting"),
     demoConsole: document.querySelector(".demo-console"),
+    demoContent: document.querySelector(".content"),
     demoProgress: document.querySelector(".demo-progress"),
     demoProgressBar: document.getElementById("demo-progress-bar"),
     posterStatus: document.getElementById("poster-status"),
@@ -50,644 +76,9 @@
     unityCanvas: document.getElementById("unity-canvas")
   };
 
-  const translations = {
-    en: {
-      htmlLang: "en",
-      title: "LearningArchitect | Interactive Architecture Showcase",
-      description: "LearningArchitect is a Unity-based architecture showcase for comparing runtime strategies, stress presets, and implementation trade-offs in one shared interactive shell.",
-      nav: {
-        modules: "Modules",
-        architecture: "Architecture Notes",
-        demo: "Interactive Demo"
-      },
-      hero: {
-        eyebrow: "Interactive Unity Architecture Showcase",
-        title: "Trade\u2011offs in one browser demo.",
-        summary: "Launch WebGL and compare decisions on one page.",
-        demoCta: "Launch Demo",
-        architectureCta: "Architecture Notes",
-        sourceCta: "Source on GitHub",
-        chips: [
-          "7 modules",
-          "15 variants",
-          "Shared stress presets",
-          "WebGL portfolio shell"
-        ],
-        demoBadgeLabel: "WebGL",
-        demoBadgeValue: "Ready",
-        panelLabel: "Why this format works in interviews",
-        points: [
-          "You can read the context before the Unity loader takes over.",
-          "The same shell keeps module and stress comparisons consistent.",
-          "Architecture notes and source stay available during the walkthrough."
-        ],
-        stats: {
-          modules: "Modules",
-          variants: "Variants",
-          runtime: "Shared Runtime",
-          languages: "Languages"
-        }
-      },
-      sections: {
-        whatEyebrow: "What This Demonstrates",
-        whatTitle: "Architecture comparison, not isolated demo scenes.",
-        whatFocusLabel: "Focus here",
-        whatFocusCopy: "Notice what stays constant across every module: one shell, one preset flow, one comparison surface.",
-        insights: [
-          {
-            title: "Comparable runtime pressure",
-            copy: "Each module goes through the same shell, stress presets, and metrics surface, so differences point back to architecture rather than presentation drift."
-          },
-          {
-            title: "Pattern and domain range",
-            copy: "The showcase spans AI, pooling, update loops, inventory, animation, VFX delivery, and effect simulation instead of repeating one narrow optimization story."
-          },
-          {
-            title: "Data-driven authoring",
-            copy: "Modules and variants are wired through ScriptableObject data assets, which makes the showcase easier to extend without scene-specific logic."
-          },
-          {
-            title: "Portfolio-ready presentation",
-            copy: "The browser entry page explains what the reviewer should look for before the WebGL runtime starts."
-          }
-        ],
-        modulesEyebrow: "Module Explorer",
-        modulesTitle: "Pick a strong example before the live client.",
-        modulesCopy: "Use one module as the entry point, then switch variants and presets in the runtime.",
-        modulesFocusLabel: "Focus here",
-        modulesFocusCopy: "Use this section to decide which module best tells your architecture story before the live runtime starts.",
-        moduleLabels: {
-          variants: "Variants",
-          focus: "Focus",
-          try: "What To Try",
-          signal: "Architecture Signal"
-        },
-        architectureEyebrow: "Architecture Notes",
-        architectureTitle: "One shell, swappable variants, shared stress and metrics.",
-        architectureCopy: "Enough context for a reviewer to understand the structure before opening the repository.",
-        architectureFocusLabel: "Focus here",
-        architectureFocusCopy: "This is where the reviewer should understand how the shell stays stable while the modules change underneath it.",
-        stack: [
-          {
-            title: "Showcase Shell",
-            copy: "The shell owns selection, stress state, localization, and lifecycle instead of scene-specific setup."
-          },
-          {
-            title: "Presentation Shell",
-            copy: "UI presenters subscribe to shared state so the interface stays comparable while modules change underneath it."
-          },
-          {
-            title: "Module Layer",
-            copy: "Active variants implement the same stress and lifecycle contract while preserving their own runtime behavior."
-          },
-          {
-            title: "Data Layer",
-            copy: "Module and variant definitions store presets, copy, and prefab references so new comparisons stay data-driven."
-          }
-        ],
-        runtimeStoryLabel: "Runtime in five steps",
-        runtimeStory: [
-          "Composition root builds the coordinator.",
-          "Coordinator selects module and variant data.",
-          "Spawner instantiates the variant prefab.",
-          "Runtime host validates lifecycle and stress contracts.",
-          "State hub publishes module, variant, stress, and metrics to the UI."
-        ],
-        reviewLabel: "Why it is portfolio-ready",
-        reviewCopy: "The value is not another Unity scene. The value is one disciplined runtime shell for comparing multiple implementation paths under the same rules.",
-        reviewEyebrow: "Suggested Review Flow",
-        reviewTitle: "What to try once the build is ready.",
-        reviewFocusLabel: "Focus here",
-        reviewFocusCopy: "This sequence tells an interviewer where to click first instead of leaving them to guess how the demo should be read.",
-        reviewSteps: [
-          {
-            title: "Pick a module family",
-            copy: "Start with `Update Loop`, `Pooling`, or `AI` depending on whether you want a pattern-focused or domain-focused comparison."
-          },
-          {
-            title: "Switch variants",
-            copy: "Use the shared variant controls to compare how different implementation styles behave under the same shell."
-          },
-          {
-            title: "Raise the stress preset",
-            copy: "Use the same preset steps to expose when ownership, layout, batching, or callback volume starts to matter."
-          },
-          {
-            title: "Connect behavior to notes",
-            copy: "Read the architecture and trade-off cards beside the runtime so the system teaches the reason behind the difference, not only the surface result."
-          }
-        ],
-        demoEyebrow: "Interactive Demo",
-        demoTitle: "Read the context, then launch.",
-        demoCopy: "The page stages WebGL delivery in the background. Unity starts only when you choose to launch.",
-        demoInlineCopy: "Runtime, modules, stress presets, and notes stay on one page.",
-        demoFocusLabel: "Focus here",
-        demoFocusCopy: "This block is the handoff from explanation to proof: read the page, then launch the shared runtime only when the reviewer is ready.",
-        demoLabel: "WebGL Host State",
-        demoFullscreenEnter: "Open Fullscreen",
-        demoFullscreenExit: "Exit Fullscreen",
-        demoNotesCta: "Read Architecture Notes",
-        demoNote1: "<strong>Review mode:</strong> keep scrolling and reading while the page stages the loader and build URLs.",
-        demoNote2: "<strong>Interview mode:</strong> jump back here and launch the runtime once the reviewer has context.",
-        posterLabel: "Embedded Unity Runtime",
-        posterTitle: "Launch the showcase shell here.",
-        footerCopy: "Unity runtime for explaining architecture trade\u2011offs in one browser-friendly shell.",
-        footerTop: "Back to top",
-        footerArchitecture: "Architecture Notes",
-        footerSource: "Source on GitHub",
-        guide: {
-          title: "Reading Guide",
-          topTitle: "Overview",
-          topCopy: "What this project is.",
-          whatTitle: "Signals",
-          whatCopy: "Why the comparison matters.",
-          modulesTitle: "Modules",
-          modulesCopy: "Pick the strongest example.",
-          architectureTitle: "Architecture",
-          architectureCopy: "How the shell is layered.",
-          reviewTitle: "Review Flow",
-          reviewCopy: "How to walk through the demo.",
-          demoTitle: "Launch",
-          demoCopy: "Where proof starts."
-        }
-      },
-      demoPhases: {
-        idle: {
-          pill: "Preload idle",
-          pillCopy: "Core demo delivery will start staging in the background while you read.",
-          stage: "Waiting for configuration",
-          supporting: "The host shell is ready. Drop a Unity WebGL export into Site/webgl/Build, run prepare-webgl-site.ps1, and this section can preload and launch the runtime from the same page.",
-          poster: "No WebGL build is connected yet. The presentation shell is ready; add the export and generate <code>webgl/build-manifest.json</code>.",
-          button: "Launch Demo"
-        },
-        buildPending: {
-          pill: "Build pending",
-          pillCopy: "The presentation shell is ready, but the Unity WebGL export is not configured yet.",
-          stage: "Build pending",
-          supporting: "Add the Unity WebGL export into Site/webgl/Build and run prepare-webgl-site.ps1 to generate the launch manifest.",
-          poster: "No WebGL build is configured yet. The host shell is in place and waiting for the exported Unity build.",
-          button: "Check for WebGL Build"
-        },
-        preloading: {
-          pill: "Preloading",
-          pillCopy: "Staging Unity loader and build artifacts while the page remains readable.",
-          stage: "Preloading build URLs",
-          supporting: "The page is warming the loader and build files in the background. You can keep reading until launch time.",
-          poster: "Core delivery files are being staged in the background. The interactive runtime instance will only be created when you click launch.",
-          button: "Launch While Preparing"
-        },
-        preloadReady: {
-          pill: "Preload ready",
-          pillCopy: "The Unity loader is staged. Launch will create the runtime instance on demand.",
-          stage: "Core loader ready",
-          supporting: "The shell has staged the Unity loader. The runtime instance will initialize only when you choose to open the demo.",
-          poster: "The host shell is ready. Click launch to create the Unity WebGL instance inside this page.",
-          button: "Launch Demo"
-        },
-        preloadPartial: {
-          pill: "Preload partial",
-          pillCopy: "The page could not verify the loader yet, but launch can still try a direct initialization.",
-          stage: "Loader not verified",
-          supporting: "The shell could not verify the WebGL loader path during preload. Launch can still attempt a direct initialization.",
-          poster: "The Unity build path may still be wrong. Re-run prepare-webgl-site.ps1 or confirm the exported build sits under Site/webgl/Build.",
-          button: "Try Launch Anyway"
-        },
-        loadingRuntime: {
-          pill: "Launching",
-          pillCopy: "The Unity runtime is being created only now, after the reviewer already has context.",
-          stage: "Creating runtime instance",
-          supporting: "The page is creating the Unity WebGL instance only when launch is requested.",
-          poster: "The interactive runtime is starting. Once the instance is ready, the poster will get out of the way.",
-          button: "Launching Demo..."
-        },
-        runtimeLive: {
-          pill: "Runtime live",
-          pillCopy: "The Unity WebGL client is active inside the same presentation page.",
-          stage: "Runtime live",
-          supporting: "The client is running. Reviewers can now switch modules and variants without leaving this page.",
-          poster: "The interactive runtime is live.",
-          button: "Demo Running"
-        },
-        launchFailed: {
-          pill: "Launch failed",
-          pillCopy: "The presentation shell is fine, but the WebGL build path or exported files still need attention.",
-          stage: "Launch failed",
-          supporting: "The host shell attempted to create the Unity instance but the build could not start. Check the exported build files and config paths.",
-          posterPrefix: "Launch failed: ",
-          posterSuffix: "<br>Confirm the Unity build files exist in <code>Site/webgl/Build</code> and re-generate <code>webgl/build-manifest.json</code> with <code>prepare-webgl-site.ps1</code>.",
-          button: "Retry Demo Launch"
-        },
-        runtimeProgress: "Loading runtime {value}%"
-      }
-    },
-    ru: {
-      htmlLang: "ru",
-      title: "LearningArchitect | Интерактивный архитектурный showcase",
-      description: "LearningArchitect — это Unity showcase для сравнения runtime-стратегий, stress preset'ов и архитектурных компромиссов в одной общей оболочке.",
-      nav: {
-        modules: "Модули",
-        architecture: "Архитектура",
-        demo: "Демо"
-      },
-      hero: {
-        eyebrow: "Интерактивный Unity Architecture Showcase",
-        title: "Trade\u2011offs прямо в браузере.",
-        summary: "Запусти WebGL и сравнивай решения на одной странице.",
-        demoCta: "Запустить демо",
-        architectureCta: "Заметки по архитектуре",
-        sourceCta: "Исходники на GitHub",
-        chips: [
-          "7 модулей",
-          "15 вариантов",
-          "Общие stress preset'ы",
-          "WebGL portfolio shell"
-        ],
-        demoBadgeLabel: "WebGL",
-        demoBadgeValue: "Готово",
-        panelLabel: "Почему это удобно для собеседований",
-        points: [
-          "Контекст можно прочитать до того, как Unity loader займёт экран.",
-          "Одна и та же оболочка держит сравнение модулей и stress preset'ов единым.",
-          "Архитектурные заметки и код остаются рядом во время показа."
-        ],
-        stats: {
-          modules: "Модулей",
-          variants: "Вариантов",
-          runtime: "Общий runtime",
-          languages: "Языка"
-        }
-      },
-      sections: {
-        whatEyebrow: "Что Это Показывает",
-        whatTitle: "Сравнение архитектуры, а не набор отдельных сцен.",
-        whatFocusLabel: "Фокус Здесь",
-        whatFocusCopy: "Здесь важно заметить, что остаётся неизменным у всех модулей: одна оболочка, один preset flow, одна поверхность сравнения.",
-        insights: [
-          {
-            title: "Сопоставимое давление на runtime",
-            copy: "Каждый модуль проходит через одну и ту же оболочку, stress preset'ы и поверхность метрик, поэтому различия видны именно в архитектуре."
-          },
-          {
-            title: "Широкий охват паттернов и доменов",
-            copy: "Showcase охватывает AI, pooling, update loops, inventory, animation, VFX delivery и effect simulation вместо одной узкой истории про оптимизацию."
-          },
-          {
-            title: "Data-driven авторинг",
-            copy: "Модули и варианты связываются через ScriptableObject assets, поэтому проект проще расширять без scene-specific логики."
-          },
-          {
-            title: "Упаковка под портфолио",
-            copy: "Стартовая страница объясняет, на что смотреть, ещё до запуска WebGL runtime."
-          }
-        ],
-        modulesEyebrow: "Обзор Модулей",
-        modulesTitle: "Выбери сильный пример перед live-клиентом.",
-        modulesCopy: "Используй один модуль как точку входа, а затем переключай варианты и preset'ы уже в runtime.",
-        modulesFocusLabel: "Фокус Здесь",
-        modulesFocusCopy: "Используй этот блок, чтобы выбрать модуль, который лучше всего рассказывает твою архитектурную историю до живого запуска.",
-        moduleLabels: {
-          variants: "Варианты",
-          focus: "Фокус",
-          try: "Что попробовать",
-          signal: "Архитектурный сигнал"
-        },
-        architectureEyebrow: "Заметки По Архитектуре",
-        architectureTitle: "Одна оболочка, сменные варианты, общий stress и metrics.",
-        architectureCopy: "Этого достаточно, чтобы понять структуру до перехода в репозиторий.",
-        architectureFocusLabel: "Фокус Здесь",
-        architectureFocusCopy: "Здесь зритель должен понять, как shell остаётся стабильным, пока сами модули меняются под ним.",
-        stack: [
-          {
-            title: "Showcase Shell",
-            copy: "Оболочка владеет выбором, stress state, локализацией и lifecycle, а не перекладывает это на scene-specific setup."
-          },
-          {
-            title: "Presentation Shell",
-            copy: "UI presenters подписываются на общий state, поэтому интерфейс остаётся сопоставимым, пока сами модули меняются под ним."
-          },
-          {
-            title: "Module Layer",
-            copy: "Активные variants реализуют один и тот же stress и lifecycle contract, но сохраняют своё runtime-поведение."
-          },
-          {
-            title: "Data Layer",
-            copy: "ModuleDefinition и VariantDefinition хранят presets, copy и prefab references, поэтому новые сравнения остаются data-driven."
-          }
-        ],
-        runtimeStoryLabel: "Runtime в пяти шагах",
-        runtimeStory: [
-          "Composition root собирает coordinator.",
-          "Coordinator выбирает данные модуля и варианта.",
-          "Spawner инстанцирует prefab варианта.",
-          "Runtime host валидирует lifecycle и stress contracts.",
-          "State hub публикует модуль, вариант, stress и метрики в UI."
-        ],
-        reviewLabel: "Почему это удобно для портфолио",
-        reviewCopy: "Ценность не в ещё одной Unity-сцене. Ценность в одной дисциплинированной оболочке, которая сравнивает несколько путей реализации по одинаковым правилам.",
-        reviewEyebrow: "Как Смотреть Демо",
-        reviewTitle: "Что попробовать после запуска build'а.",
-        reviewFocusLabel: "Фокус Здесь",
-        reviewFocusCopy: "Эта последовательность показывает интервьюеру, куда кликать в первую очередь, вместо того чтобы оставлять его без сценария.",
-        reviewSteps: [
-          {
-            title: "Выбери семейство модулей",
-            copy: "Начни с `Update Loop`, `Pooling` или `AI` в зависимости от того, хочешь ли ты pattern-driven или domain-driven сравнение."
-          },
-          {
-            title: "Переключай варианты",
-            copy: "Используй общий вариантный control, чтобы сравнить разные implementation styles внутри одной и той же оболочки."
-          },
-          {
-            title: "Подними stress preset",
-            copy: "Используй одинаковые preset steps, чтобы увидеть, когда ownership, layout, batching или callback volume начинают иметь значение."
-          },
-          {
-            title: "Связывай поведение с заметками",
-            copy: "Читай архитектурные карточки рядом с runtime, чтобы система объясняла не только результат на экране, но и причину различий."
-          }
-        ],
-        demoEyebrow: "Интерактивное Демо",
-        demoTitle: "Прочитай контекст, затем запускай.",
-        demoCopy: "Страница заранее готовит WebGL-доставку. Unity instance создаётся только по кнопке.",
-        demoInlineCopy: "Runtime встроен в страницу: модули, stress preset'ы и заметки рядом.",
-        demoFocusLabel: "Фокус Здесь",
-        demoFocusCopy: "Этот блок — переход от объяснения к доказательству: сначала чтение, потом запуск общего runtime в нужный момент.",
-        demoLabel: "Состояние WebGL Host",
-        demoFullscreenEnter: "Открыть на весь экран",
-        demoFullscreenExit: "Выйти из полного экрана",
-        demoNotesCta: "Читать заметки по архитектуре",
-        demoNote1: "<strong>Режим просмотра:</strong> можно листать и читать страницу, пока host подготавливает loader и build URLs.",
-        demoNote2: "<strong>Режим собеседования:</strong> вернись сюда и запусти runtime, когда у зрителя уже есть контекст.",
-        posterLabel: "Встроенный Unity Runtime",
-        posterTitle: "Запусти showcase-оболочку прямо здесь.",
-        footerCopy: "Unity runtime для объяснения trade\u2011offs в одной browser-friendly оболочке.",
-        footerTop: "Наверх",
-        footerArchitecture: "Архитектура",
-        footerSource: "Исходники на GitHub",
-        guide: {
-          title: "Маршрут Чтения",
-          topTitle: "Обзор",
-          topCopy: "Что это за проект.",
-          whatTitle: "Сигналы",
-          whatCopy: "Почему это сравнение важно.",
-          modulesTitle: "Модули",
-          modulesCopy: "Выбери сильнейший пример.",
-          architectureTitle: "Архитектура",
-          architectureCopy: "Как устроены слои shell.",
-          reviewTitle: "Сценарий Показа",
-          reviewCopy: "Как провести по демо.",
-          demoTitle: "Запуск",
-          demoCopy: "Где начинается proof."
-        }
-      },
-      demoPhases: {
-        idle: {
-          pill: "Preload idle",
-          pillCopy: "Подготовка core demo delivery начнётся в фоне, пока ты читаешь страницу.",
-          stage: "Ожидание конфигурации",
-          supporting: "Host shell уже готов. Положи Unity WebGL export в Site/webgl/Build, запусти prepare-webgl-site.ps1, и эта секция сможет preload'ить и запускать runtime прямо с этой страницы.",
-          poster: "WebGL build пока не подключён. Presentation shell уже готов: нужно добавить export и сгенерировать <code>webgl/build-manifest.json</code>.",
-          button: "Запустить демо"
-        },
-        buildPending: {
-          pill: "Build pending",
-          pillCopy: "Presentation shell уже готов, но Unity WebGL export ещё не подключён.",
-          stage: "Build pending",
-          supporting: "Добавь WebGL export в Site/webgl/Build и запусти prepare-webgl-site.ps1, чтобы собрать launch manifest.",
-          poster: "WebGL build пока не подключён. Host shell уже на месте и ждёт экспортированный Unity build.",
-          button: "Проверить WebGL build"
-        },
-        preloading: {
-          pill: "Preloading",
-          pillCopy: "Страница подготавливает Unity loader и build artifacts, пока текст остаётся читаемым.",
-          stage: "Предзагрузка build URL",
-          supporting: "Страница прогревает loader и build files в фоне. Можно продолжать чтение до момента запуска.",
-          poster: "Core delivery files уже подготавливаются в фоне. Сам Unity runtime instance будет создан только после клика.",
-          button: "Запустить во время подготовки"
-        },
-        preloadReady: {
-          pill: "Preload ready",
-          pillCopy: "Unity loader уже подготовлен. Instance будет создан только по запросу.",
-          stage: "Core loader готов",
-          supporting: "Shell уже прогрел Unity loader. Runtime instance инициализируется только в момент запуска.",
-          poster: "Host shell готов. Нажми запуск, чтобы создать Unity WebGL instance прямо на этой странице.",
-          button: "Запустить демо"
-        },
-        preloadPartial: {
-          pill: "Preload partial",
-          pillCopy: "Страница не смогла подтвердить loader, но прямой запуск всё ещё можно попробовать.",
-          stage: "Loader не подтверждён",
-          supporting: "Shell не смог проверить путь к WebGL loader во время preload. Но launch всё ещё может попробовать прямую инициализацию.",
-          poster: "Путь к Unity build всё ещё может быть неверным. Повтори prepare-webgl-site.ps1 или проверь, что export лежит в Site/webgl/Build.",
-          button: "Попробовать запуск"
-        },
-        loadingRuntime: {
-          pill: "Launching",
-          pillCopy: "Unity runtime создаётся только сейчас, когда у зрителя уже есть контекст.",
-          stage: "Создание runtime instance",
-          supporting: "Страница создаёт Unity WebGL instance только в момент запуска.",
-          poster: "Интерактивный runtime запускается. Как только instance будет готов, poster уйдёт с экрана.",
-          button: "Запуск демо..."
-        },
-        runtimeLive: {
-          pill: "Runtime live",
-          pillCopy: "Unity WebGL client уже активен внутри этой же страницы.",
-          stage: "Runtime live",
-          supporting: "Клиент запущен. Теперь можно переключать модули и варианты, не уходя с этой страницы.",
-          poster: "Интерактивный runtime уже активен.",
-          button: "Демо запущено"
-        },
-        launchFailed: {
-          pill: "Launch failed",
-          pillCopy: "Presentation shell в порядке, но пути до WebGL build или export files ещё нужно проверить.",
-          stage: "Запуск не удался",
-          supporting: "Host shell попытался создать Unity instance, но build не смог стартовать. Проверь export files и config paths.",
-          posterPrefix: "Запуск не удался: ",
-          posterSuffix: "<br>Проверь, что Unity build files лежат в <code>Site/webgl/Build</code>, и пересобери <code>webgl/build-manifest.json</code> через <code>prepare-webgl-site.ps1</code>.",
-          button: "Повторить запуск"
-        },
-        runtimeProgress: "Загрузка runtime {value}%"
-      }
-    }
-  };
-
-  const modules = [
-    {
-      id: "update-loop",
-      en: {
-        category: "Architecture Pattern Module",
-        title: "Update Loop Strategies",
-        summary: "Compare per-object callbacks against one centralized owner loop under identical shell controls.",
-        variants: "Per-Object, Centralized",
-        focus: "Callback ownership, scene noise, and how update responsibility scales.",
-        try: "Switch variants, raise the stress preset, and compare how easily behavior maps back to the owning code model.",
-        signal: "This module shows when a simple MonoBehaviour-per-object baseline stops being the right long-term path.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "The same shell can compare a friendly object model against a more scalable centralized update owner."
-      },
-      ru: {
-        category: "Архитектурный Паттерн",
-        title: "Стратегии Update Loop",
-        summary: "Сравнение Update на каждом объекте и одного централизованного owner loop внутри одной оболочки.",
-        variants: "На объекте, Централизованный",
-        focus: "Владение callback'ами, шум сцены и то, как масштабируется ответственность за update.",
-        try: "Переключай варианты, поднимай stress preset и смотри, насколько поведение легко связать с кодовой моделью владения.",
-        signal: "Этот модуль показывает, когда понятная MonoBehaviour-модель на каждый объект перестаёт быть хорошим долгосрочным baseline.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "Одна и та же оболочка сравнивает дружелюбную объектную модель с более масштабируемым centralized owner loop."
-      }
-    },
-    {
-      id: "pooling",
-      en: {
-        category: "Architecture Pattern Module",
-        title: "Object Pooling",
-        summary: "Contrast straight instantiation against a reusable pool while the visible hub experience stays the same.",
-        variants: "Instantiation, Reusable Pool",
-        focus: "Lifecycle churn, allocation pressure, and ownership of reusable runtime objects.",
-        try: "Increase stress and compare how each variant frames object lifetime and reset logic.",
-        signal: "The difference is not only performance. It is also about who owns re-entry, cleanup, and spawn coordination.",
-        image: "./assets/images/module-preview-b.png",
-        caption: "The pooled path reframes runtime object lifetime instead of only patching allocations after the fact."
-      },
-      ru: {
-        category: "Архитектурный Паттерн",
-        title: "Object Pooling",
-        summary: "Сравнение прямой instantiation и reusable pool при одинаковом пользовательском потоке в hub.",
-        variants: "Instantiation, Reusable Pool",
-        focus: "Lifecycle churn, allocation pressure и владение переиспользуемыми runtime-объектами.",
-        try: "Повышай stress и сравнивай, как каждый вариант определяет время жизни объекта и reset logic.",
-        signal: "Разница не только в производительности. Она ещё и в том, кто владеет повторным входом, cleanup и spawn coordination.",
-        image: "./assets/images/module-preview-b.png",
-        caption: "Pooled path переопределяет владение жизненным циклом объектов, а не просто чинит allocations постфактум."
-      }
-    },
-    {
-      id: "vfx-delivery",
-      en: {
-        category: "Architecture Pattern Module",
-        title: "VFX Delivery",
-        summary: "Compare emitter-local bursts with a batched pulses approach aimed at denser feedback scenarios.",
-        variants: "Emitter Bursts, Batched Pulses",
-        focus: "Effect ownership, presentation density, and rendering-oriented delivery decisions.",
-        try: "Flip between local emitters and batched pulses, then inspect how the same presentation goal shifts the architecture boundary.",
-        signal: "Dense VFX problems are often ownership and batching problems, not only content-authoring problems.",
-        image: "./assets/images/vfx-batched.png",
-        caption: "Batched visual feedback emphasizes architectural delivery choices more than isolated one-off emitters."
-      },
-      ru: {
-        category: "Архитектурный Паттерн",
-        title: "VFX Delivery",
-        summary: "Сравнение локальных emitter bursts и batched pulses для более плотных сценариев визуальной обратной связи.",
-        variants: "Emitter Bursts, Batched Pulses",
-        focus: "Владение эффектами, плотность presentation и rendering-oriented delivery decisions.",
-        try: "Переключай local emitters и batched pulses и смотри, как одна и та же цель меняет архитектурную границу.",
-        signal: "Плотные VFX-задачи часто оказываются задачами ownership и batching, а не только content authoring.",
-        image: "./assets/images/vfx-batched.png",
-        caption: "Batched visual feedback делает архитектурные различия видимыми сильнее, чем isolated one-off emitters."
-      }
-    },
-    {
-      id: "effects-system",
-      en: {
-        category: "Simulation Module",
-        title: "Effects System",
-        summary: "Show how straightforward object-style effects compare with chunk-based batched updates.",
-        variants: "Indie, Chunk",
-        focus: "Readability versus packed update ownership for many small transient effects.",
-        try: "Raise the same stress preset in both variants and compare hierarchy friendliness against batched processing scale.",
-        signal: "The module shows how a system can evolve from easy-to-read object ownership into explicit packed processing.",
-        image: "./assets/images/module-preview-b.png",
-        caption: "Chunk-based execution makes the architecture story visible without changing the surrounding shell."
-      },
-      ru: {
-        category: "Симуляционный Модуль",
-        title: "Effects System",
-        summary: "Показывает разницу между straightforward object-style effects и chunk-based batched updates.",
-        variants: "Indie, Chunk",
-        focus: "Читаемость против packed update ownership для большого числа мелких transient effects.",
-        try: "Подними один и тот же stress preset в обоих вариантах и сравни hierarchy friendliness с масштабом batched processing.",
-        signal: "Модуль показывает, как система эволюционирует от простого object ownership к явному packed processing.",
-        image: "./assets/images/module-preview-b.png",
-        caption: "Chunk-based execution делает архитектурную историю видимой, не меняя остальную оболочку."
-      }
-    },
-    {
-      id: "ai-system",
-      en: {
-        category: "Simulation Module",
-        title: "AI System",
-        summary: "Compare FSM, Utility, and Behavior Tree decision models inside one common runtime presentation shell.",
-        variants: "FSM, Utility, Behavior Tree",
-        focus: "Decision-model complexity, explainability, and how control logic scales with agent count.",
-        try: "Switch decision models, keep the same stress preset, and read the trade-offs panel alongside the visible runtime changes.",
-        signal: "This is less about one best AI pattern and more about how different decision models shape ownership and reasoning cost.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "The AI module turns abstract decision-model discussions into something visible and comparable."
-      },
-      ru: {
-        category: "Симуляционный Модуль",
-        title: "AI System",
-        summary: "Сравнение FSM, Utility и Behavior Tree decision models внутри одной общей presentation shell.",
-        variants: "FSM, Utility, Behavior Tree",
-        focus: "Сложность decision model, explainability и то, как control logic масштабируется по числу агентов.",
-        try: "Переключай decision models, держи один и тот же stress preset и читай trade-offs panel рядом с поведением в runtime.",
-        signal: "Здесь вопрос не в одном лучшем AI pattern, а в том, как разные decision models меняют ownership и reasoning cost.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "AI-модуль делает абстрактный разговор о decision models видимым и сопоставимым."
-      }
-    },
-    {
-      id: "inventory",
-      en: {
-        category: "Simulation Module",
-        title: "Inventory Systems",
-        summary: "Contrast object-rich slot ownership with packed slot processing for a mutation-heavy system.",
-        variants: "Object Slots, Packed Slots",
-        focus: "Data layout, mutability, and how much convenience the runtime can afford before pressure builds.",
-        try: "Inspect the Inventory variants and compare how representation choices change the mental model of ownership.",
-        signal: "Inventory starts as convenient object graphs very often. The packed path shows what happens when that convenience becomes hot runtime traffic.",
-        image: "./assets/images/inventory-metrics.png",
-        caption: "Inventory is useful because layout decisions affect both code clarity and scaling characteristics."
-      },
-      ru: {
-        category: "Симуляционный Модуль",
-        title: "Inventory Systems",
-        summary: "Сравнение object-rich slot ownership и packed slot processing для mutation-heavy системы.",
-        variants: "Object Slots, Packed Slots",
-        focus: "Data layout, mutability и то, сколько удобства runtime может позволить себе до появления давления.",
-        try: "Посмотри варианты Inventory и сравни, как representation choices меняют mental model of ownership.",
-        signal: "Inventory очень часто стартует как удобные object graphs. Packed path показывает, что происходит, когда это удобство становится hot runtime traffic.",
-        image: "./assets/images/inventory-metrics.png",
-        caption: "Inventory полезен как пример: решения по layout влияют и на читаемость кода, и на scaling characteristics."
-      }
-    },
-    {
-      id: "animation",
-      en: {
-        category: "Simulation Module",
-        title: "Layered Character Animation",
-        summary: "Show one humanoid model running, shooting, and combining both actions through Animator layers.",
-        variants: "Run, Shoot, Run + Shoot",
-        focus: "Animator layers, upper-body AvatarMask, and why action games separate locomotion from combat actions.",
-        try: "Open Run + Shoot to discuss how the lower body keeps locomotion while the upper body plays the shooting clip.",
-        signal: "Animation systems are not only clip playback. The production problem is composing actions without losing movement responsiveness.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "The animation module broadens the showcase into a common game-dev mechanic: layered locomotion plus combat."
-      },
-      ru: {
-        category: "Симуляционный Модуль",
-        title: "Слоистая анимация персонажа",
-        summary: "Одна humanoid-модель бежит, стреляет или совмещает оба действия через Animator layers.",
-        variants: "Бег, Стрельба, Бег + стрельба",
-        focus: "Animator layers, upper-body AvatarMask и разделение locomotion от combat actions.",
-        try: "Открой Бег + стрельба и покажи, как ноги продолжают locomotion, пока верх тела проигрывает shooting clip.",
-        signal: "Animation systems — это не только playback клипов. В production часто нужно компоновать действия, не теряя отзывчивость движения.",
-        image: "./assets/images/module-preview-a.png",
-        caption: "Animation-модуль показывает частую game-dev механику: layered locomotion plus combat."
-      }
-    }
-  ];
+  const runtimeCopyUrl = "./content/site-copy.runtime.json";
+  let translations = null;
+  let modules = [];
 
   const demoState = {
     phase: "idle",
@@ -697,17 +88,19 @@
     launchStarted: false,
     observerAttached: false,
     unityInstance: null,
-    fullscreenActive: false,
+    presentationActive: false,
     progress: 6,
     runtimePercent: 0,
     errorMessage: ""
   };
 
   const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
+  const qualityModeStorageKey = "learningArchitectSiteQualityMode";
   let currentLanguage = requestedLanguage === "ru" || requestedLanguage === "en"
     ? requestedLanguage
     : (window.localStorage.getItem("learningArchitectSiteLanguage") === "ru" ? "ru" : "en");
-  let selectedModuleId = modules[0].id;
+  let selectedModuleId = "";
+  let currentQualityMode = normalizeQualityMode(window.localStorage.getItem(qualityModeStorageKey) || siteConfig.demo.defaultQualityMode);
 
   function setText(id, value) {
     const node = document.getElementById(id);
@@ -721,8 +114,162 @@
       node.innerHTML = value;
   }
 
+  function getQualityModes() {
+    return siteConfig.demo && siteConfig.demo.qualityModes
+      ? siteConfig.demo.qualityModes
+      : demoDefaults.qualityModes;
+  }
+
+  function getQualityProfile(mode) {
+    const modes = getQualityModes();
+    return modes[normalizeQualityMode(mode)] || modes.balanced || demoDefaults.qualityModes.balanced;
+  }
+
+  function normalizeQualityMode(mode) {
+    const modes = getQualityModes();
+    return Object.prototype.hasOwnProperty.call(modes, mode) ? mode : "balanced";
+  }
+
+  function isRuntimeLiveOrLaunching() {
+    return demoState.phase === "loadingRuntime" || demoState.phase === "runtimeLive";
+  }
+
+  function getEffectiveDevicePixelRatio() {
+    const demo = siteConfig.demo || {};
+    const profile = getQualityProfile(currentQualityMode);
+    const requested = Math.max(1, Number(profile.maxDpr || demo.devicePixelRatio || 1) || 1);
+    const maxDevicePixelRatio = Math.max(1, Number(demo.maxDevicePixelRatio || 1.5) || 1.5);
+    const nativeDevicePixelRatio = Math.max(1, Number(window.devicePixelRatio || 1) || 1);
+    return Math.min(requested, maxDevicePixelRatio, nativeDevicePixelRatio);
+  }
+
+  class RenderController {
+    constructor(canvas, container) {
+      this.canvas = canvas;
+      this.container = container;
+      this.currentDpr = 1;
+      this.currentWidth = 0;
+      this.currentHeight = 0;
+    }
+
+    getContainerMetrics() {
+      if (!this.container) {
+        return {
+          width: 1280,
+          height: 720
+        };
+      }
+
+      const styles = window.getComputedStyle(this.container);
+      const paddingX = parseFloat(styles.paddingLeft || "0") + parseFloat(styles.paddingRight || "0");
+      const paddingY = parseFloat(styles.paddingTop || "0") + parseFloat(styles.paddingBottom || "0");
+
+      return {
+        width: Math.max(320, this.container.clientWidth - paddingX),
+        height: Math.max(180, this.container.clientHeight - paddingY)
+      };
+    }
+
+    update() {
+      if (!this.canvas)
+        return;
+
+      const profile = getQualityProfile(currentQualityMode);
+      const visualBox = this.getContainerMetrics();
+      const dpr = getEffectiveDevicePixelRatio();
+      const scale = Math.min(
+        visualBox.width / profile.width,
+        visualBox.height / profile.height
+      );
+      const safeScale = Number.isFinite(scale) && scale > 0 ? Math.min(scale, 1) : 1;
+      const displayWidth = Math.floor(profile.width * safeScale);
+      const displayHeight = Math.floor(profile.height * safeScale);
+
+      this.currentDpr = dpr;
+      this.currentWidth = displayWidth;
+      this.currentHeight = displayHeight;
+
+      this.canvas.style.width = displayWidth + "px";
+      this.canvas.style.height = displayHeight + "px";
+      this.canvas.dataset.qualityMode = currentQualityMode;
+      this.canvas.dataset.renderWidth = String(displayWidth);
+      this.canvas.dataset.renderHeight = String(displayHeight);
+      this.canvas.dataset.renderDpr = String(dpr);
+    }
+  }
+
+  const renderController = new RenderController(dom.unityCanvas, dom.demoFrame);
+
+  function renderQualityMode() {
+    const copy = getTranslation();
+    const buttons = [
+      { mode: "performance", node: dom.qualityPerformance, text: copy.sections.demoQualityPerformance },
+      { mode: "balanced", node: dom.qualityBalanced, text: copy.sections.demoQualityBalanced },
+      { mode: "quality", node: dom.qualityQuality, text: copy.sections.demoQualityQuality }
+    ];
+
+    if (dom.qualityLabel)
+      dom.qualityLabel.textContent = copy.sections.demoQualityLabel;
+    if (dom.qualityCopy)
+      dom.qualityCopy.textContent = copy.sections.demoQualityCopy;
+    if (dom.qualityNote)
+      dom.qualityNote.textContent = isRuntimeLiveOrLaunching()
+        ? copy.sections.demoQualityNoteLive
+        : copy.sections.demoQualityNote;
+    if (dom.presentationButton) {
+      dom.presentationButton.textContent = demoState.presentationActive
+        ? copy.sections.demoPresentationExit
+        : copy.sections.demoPresentationEnter;
+      dom.presentationButton.setAttribute("aria-pressed", demoState.presentationActive ? "true" : "false");
+    }
+
+    buttons.forEach(function (entry) {
+      if (!entry.node)
+        return;
+
+      entry.node.textContent = entry.text;
+      entry.node.classList.toggle("is-active", currentQualityMode === entry.mode);
+      entry.node.setAttribute("aria-pressed", currentQualityMode === entry.mode ? "true" : "false");
+    });
+  }
+
+  function setQualityMode(mode) {
+    currentQualityMode = normalizeQualityMode(mode);
+    window.localStorage.setItem(qualityModeStorageKey, currentQualityMode);
+    renderController.update();
+    renderQualityMode();
+  }
+
   function getTranslation() {
-    return translations[currentLanguage];
+    if (!translations)
+      throw new Error("Site copy has not been loaded yet.");
+
+    const localizedCopy = translations[currentLanguage] || translations.en;
+    if (!localizedCopy || !localizedCopy.site)
+      throw new Error(`Missing site copy for language '${currentLanguage}'.`);
+
+    return localizedCopy.site;
+  }
+
+  function loadSiteCopy() {
+    return fetch(runtimeCopyUrl, { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok)
+          throw new Error(`Unable to load site copy from ${runtimeCopyUrl}.`);
+
+        return response.json();
+      })
+      .then(function (content) {
+        if (!content || !content.translations || !content.translations.en || !content.translations.ru)
+          throw new Error("Site copy JSON is missing translations.en or translations.ru.");
+
+        if (!Array.isArray(content.modules) || content.modules.length === 0)
+          throw new Error("Site copy JSON does not define any modules.");
+
+        translations = content.translations;
+        modules = content.modules;
+        selectedModuleId = modules[0].id;
+      });
   }
 
   function initializeLinks() {
@@ -790,13 +337,21 @@
     });
     setText("brief-review-label", copy.sections.reviewLabel);
     setText("brief-review-copy", copy.sections.reviewCopy);
+    setText("section-review-eyebrow", copy.sections.reviewEyebrow);
+    setText("section-review-title", copy.sections.reviewTitle);
+    setText("section-review-copy", copy.sections.reviewFocusCopy);
+    copy.sections.reviewSteps.forEach(function (item, index) {
+      setText("review-step-" + (index + 1) + "-title", item.title);
+      setText("review-step-" + (index + 1) + "-copy", item.copy);
+    });
+    setText("integrity-label", copy.sections.integrityLabel);
+    setText("integrity-copy", copy.sections.integrityCopy);
 
     setText("section-demo-eyebrow", copy.sections.demoEyebrow);
     setText("section-demo-title", copy.sections.demoTitle);
     setText("section-demo-copy", copy.sections.demoCopy);
     setText("demo-inline-copy", copy.sections.demoInlineCopy);
     setText("demo-console-label", copy.sections.demoLabel);
-    setText("toggle-fullscreen", demoState.fullscreenActive ? copy.sections.demoFullscreenExit : copy.sections.demoFullscreenEnter);
     setText("cta-read-notes", copy.sections.demoNotesCta);
     setHtml("demo-note-1", copy.sections.demoNote1);
     setHtml("demo-note-2", copy.sections.demoNote2);
@@ -818,10 +373,12 @@
       dom.langRu.classList.toggle("is-active", currentLanguage === "ru");
       dom.langRu.setAttribute("aria-pressed", currentLanguage === "ru" ? "true" : "false");
     }
+
+    renderQualityMode();
   }
 
   function renderModuleSelector() {
-    if (!dom.moduleSelector)
+    if (!dom.moduleSelector || modules.length === 0)
       return;
 
     const localizedNav = getTranslation().nav;
@@ -850,7 +407,7 @@
   }
 
   function renderSelectedModule() {
-    if (!dom.moduleCategory || !dom.moduleTitle || !dom.moduleSummary || !dom.moduleVariants || !dom.moduleFocus || !dom.moduleTry || !dom.moduleSignal || !dom.moduleImage || !dom.moduleCaption)
+    if (!dom.moduleCategory || !dom.moduleTitle || !dom.moduleSummary || !dom.moduleVariants || !dom.moduleFocus || !dom.moduleTry || !dom.moduleSignal || !dom.moduleImage || !dom.moduleCaption || modules.length === 0)
       return;
 
     const module = modules.find(function (candidate) {
@@ -947,26 +504,29 @@
     return deriveWebGlRoot() + "/" + candidate.replace(/^\/+/, "");
   }
 
-  function isFullscreenSupported() {
-    return Boolean(dom.demoFrame && (dom.demoFrame.requestFullscreen || dom.demoFrame.webkitRequestFullscreen));
+  function syncPresentationState() {
+    document.body.classList.toggle("is-presentation-active", demoState.presentationActive);
+    if (dom.demoContent)
+      dom.demoContent.classList.toggle("is-presentation", demoState.presentationActive);
+    if (dom.demoFrame)
+      dom.demoFrame.classList.toggle("is-presentation", demoState.presentationActive);
+    renderController.update();
+    renderQualityMode();
   }
 
-  function isDemoFullscreen() {
-    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
-    return fullscreenElement === dom.demoFrame || fullscreenElement === dom.unityCanvas;
+  function togglePresentationView() {
+    demoState.presentationActive = !demoState.presentationActive;
+    syncPresentationState();
+    window.setTimeout(function () {
+      renderController.update();
+    }, 20);
   }
 
-  function renderFullscreenButton() {
-    if (!dom.fullscreenButton)
-      return;
-
-    const copy = getTranslation();
-    demoState.fullscreenActive = isDemoFullscreen();
-    dom.demoFrame.classList.toggle("is-fullscreen", demoState.fullscreenActive);
-    dom.fullscreenButton.hidden = !isFullscreenSupported();
-    dom.fullscreenButton.textContent = demoState.fullscreenActive
-      ? copy.sections.demoFullscreenExit
-      : copy.sections.demoFullscreenEnter;
+  function handleGlobalKeyDown(event) {
+    if (event.key === "Escape" && demoState.presentationActive) {
+      demoState.presentationActive = false;
+      syncPresentationState();
+    }
   }
 
   function stagePrefetchLink(url, rel, asValue) {
@@ -1011,7 +571,7 @@
     const shouldDisableButton = demoState.phase === "loadingRuntime" ||
       demoState.phase === "runtimeLive";
     dom.launchButton.disabled = shouldDisableButton;
-    renderFullscreenButton();
+    renderQualityMode();
   }
 
   function setDemoPhase(phase, options) {
@@ -1093,47 +653,8 @@
       productName: demo.productName || "LearningArchitect",
       productVersion: demo.productVersion || "1.0.0",
       matchWebGLToCanvasSize: demo.matchWebGLToCanvasSize !== false,
-      devicePixelRatio: demo.devicePixelRatio || 1
+      devicePixelRatio: getEffectiveDevicePixelRatio()
     };
-  }
-
-  function requestDemoFullscreen() {
-    if (demoState.unityInstance && typeof demoState.unityInstance.SetFullscreen === "function") {
-      demoState.unityInstance.SetFullscreen(1);
-      return Promise.resolve();
-    }
-
-    if (!dom.demoFrame)
-      return Promise.resolve();
-
-    if (dom.demoFrame.requestFullscreen)
-      return dom.demoFrame.requestFullscreen();
-
-    if (dom.demoFrame.webkitRequestFullscreen) {
-      dom.demoFrame.webkitRequestFullscreen();
-      return Promise.resolve();
-    }
-
-    return Promise.resolve();
-  }
-
-  function exitDemoFullscreen() {
-    if (document.exitFullscreen)
-      return document.exitFullscreen();
-
-    if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-      return Promise.resolve();
-    }
-
-    return Promise.resolve();
-  }
-
-  function toggleDemoFullscreen() {
-    const action = isDemoFullscreen() ? exitDemoFullscreen() : requestDemoFullscreen();
-    Promise.resolve(action).catch(function () {
-      renderFullscreenButton();
-    });
   }
 
   function launchDemo() {
@@ -1150,6 +671,7 @@
       demoState.launchStarted = true;
       demoState.errorMessage = "";
       setDemoPhase("loadingRuntime", { progress: 54, runtimePercent: 0 });
+      renderController.update();
 
       injectLoaderScript()
         .then(function () {
@@ -1166,11 +688,14 @@
           demoState.unityInstance = instance;
           dom.demoPoster.classList.add("is-hidden");
           dom.demoFrame.classList.add("is-live");
+          renderController.update();
           setDemoPhase("runtimeLive", { progress: 100, runtimePercent: 100 });
         })
         .catch(function (error) {
           demoState.launchStarted = false;
-          setDemoPhase("launchFailed", { progress: 32, errorMessage: error.message || "Unknown error." });
+          const errorMessage = describeLaunchError(error);
+          console.error("[LearningArchitect.Site] Unity launch failed.", error);
+          setDemoPhase("launchFailed", { progress: 32, errorMessage: errorMessage });
         });
     });
   }
@@ -1300,6 +825,41 @@
       window.setTimeout(start, 900);
   }
 
+  function stringifyLaunchErrorPayload(error) {
+    if (error === null || typeof error === "undefined")
+      return "";
+
+    if (typeof error === "string")
+      return error;
+
+    if (error instanceof Error)
+      return error.message || String(error);
+
+    if (typeof error.message === "string" && error.message.trim())
+      return error.message.trim();
+
+    if (typeof error.reason === "string" && error.reason.trim())
+      return error.reason.trim();
+
+    if (error.reason && typeof error.reason.message === "string" && error.reason.message.trim())
+      return error.reason.message.trim();
+
+    if (error.error && typeof error.error.message === "string" && error.error.message.trim())
+      return error.error.message.trim();
+
+    try {
+      const serialized = JSON.stringify(error);
+      return serialized && serialized !== "{}" ? serialized : "";
+    } catch (serializationError) {
+      return "";
+    }
+  }
+
+  function describeLaunchError(error) {
+    const message = stringifyLaunchErrorPayload(error);
+    return message || "The Unity loader did not provide an error message.";
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
@@ -1319,11 +879,13 @@
     setupRevealAnimations();
   }
 
+  window.LearningArchitectSiteSetLanguage = setLanguage;
+
   function bindEvents() {
     if (dom.launchButton)
       dom.launchButton.addEventListener("click", launchDemo);
-    if (dom.fullscreenButton)
-      dom.fullscreenButton.addEventListener("click", toggleDemoFullscreen);
+    if (dom.presentationButton)
+      dom.presentationButton.addEventListener("click", togglePresentationView);
     if (dom.jumpToDemo) {
       dom.jumpToDemo.addEventListener("click", function () {
         prepareDemoAssets("cta");
@@ -1339,12 +901,29 @@
         setLanguage("ru");
       });
     }
-    document.addEventListener("fullscreenchange", renderFullscreenButton);
-    document.addEventListener("webkitfullscreenchange", renderFullscreenButton);
+    if (dom.qualityPerformance) {
+      dom.qualityPerformance.addEventListener("click", function () {
+        setQualityMode("performance");
+      });
+    }
+    if (dom.qualityBalanced) {
+      dom.qualityBalanced.addEventListener("click", function () {
+        setQualityMode("balanced");
+      });
+    }
+    if (dom.qualityQuality) {
+      dom.qualityQuality.addEventListener("click", function () {
+        setQualityMode("quality");
+      });
+    }
+    window.addEventListener("resize", renderController.update.bind(renderController));
+    document.addEventListener("keydown", handleGlobalKeyDown);
   }
 
-  loadDemoManifest().finally(function () {
+  Promise.all([loadSiteCopy(), loadDemoManifest()]).then(function () {
     initializeLinks();
+    syncPresentationState();
+    renderController.update();
     renderStaticCopy();
     renderModuleSelector();
     renderSelectedModule();
@@ -1354,5 +933,7 @@
     observeSections();
     setupRevealAnimations();
     scheduleIdlePreload();
+  }).catch(function (error) {
+    console.error("[LearningArchitect.Site] Failed to initialize site copy.", error);
   });
 }());

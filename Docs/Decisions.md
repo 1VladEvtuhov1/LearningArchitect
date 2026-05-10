@@ -104,7 +104,7 @@ Touches:
 - `Assets/Editor/ShowcaseLayoutTool.cs`
 - `Docs/HubAndCarrierAuthoring.md`
 
-### D-005: Description Panel Supports Both Legacy And Composite Viewports
+### D-005: Description Panel Follows The Shipped Legacy Viewport Contract
 
 Status:
 
@@ -112,15 +112,13 @@ Status:
 
 Decision:
 
-- `DescriptionPanel` runtime and validation support both:
-  - the legacy `Viewport -> DescriptionText` baseline;
-  - the composite section-based viewport model.
+- `DescriptionPanel` runtime, validation, and tests follow the shipped `Viewport -> DescriptionText` baseline.
 
 Why:
 
-- the restored shipped hub prefab still uses the legacy text viewport;
-- the composite model remains useful for future richer card composition;
-- dual support avoids another forced migration where tooling and validator get ahead of the actual prefab baseline.
+- the restored shipped hub prefab already provides the clearest public-facing baseline;
+- one explicit contract is easier to learn from than a migration-era dual-path UI;
+- validator and tooling should preserve the shipped shell instead of teaching two competing authoring models.
 
 Touches:
 

@@ -63,5 +63,7 @@ namespace LearningArchitect.Modules.Animation3D
         public bool HasActorPrefab => actorPrefab != null;
         public bool HasAnimatorController => animatorController != null;
         public bool HasAvatar => avatar != null;
+        public bool ActorPrefabHasAnimator => actorPrefab != null && actorPrefab.GetComponentInChildren<Animator>(true) != null;
+        public bool ActorPrefabHasCrowdActor => actorPrefab != null && actorPrefab.GetComponent<HumanoidCrowdActor>() != null;
     }
 }

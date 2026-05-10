@@ -156,6 +156,40 @@ namespace LearningArchitect.Tests.Modules
         }
 
         [Test]
+        public void HumanoidAnimationAssets_AssignCompleteProfileAndAnimatorDrivenActorPrefab()
+        {
+            string[] prefabPaths =
+            {
+                "Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_Run.prefab",
+                "Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_Shoot.prefab",
+                "Assets/Modules/LayeredCharacterAnimation/Prefabs/AnimationVariant_RunShoot.prefab"
+            };
+
+            for (int i = 0; i < prefabPaths.Length; i++)
+            {
+                string prefabPath = prefabPaths[i];
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                Assert.IsNotNull(prefab, $"Could not load humanoid animation prefab '{prefabPath}'.");
+
+                HumanoidAnimationVariant variant = prefab.GetComponent<HumanoidAnimationVariant>();
+                Assert.IsNotNull(variant, $"Prefab '{prefabPath}' is missing {nameof(HumanoidAnimationVariant)}.");
+
+                SerializedObject serializedVariant = new(variant);
+                SerializedProperty profileProperty = serializedVariant.FindProperty("animationProfile");
+                Assert.IsNotNull(profileProperty, $"Prefab '{prefabPath}' should expose an animationProfile field.");
+                Assert.IsNotNull(profileProperty.objectReferenceValue, $"Prefab '{prefabPath}' must assign an animationProfile.");
+
+                HumanoidAnimationProfileSO profile = profileProperty.objectReferenceValue as HumanoidAnimationProfileSO;
+                Assert.IsNotNull(profile, $"Prefab '{prefabPath}' must assign a {nameof(HumanoidAnimationProfileSO)}.");
+                Assert.IsTrue(profile.HasActorPrefab, $"Profile '{profile.name}' must assign actorPrefab.");
+                Assert.IsTrue(profile.HasAvatar, $"Profile '{profile.name}' must assign avatar.");
+                Assert.IsTrue(profile.HasAnimatorController, $"Profile '{profile.name}' must assign animatorController.");
+                Assert.IsTrue(profile.ActorPrefabHasAnimator, $"Profile '{profile.name}' actor prefab must include an Animator.");
+                Assert.IsTrue(profile.ActorPrefabHasCrowdActor, $"Profile '{profile.name}' actor prefab should include {nameof(HumanoidCrowdActor)}.");
+            }
+        }
+
+        [Test]
         public void CreatureAnimationVariant_UsesVisibleCapForRigCount()
         {
             using ModuleFixture<CreatureAnimationVariant> fixture = CreateFixture<CreatureAnimationVariant>();

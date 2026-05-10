@@ -24,6 +24,14 @@ For the full run, build, and server deployment checklist, see `../Docs/WebDeploy
 - `config.js`
   - source URL
   - default WebGL discovery settings
+- `content/site-copy.csv`
+  - source of truth for all editable site copy
+  - contains both `EN` and `RU` columns in one table
+- `content/site-copy.runtime.json`
+  - generated runtime payload consumed by the page
+- `scripts/site-copy-tool.mjs`
+  - converts `CSV -> JSON`
+  - can also bootstrap the initial CSV from the older embedded `app.js` content
 - `assets/images`
   - copied preview screenshots used by the page
 - `webgl`
@@ -54,6 +62,29 @@ The current local preview used during development is typically:
 
 ```powershell
 python -m http.server 8081 -d Site
+```
+
+## Copy Workflow
+
+The site now uses a strict content pipeline:
+
+1. `content/site-copy.csv`
+   - source of truth
+2. `content/site-copy.runtime.json`
+   - generated runtime payload
+3. `app.js`
+   - reads the generated JSON only
+
+When you edit site text, change the CSV first and then rebuild the runtime JSON:
+
+```powershell
+node .\scripts\site-copy-tool.mjs build-json
+```
+
+If you ever need to re-bootstrap the CSV from an older embedded-copy version of `app.js`, run:
+
+```powershell
+node .\scripts\site-copy-tool.mjs extract-appjs
 ```
 
 ## How To Plug In The Unity WebGL Build

@@ -21,6 +21,14 @@ That means:
 
 The public rebuild entrypoints in `ShowcaseLayoutTool` are currently left in safe mode for exactly this reason.
 
+The remaining private layout helper is no longer a full UI generator.
+It should be treated only as a preserve-first normalizer for a few known drift cases:
+
+- `ModuleInfoPanel` naming compatibility
+- `DescriptionPanel` baseline wiring
+- stress summary branch cleanup
+- navigation glow cleanup
+
 ## Hub Prefab Contract
 
 The root prefab is:
@@ -49,51 +57,35 @@ The root hierarchy must keep these top-level child roles:
 
 ## Description Panel Contract
 
-`DescriptionPanel` currently supports two viewport layouts.
+`DescriptionPanel` uses one shipped viewport layout.
 
-### 1. Legacy baseline layout
+### Legacy baseline layout
 
 Used by the restored hand-authored hub baseline:
 
 - `Viewport`
   - `DescriptionText`
 
-This path is still valid and still supported at runtime.
-
-### 2. Composite section layout
-
-Supported for more structured card-style rendering:
-
-- `Viewport`
-  - `Container - AboutInfo`
-  - `Container - ArchitectureInfo`
-  - `Container - Trade-OffsInfo`
-  - `Container - ProsCons`
-    - `Container - Pros`
-    - `Container - Cons`
-
-Each composite section must provide:
-
-- `Text - Header`
-- `Text - Description`
+This path is the current runtime and validation contract.
 
 ## Important Constraint
 
-The runtime and validator now accept both layouts, but the current shipped visual baseline is the legacy single-text path.
+The runtime and validator now follow the shipped legacy single-text path.
 
 So:
 
 - do not remove `DescriptionText` from the hub prefab unless you intentionally migrate the visual baseline;
-- do not tighten validator/tooling back to composite-only assumptions without changing the shipped hub prefab at the same time.
+- do not reintroduce alternate `DescriptionPanel` viewport layouts without changing the shipped hub prefab and validator contract at the same time;
+- do not expand `ShowcaseLayoutTool` back into a full scene/prefab rebuild path unless the visual baseline ownership model is intentionally changed.
 
 ## Tabs Contract
 
 `DescriptionPanel` expects:
 
-- `TabsBar` or `Container - DescriptionCharacters`
+- `Container - DescriptionCharacters`
 - `ActiveTabUnderline`
 
-Named tabs like `Tab_0`, `Tab_1`, `Tab_2` are supported, but the runtime can also bind fallback text labels under the tab bar when the old baseline layout is used.
+The current prefab uses three text labels under the tab bar. Keep that naming/layout unless the visual baseline is intentionally migrated.
 
 ## Carrier Prefab Contract
 

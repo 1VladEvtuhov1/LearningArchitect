@@ -4,8 +4,10 @@ using LearningArchitect.Core;
 using LearningArchitect.Modules.Animation3D;
 using LearningArchitect.UI;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.Localization;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Localization.Tables;
 using UnityEngine.UI;
 
@@ -89,6 +91,9 @@ namespace LearningArchitect.EditorTools
     public static class ShowcaseValidator
     {
         internal const string HubPrefabPath = "Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab";
+        internal const string ShowcaseScenePath = "Assets/Showcase/Scenes/ArchitectureShowcase.unity";
+        internal const string HubRootName = "ArchitectureShowcaseHub";
+        private const float TransformTolerance = 0.001f;
 
         private static readonly string[] DefinitionSearchFolders =
         {
@@ -178,6 +183,7 @@ namespace LearningArchitect.EditorTools
             ShowcaseLocalizationSnapshot localization = CaptureLocalizationSnapshot();
             ShowcaseValidationReport report = ValidateDefinitions(modules, variants, localization);
             ValidateHubPrefabLayout(AssetDatabase.LoadAssetAtPath<GameObject>(HubPrefabPath), report);
+            ValidateHubSceneLayout(report);
 
             LogReport(report, modules.Length, variants.Length);
         }
@@ -527,8 +533,30 @@ namespace LearningArchitect.EditorTools
                     continue;
                 }
 
-                if (animationProfileProperty.objectReferenceValue is HumanoidAnimationProfileSO profile && !profile.HasActorPrefab)
+                if (animationProfileProperty.objectReferenceValue is not HumanoidAnimationProfileSO profile)
+                    continue;
+
+                if (!profile.HasActorPrefab)
+                {
                     report.AddError($"Animation profile '{profile.name}' requires an assigned actorPrefab.", profile);
+                    continue;
+                }
+
+                if (!profile.HasAvatar)
+                    report.AddError($"Animation profile '{profile.name}' requires an assigned avatar.", profile);
+
+                if (!profile.HasAnimatorController)
+                    report.AddError($"Animation profile '{profile.name}' requires an assigned animatorController.", profile);
+
+                if (!profile.ActorPrefabHasAnimator)
+                    report.AddError(
+                        $"Animation profile '{profile.name}' actor prefab '{profile.ActorPrefab.name}' requires an Animator component in children.",
+                        profile.ActorPrefab);
+
+                if (!profile.ActorPrefabHasCrowdActor)
+                    report.AddWarning(
+                        $"Animation profile '{profile.name}' actor prefab '{profile.ActorPrefab.name}' should preconfigure HumanoidCrowdActor for a self-describing showcase contract.",
+                        profile.ActorPrefab);
             }
         }
 
@@ -563,57 +591,62 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            if (FindDeep(descriptionPanel.transform, "TabsBar") == null &&
-                FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
+            if (FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
             {
-                report.AddError("DescriptionPanel is missing its tabs root.", descriptionPanel);
+                report.AddError("DescriptionPanel is missing 'Container - DescriptionCharacters'.", descriptionPanel);
             }
 
             if (FindDeep(descriptionPanel.transform, "ActiveTabUnderline") == null)
                 report.AddError("DescriptionPanel is missing ActiveTabUnderline.", descriptionPanel);
 
-            bool hasLegacyDescriptionText = FindDeep(viewport, "DescriptionText") != null;
-            bool hasCompositeLayout = FindDeep(viewport, "Container - AboutInfo") != null ||
-                                      FindDeep(viewport, "Container - ArchitectureInfo") != null ||
-                                      FindDeep(viewport, "Container - Trade-OffsInfo") != null ||
-                                      FindDeep(viewport, "Container - ProsCons") != null;
-
-            if (hasCompositeLayout)
-            {
-                ValidateRequiredSection(viewport, "Container - AboutInfo", report);
-                ValidateRequiredSection(viewport, "Container - ArchitectureInfo", report);
-                ValidateRequiredSection(viewport, "Container - Trade-OffsInfo", report);
-
-                Transform prosConsRoot = FindDeep(viewport, "Container - ProsCons");
-                if (prosConsRoot == null)
-                {
-                    report.AddError("DescriptionPanel viewport is missing Container - ProsCons.", viewport);
-                    return;
-                }
-
-                ValidateRequiredSection(prosConsRoot, "Container - Pros", report);
-                ValidateRequiredSection(prosConsRoot, "Container - Cons", report);
-                return;
-            }
-
-            if (!hasLegacyDescriptionText)
-                report.AddError("DescriptionPanel viewport must provide either composite sections or legacy DescriptionText.", viewport);
+            if (FindDeep(viewport, "DescriptionText") == null)
+                report.AddError("DescriptionPanel viewport must provide 'DescriptionText'.", viewport);
         }
 
-        private static void ValidateRequiredSection(Transform parent, string sectionName, ShowcaseValidationReport report)
+        internal static void ValidateHubSceneLayout(ShowcaseValidationReport report)
         {
-            Transform section = FindDeep(parent, sectionName);
-            if (section == null)
+            Scene existingScene = SceneManager.GetSceneByPath(ShowcaseScenePath);
+            bool wasLoaded = existingScene.IsValid() && existingScene.isLoaded;
+            Scene scene = wasLoaded
+                ? existingScene
+                : EditorSceneManager.OpenScene(ShowcaseScenePath, OpenSceneMode.Additive);
+
+            try
             {
-                report.AddError($"DescriptionPanel is missing required section '{sectionName}'.", parent as UnityEngine.Object);
+                GameObject hubInstance = FindSceneHubRoot(scene);
+                ValidateHubSceneInstanceLayout(hubInstance, report);
+            }
+            finally
+            {
+                if (!wasLoaded && scene.IsValid() && scene.isLoaded)
+                    EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        internal static void ValidateHubSceneInstanceLayout(GameObject hubInstance, ShowcaseValidationReport report)
+        {
+            if (hubInstance == null)
+            {
+                report.AddError($"Could not find scene instance '{HubRootName}' in '{ShowcaseScenePath}'.", null);
                 return;
             }
 
-            if (FindDeep(section, "Text - Header") == null)
-                report.AddError($"DescriptionPanel section '{sectionName}' is missing 'Text - Header'.", section as UnityEngine.Object);
+            ValidateTransformIsIdentity(
+                hubInstance.transform,
+                $"Scene hub '{HubRootName}' must stay at the world origin",
+                report);
 
-            if (FindDeep(section, "Text - Description") == null)
-                report.AddError($"DescriptionPanel section '{sectionName}' is missing 'Text - Description'.", section as UnityEngine.Object);
+            Transform moduleRoot = FindDeep(hubInstance.transform, "ModuleRoot");
+            if (moduleRoot == null)
+            {
+                report.AddError("Scene hub instance is missing ModuleRoot.", hubInstance);
+                return;
+            }
+
+            ValidateTransformIsIdentity(
+                moduleRoot,
+                "Scene ModuleRoot must stay aligned with the hub origin",
+                report);
         }
 
         private static bool HasSerializedPresetLabels(VariantDefinitionSO variant, ShowcaseLanguage language)
@@ -667,6 +700,56 @@ namespace LearningArchitect.EditorTools
             }
 
             return null;
+        }
+
+        private static GameObject FindSceneHubRoot(Scene scene)
+        {
+            if (!scene.IsValid() || !scene.isLoaded)
+                return null;
+
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                GameObject root = roots[i];
+                if (root != null && root.name == HubRootName)
+                    return root;
+            }
+
+            return null;
+        }
+
+        private static void ValidateTransformIsIdentity(Transform target, string label, ShowcaseValidationReport report)
+        {
+            if (target == null)
+                return;
+
+            if (!Approximately(target.localPosition, Vector3.zero))
+            {
+                report.AddError(
+                    $"{label}: localPosition must be (0, 0, 0), but was {target.localPosition}.",
+                    target);
+            }
+
+            if (!Approximately(target.localEulerAngles, Vector3.zero))
+            {
+                report.AddError(
+                    $"{label}: localRotation must be (0, 0, 0), but was {target.localEulerAngles}.",
+                    target);
+            }
+
+            if (!Approximately(target.localScale, Vector3.one))
+            {
+                report.AddError(
+                    $"{label}: localScale must be (1, 1, 1), but was {target.localScale}.",
+                    target);
+            }
+        }
+
+        private static bool Approximately(Vector3 left, Vector3 right)
+        {
+            return Mathf.Abs(left.x - right.x) <= TransformTolerance &&
+                   Mathf.Abs(left.y - right.y) <= TransformTolerance &&
+                   Mathf.Abs(left.z - right.z) <= TransformTolerance;
         }
 
         private static T[] LoadAssets<T>()

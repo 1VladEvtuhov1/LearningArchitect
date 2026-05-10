@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LearningArchitect | Interactive Architecture Showcase</title>
-  <meta name="description" content="LearningArchitect is a Unity-based architecture showcase for comparing runtime strategies, stress presets, and implementation trade-offs in one shared interactive shell.">
+  <title>LearningArchitect | Architecture Review In The Browser</title>
+  <meta name="description" content="LearningArchitect is a browser-based Unity showcase for discussing runtime architecture, stress scaling, and implementation trade-offs in one guided review flow.">
   <meta name="theme-color" content="#0a0d14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,61 +23,105 @@
       <div class="topbar-actions">
         <a class="topbar-source-link" href="#" id="topbar-source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
         <div class="lang-toggle" aria-label="Language switcher">
-          <button class="lang-toggle-button is-active" id="lang-en" type="button" aria-pressed="true">EN</button>
-          <button class="lang-toggle-button" id="lang-ru" type="button" aria-pressed="false">RU</button>
+          <button class="lang-toggle-button is-active" id="lang-en" type="button" aria-pressed="true" onclick="window.LearningArchitectSiteSetLanguage && window.LearningArchitectSiteSetLanguage('en'); return false;">EN</button>
+          <button class="lang-toggle-button" id="lang-ru" type="button" aria-pressed="false" onclick="window.LearningArchitectSiteSetLanguage && window.LearningArchitectSiteSetLanguage('ru'); return false;">RU</button>
         </div>
       </div>
     </nav>
 
     <header class="hero">
-      <p class="eyebrow" id="hero-eyebrow">Interactive Unity Architecture Showcase</p>
-      <h1 id="hero-title">Trade&#8209;offs in one browser demo.</h1>
-      <p class="hero-summary" id="hero-summary">Launch WebGL and compare decisions on one page.</p>
-      <div class="hero-buttons">
-        <a class="button button-primary" href="#interactive-demo" id="jump-to-demo">Launch Demo</a>
-        <a class="button button-secondary" href="#" id="source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
-        <a class="button button-ghost" href="#architecture-notes" id="cta-architecture">Architecture Notes</a>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow" id="hero-eyebrow">Unity architecture review in the browser</p>
+          <h1 id="hero-title">Talk through trade&#8209;offs in one browser session.</h1>
+          <p class="hero-summary" id="hero-summary">Set the context, open the demo, and compare implementation choices without leaving the page.</p>
+          <div class="hero-buttons">
+            <a class="button button-primary" href="#interactive-demo" id="jump-to-demo">Launch Demo</a>
+            <a class="button button-secondary" href="#" id="source-link" rel="noreferrer" target="_blank">Source on GitHub</a>
+            <a class="button button-ghost" href="#architecture-notes" id="cta-architecture">Architecture Notes</a>
+          </div>
+        </div>
+
+        <aside class="hero-proof">
+          <p class="brief-label" id="hero-panel-label">Why this works in interviews</p>
+          <div class="hero-proof-copy">
+            <p id="hero-point-1">The reviewer gets the framing before the Unity loader takes over.</p>
+            <p id="hero-point-2">The same shell keeps module and stress comparisons consistent.</p>
+            <p id="hero-point-3">Architecture notes and source stay one click away during the walkthrough.</p>
+          </div>
+          <dl class="hero-stats" aria-label="Showcase facts">
+            <div class="hero-stat">
+              <dt id="stat-modules">Modules</dt>
+              <dd>7</dd>
+            </div>
+            <div class="hero-stat">
+              <dt id="stat-variants">Variants</dt>
+              <dd>15</dd>
+            </div>
+            <div class="hero-stat">
+              <dt id="stat-runtime">Shared Runtime</dt>
+              <dd>1</dd>
+            </div>
+            <div class="hero-stat">
+              <dt id="stat-languages">Languages</dt>
+              <dd>2</dd>
+            </div>
+          </dl>
+        </aside>
       </div>
     </header>
 
     <main class="main-grid demo-section" id="interactive-demo">
       <aside class="sidebar demo-console">
-        <h2 id="section-demo-title">Read the context, then launch.</h2>
-        <p class="sidebar-copy" id="section-demo-copy">The page stages WebGL delivery in the background. Unity starts only when you choose to launch.</p>
+        <h2 id="section-demo-title">Read first. Launch when it helps.</h2>
+        <p class="sidebar-copy" id="section-demo-copy">The page gets the demo ready in the background. Unity opens only when you want to show it.</p>
 
         <div class="status-strip" aria-live="polite">
-          <span class="status-pill" id="preload-pill">Preload idle</span>
-          <span class="status-copy" id="preload-copy">Core demo delivery will start staging in the background while you read.</span>
+          <span class="status-pill" id="preload-pill">Demo not available</span>
+          <span class="status-copy" id="preload-copy">The demo is not available on this page yet, but the rest of the walkthrough is ready to read.</span>
         </div>
 
         <div class="sidebar-actions demo-actions">
           <button class="button button-primary" id="launch-demo" type="button">Launch Demo</button>
-          <button class="button button-accent" id="toggle-fullscreen" type="button">Open Fullscreen</button>
+          <button class="button button-accent" id="toggle-presentation" type="button">Presentation View</button>
           <a class="button button-secondary" href="#architecture-notes" id="cta-read-notes">Read Architecture Notes</a>
         </div>
 
+        <section class="quality-panel" aria-labelledby="demo-quality-label">
+          <div class="quality-panel-topline">
+            <span class="demo-console-label" id="demo-quality-label">Demo quality</span>
+            <p class="quality-panel-copy" id="demo-quality-copy">Sharper modes increase internal canvas resolution and can cost FPS.</p>
+          </div>
+          <div class="quality-toggle" id="quality-toggle" role="group" aria-labelledby="demo-quality-label">
+            <button class="quality-toggle-button" id="quality-performance" type="button" data-quality-mode="performance">Performance</button>
+            <button class="quality-toggle-button" id="quality-balanced" type="button" data-quality-mode="balanced">Balanced</button>
+            <button class="quality-toggle-button" id="quality-quality" type="button" data-quality-mode="quality">Quality</button>
+          </div>
+          <p class="quality-panel-note" id="demo-quality-note">Pick the launch profile before opening the demo.</p>
+        </section>
+
         <div class="demo-console-topline">
-          <span class="demo-console-label" id="demo-console-label">WebGL Host State</span>
-          <span class="demo-console-stage" id="demo-stage">Waiting for configuration</span>
+          <span class="demo-console-label" id="demo-console-label">Demo status</span>
+          <span class="demo-console-stage" id="demo-stage">Demo not available</span>
         </div>
 
         <div class="demo-progress" aria-hidden="true">
           <div class="demo-progress-bar" id="demo-progress-bar"></div>
         </div>
 
-        <p class="demo-supporting" id="demo-supporting">The host shell is ready. Drop a Unity WebGL export into <code>Site/webgl/Build</code>, run <code>prepare-webgl-site.ps1</code>, and this section can preload and launch the runtime from the same page.</p>
+        <p class="demo-supporting" id="demo-supporting">The interactive demo is not available in this version of the page. You can still read the architecture notes and browse the modules below.</p>
 
         <div class="demo-notes">
-          <p id="demo-note-1"><strong>Review mode:</strong> keep scrolling and reading while the page stages the loader and build URLs.</p>
-          <p id="demo-note-2"><strong>Interview mode:</strong> jump back here and launch the runtime once the reviewer has context.</p>
+          <p id="demo-note-1"><strong>Review mode:</strong> keep reading while the page gets the demo ready in the background.</p>
+          <p id="demo-note-2"><strong>Interview mode:</strong> come back here and open the runtime once the reviewer has enough context.</p>
         </div>
       </aside>
 
       <section class="content">
         <div class="content-heading">
           <p class="eyebrow" id="section-demo-eyebrow">Interactive Demo</p>
-          <h2 id="poster-title">Launch the showcase shell here.</h2>
-          <p class="content-copy" id="demo-inline-copy">Runtime, modules, stress presets, and notes stay on one page.</p>
+          <h2 id="poster-title">Open the demo here.</h2>
+          <p class="content-copy" id="demo-inline-copy">The demo stays beside the notes and module guide.</p>
         </div>
 
         <article class="demo-host">
@@ -85,7 +129,7 @@
             <div class="demo-poster" id="demo-poster">
               <div class="poster-copy">
                 <p class="poster-label" id="poster-label">Embedded Unity Runtime</p>
-                <p id="poster-status">No WebGL build is connected yet. The presentation shell is ready; add the export and generate <code>webgl/build-manifest.json</code>.</p>
+                <p id="poster-status">The interactive demo is not available in this version of the page.</p>
               </div>
 
               <div class="poster-gallery">
@@ -100,8 +144,9 @@
 
         <div class="live-status">
           <div><span class="dot dot-orange"></span><span id="hero-chip-1">7 modules</span></div>
+          <div><span class="dot dot-violet"></span><span id="hero-chip-2">15 variants</span></div>
           <div><span class="dot dot-teal"></span><span id="hero-chip-3">Shared stress presets</span></div>
-          <div><span class="dot dot-blue"></span><span id="hero-chip-4">WebGL portfolio shell</span></div>
+          <div><span class="dot dot-blue"></span><span id="hero-chip-4">WebGL review flow</span></div>
         </div>
       </section>
     </main>
@@ -109,8 +154,8 @@
     <section class="modules" id="module-explorer">
       <div class="section-heading">
         <p class="eyebrow" id="section-modules-eyebrow">Module Explorer</p>
-        <h2 id="section-modules-title">Pick a strong example before the live client.</h2>
-        <p id="section-modules-copy">Use one module as the entry point, then switch variants and presets in the runtime.</p>
+        <h2 id="section-modules-title">Pick the best entry point before you open the demo.</h2>
+        <p id="section-modules-copy">Start with one module, then switch variants and presets inside the shared runtime.</p>
       </div>
 
       <div class="module-layout">
@@ -119,9 +164,9 @@
         <article class="module-detail">
           <div class="module-detail-copy">
             <div class="module-detail-header">
-              <p class="detail-kicker" id="module-category">Architecture Pattern Module</p>
+              <p class="detail-kicker" id="module-category">Architecture Pattern</p>
               <h3 id="module-title">Update Loop Strategies</h3>
-              <p id="module-summary">Compare per-object callbacks against a centralized owner loop under the same hub and stress shell.</p>
+              <p id="module-summary">Compare per-object Update with one owner loop under the same stress presets.</p>
             </div>
 
             <dl class="detail-grid">
@@ -131,22 +176,22 @@
               </div>
               <div>
                 <dt id="module-label-focus">Focus</dt>
-                <dd id="module-focus">Callback ownership and scaling pressure.</dd>
+                <dd id="module-focus">Update ownership, callback volume, and scene noise at scale.</dd>
               </div>
               <div>
                 <dt id="module-label-try">What To Try</dt>
-                <dd id="module-try">Switch variants, raise the stress preset, and compare how quickly the explanation maps to the visible behavior.</dd>
+                <dd id="module-try">Switch variants, raise stress, and watch when the code model stops matching runtime cost.</dd>
               </div>
               <div>
                 <dt id="module-label-signal">Architecture Signal</dt>
-                <dd id="module-signal">The module shows when a friendly object-per-object mental model stops being the right scaling baseline.</dd>
+                <dd id="module-signal">Shows when MonoBehaviour-per-object stops scaling well.</dd>
               </div>
             </dl>
           </div>
 
           <figure class="module-preview">
             <img id="module-image" src="./assets/images/module-preview-a.png" alt="Preview of the LearningArchitect showcase UI and runtime scene.">
-            <figcaption id="module-caption">A browser reviewer can inspect architecture notes while the shared shell keeps module controls consistent.</figcaption>
+            <figcaption id="module-caption">The comparison stays steady while update ownership moves into one coordinator.</figcaption>
           </figure>
         </article>
       </div>
@@ -155,8 +200,8 @@
     <section class="architecture" id="architecture-notes">
       <div class="section-heading">
         <p class="eyebrow" id="section-architecture-eyebrow">Architecture Notes</p>
-        <h2 id="section-architecture-title">One shell, swappable variants, shared stress and metrics.</h2>
-        <p id="section-architecture-copy">Enough context for a reviewer to understand the structure before opening the repository.</p>
+        <h2 id="section-architecture-title">One shell. Different variants. Shared stress and metrics.</h2>
+        <p id="section-architecture-copy">Enough structure to understand the system before opening the repository.</p>
       </div>
 
       <div class="architecture-grid">
@@ -190,10 +235,45 @@
           <p id="brief-review-copy">The value is not another Unity scene. The value is one disciplined runtime shell for comparing multiple implementation paths under the same rules.</p>
         </section>
       </div>
+
+      <div class="review-flow">
+        <div class="review-flow-header">
+          <p class="eyebrow" id="section-review-eyebrow">Suggested Review Flow</p>
+          <h3 id="section-review-title">A simple path through the demo.</h3>
+          <p id="section-review-copy">This gives the interviewer a clear first click instead of making them guess how the page should be read.</p>
+        </div>
+
+        <div class="review-flow-grid">
+          <article class="review-step-card">
+            <p class="detail-kicker">01</p>
+            <h3 id="review-step-1-title">Pick a module family</h3>
+            <p id="review-step-1-copy">Start with `Update Loop`, `Pooling`, or `AI`, depending on whether you want to lead with a pattern or a domain problem.</p>
+          </article>
+          <article class="review-step-card">
+            <p class="detail-kicker">02</p>
+            <h3 id="review-step-2-title">Switch variants</h3>
+            <p id="review-step-2-copy">Use the shared controls to compare how different implementation styles behave under the same conditions.</p>
+          </article>
+          <article class="review-step-card">
+            <p class="detail-kicker">03</p>
+            <h3 id="review-step-3-title">Raise the stress preset</h3>
+            <p id="review-step-3-copy">Raise the preset in steady steps and watch when ownership, layout, batching, or callback volume starts to matter.</p>
+          </article>
+          <article class="review-step-card">
+            <p class="detail-kicker">04</p>
+            <h3 id="review-step-4-title">Connect behavior to notes</h3>
+            <p id="review-step-4-copy">Keep the architecture notes beside the runtime so the difference is explained, not just shown.</p>
+          </article>
+          <article class="integrity-card">
+            <p class="brief-label" id="integrity-label">Browser Metrics Note</p>
+            <p id="integrity-copy">The live runtime is real. Some browser-facing comparisons may use curated reference metrics so architectural deltas stay readable across machines. Treat the page as an architecture review surface, not a lab-grade benchmark.</p>
+          </article>
+        </div>
+      </div>
     </section>
 
     <footer class="footer">
-      <p class="footer-copy" id="footer-copy">Unity runtime for explaining architecture trade&#8209;offs in one browser-friendly shell.</p>
+      <p class="footer-copy" id="footer-copy">A browser-friendly Unity runtime for explaining architecture trade&#8209;offs.</p>
       <div class="footer-links">
         <a href="#top" id="footer-top">Back to top</a>
         <a href="#architecture-notes" id="footer-architecture">Architecture Notes</a>

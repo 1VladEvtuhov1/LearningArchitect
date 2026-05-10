@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using LearningArchitect.Core;
 using LearningArchitect.UI;
@@ -16,7 +15,7 @@ namespace LearningArchitect.Tests.UI
         private const BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 
         [Test]
-        public void OverviewTab_CreatesSixVisibleSections_WhenOptionalContentExists()
+        public void OverviewTab_RendersExpectedSections_InLegacyViewport()
         {
             ModuleDefinitionSO module = null;
             VariantDefinitionSO variant = null;
@@ -24,30 +23,28 @@ namespace LearningArchitect.Tests.UI
 
             try
             {
-                module = CreateModule(
-                    "ModuleAlpha",
-                    description: "Module description",
-                    problem: "Problem statement",
-                    webGlPreset: "WebGL note");
-                variant = CreateVariant(
-                    "VariantAlpha",
-                    compare: "Compare summary",
-                    takeaway: "Key takeaway");
+                module = CreateModule("ModuleAlpha", "Module description", "Problem statement", "WebGL note");
+                variant = CreateVariant("VariantAlpha", compare: "Compare summary", takeaway: "Key takeaway");
                 harness = DescriptionPanelHarness.Create();
 
                 harness.Panel.SetContent(module, variant);
+                string body = harness.GetRenderedBody();
 
-                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
-
-                Assert.AreEqual(6, visibleSections.Count);
-                Assert.AreEqual(ShowcaseLocalization.GetText("about"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[2].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("compare"), visibleSections[3].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("takeaway"), visibleSections[4].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("webgl_preset"), visibleSections[5].Header);
-                Assert.AreEqual("WebGL note", visibleSections[5].Body);
-                Assert.IsTrue(harness.HasRuntimeSectionClone());
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("about")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("module_type")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("problem")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("compare")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("takeaway")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("webgl_preset")));
+                Assert.That(body, Does.Contain("WebGL note"));
+                AssertSectionOrder(
+                    body,
+                    ShowcaseLocalization.GetText("about"),
+                    ShowcaseLocalization.GetText("module_type"),
+                    ShowcaseLocalization.GetText("problem"),
+                    ShowcaseLocalization.GetText("compare"),
+                    ShowcaseLocalization.GetText("takeaway"),
+                    ShowcaseLocalization.GetText("webgl_preset"));
             }
             finally
             {
@@ -66,35 +63,24 @@ namespace LearningArchitect.Tests.UI
 
             try
             {
-                module = CreateModule(
-                    "ModuleBeta",
-                    description: "Module description",
-                    problem: "Architecture problem",
-                    webGlPreset: string.Empty);
-                variant = CreateVariant(
-                    "VariantBeta",
-                    architecture: "Architecture notes",
-                    compare: string.Empty,
-                    takeaway: string.Empty,
-                    pros: string.Empty);
+                module = CreateModule("ModuleBeta", "Module description", "Architecture problem", string.Empty);
+                variant = CreateVariant("VariantBeta", architecture: "Architecture notes", compare: string.Empty, takeaway: string.Empty, pros: string.Empty);
                 harness = DescriptionPanelHarness.Create();
 
                 harness.Panel.SetContent(module, variant);
                 harness.Panel.SetTab(1);
+                string body = harness.GetRenderedBody();
 
-                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
-
-                Assert.AreEqual(4, visibleSections.Count);
-                Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("core_idea"), visibleSections[2].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("watch_out"), visibleSections[3].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("no_constraints"), visibleSections[3].Body);
-                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("strengths")));
-                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("data_flow")));
-                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("runtime_lifecycle")));
-                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("why_this_approach")));
-                Assert.IsFalse(harness.HasVisibleSection(ShowcaseLocalization.GetText("takeaway")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("module_type")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("problem")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("core_idea")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("watch_out")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("no_constraints")));
+                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("strengths")));
+                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("data_flow")));
+                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("runtime_lifecycle")));
+                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("why_this_approach")));
+                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("takeaway")));
             }
             finally
             {
@@ -105,7 +91,7 @@ namespace LearningArchitect.Tests.UI
         }
 
         [Test]
-        public void ArchitectureTab_ShowsStructuredArchitectureSections_WhenVariantProvidesThem()
+        public void ArchitectureTab_RendersStructuredSections_WhenVariantProvidesThem()
         {
             ModuleDefinitionSO module = null;
             VariantDefinitionSO variant = null;
@@ -113,11 +99,7 @@ namespace LearningArchitect.Tests.UI
 
             try
             {
-                module = CreateModule(
-                    "ModuleStructured",
-                    description: "Module description",
-                    problem: "Scale update cost across thousands of entities",
-                    webGlPreset: string.Empty);
+                module = CreateModule("ModuleStructured", "Module description", "Scale update cost across thousands of entities", string.Empty);
                 variant = CreateVariant(
                     "VariantStructured",
                     architecture: "A central coordinator owns update ordering and shared state.",
@@ -131,19 +113,19 @@ namespace LearningArchitect.Tests.UI
 
                 harness.Panel.SetContent(module, variant);
                 harness.Panel.SetTab(1);
+                string body = harness.GetRenderedBody();
 
-                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
-
-                Assert.AreEqual(9, visibleSections.Count);
-                Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("core_idea"), visibleSections[2].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("data_flow"), visibleSections[3].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("runtime_lifecycle"), visibleSections[4].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("why_this_approach"), visibleSections[5].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("strengths"), visibleSections[6].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("watch_out"), visibleSections[7].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("takeaway"), visibleSections[8].Header);
+                AssertSectionOrder(
+                    body,
+                    ShowcaseLocalization.GetText("module_type"),
+                    ShowcaseLocalization.GetText("problem"),
+                    ShowcaseLocalization.GetText("core_idea"),
+                    ShowcaseLocalization.GetText("data_flow"),
+                    ShowcaseLocalization.GetText("runtime_lifecycle"),
+                    ShowcaseLocalization.GetText("why_this_approach"),
+                    ShowcaseLocalization.GetText("strengths"),
+                    ShowcaseLocalization.GetText("watch_out"),
+                    ShowcaseLocalization.GetText("takeaway"));
             }
             finally
             {
@@ -162,31 +144,18 @@ namespace LearningArchitect.Tests.UI
 
             try
             {
-                module = CreateModule(
-                    "ModuleGamma",
-                    description: "Module description",
-                    problem: "Problem statement",
-                    webGlPreset: string.Empty);
-                variant = CreateVariant(
-                    "VariantGamma",
-                    compare: "Compare summary",
-                    tradeOffs: "Trade-off summary",
-                    pros: "- Fast\n- Stable",
-                    cons: "* Complex");
+                module = CreateModule("ModuleGamma", "Module description", "Problem statement", string.Empty);
+                variant = CreateVariant("VariantGamma", compare: "Compare summary", tradeOffs: "Trade-off summary", pros: "- Fast\n- Stable", cons: "* Complex");
                 harness = DescriptionPanelHarness.Create();
 
                 harness.Panel.SetContent(module, variant);
                 harness.Panel.SetTab(2);
+                string body = harness.GetRenderedBody();
 
-                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
-
-                Assert.AreEqual(4, visibleSections.Count);
-                Assert.AreEqual(ShowcaseLocalization.GetText("compare"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("trade_offs"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("pros"), visibleSections[2].Header);
-                Assert.AreEqual("<color=#22C55E>\u2022</color> Fast\n<color=#22C55E>\u2022</color> Stable", visibleSections[2].Body);
-                Assert.AreEqual(ShowcaseLocalization.GetText("cons"), visibleSections[3].Header);
-                Assert.AreEqual("<color=#EF4444>\u2022</color> Complex", visibleSections[3].Body);
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("compare")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("trade_offs")));
+                Assert.That(body, Does.Contain("<color=#22C55E>•</color> Fast\n<color=#22C55E>•</color> Stable"));
+                Assert.That(body, Does.Contain("<color=#EF4444>•</color> Complex"));
             }
             finally
             {
@@ -197,41 +166,34 @@ namespace LearningArchitect.Tests.UI
         }
 
         [Test]
-        public void LegacyTabContainerStructure_StillInitializesAndBuildsCompositeContent()
+        public void NoVariant_RendersFallbackOverview()
         {
-            ModuleDefinitionSO module = null;
-            VariantDefinitionSO variant = null;
             DescriptionPanelHarness harness = null;
 
             try
             {
-                module = CreateModule(
-                    "ModuleLegacy",
-                    description: "Legacy module description",
-                    problem: "Legacy problem",
-                    webGlPreset: string.Empty);
-                variant = CreateVariant(
-                    "VariantLegacy",
-                    compare: "Legacy compare",
-                    takeaway: "Legacy takeaway");
-                harness = DescriptionPanelHarness.Create(useLegacyTabs: true);
+                harness = DescriptionPanelHarness.Create();
+                harness.Panel.SetContent(null, null);
 
-                harness.Panel.SetContent(module, variant);
-
-                List<SectionSnapshot> visibleSections = harness.GetVisibleSections();
-
-                Assert.AreEqual(5, visibleSections.Count);
-                Assert.AreEqual(ShowcaseLocalization.GetText("about"), visibleSections[0].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("module_type"), visibleSections[1].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("problem"), visibleSections[2].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("compare"), visibleSections[3].Header);
-                Assert.AreEqual(ShowcaseLocalization.GetText("takeaway"), visibleSections[4].Header);
+                string body = harness.GetRenderedBody();
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("overview")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("no_variant")));
             }
             finally
             {
                 harness?.Dispose();
-                DestroyImmediateSafe(module);
-                DestroyImmediateSafe(variant);
+            }
+        }
+
+        private static void AssertSectionOrder(string body, params string[] headers)
+        {
+            int previousIndex = -1;
+            for (int i = 0; i < headers.Length; i++)
+            {
+                int currentIndex = body.IndexOf(headers[i], StringComparison.Ordinal);
+                Assert.That(currentIndex, Is.GreaterThanOrEqualTo(0), $"Expected body to contain section '{headers[i]}'.");
+                Assert.That(currentIndex, Is.GreaterThan(previousIndex), $"Section '{headers[i]}' should appear after the previous section.");
+                previousIndex = currentIndex;
             }
         }
 
@@ -289,62 +251,46 @@ namespace LearningArchitect.Tests.UI
                 UnityEngine.Object.DestroyImmediate(target);
         }
 
-        private readonly struct SectionSnapshot
-        {
-            public SectionSnapshot(string name, string header, string body)
-            {
-                Name = name;
-                Header = header;
-                Body = body;
-            }
-
-            public string Name { get; }
-            public string Header { get; }
-            public string Body { get; }
-        }
-
         private sealed class DescriptionPanelHarness
         {
             private readonly GameObject root;
-            private readonly RectTransform viewport;
-            private readonly List<GameObject> sectionRoots = new();
+            private readonly TextMeshProUGUI descriptionText;
 
-            private DescriptionPanelHarness(GameObject root, DescriptionPanel panel, RectTransform viewport)
+            private DescriptionPanelHarness(GameObject root, DescriptionPanel panel, TextMeshProUGUI descriptionText)
             {
                 this.root = root;
                 Panel = panel;
-                this.viewport = viewport;
+                this.descriptionText = descriptionText;
             }
 
             public DescriptionPanel Panel { get; }
 
-            public static DescriptionPanelHarness Create(bool useLegacyTabs = false)
+            public static DescriptionPanelHarness Create()
             {
                 GameObject canvasRoot = new("DescriptionPanel Test Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
                 Canvas canvas = canvasRoot.GetComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
-                GameObject scrollObject = new("DescriptionScroll", typeof(RectTransform), typeof(Image), typeof(ScrollRect), typeof(DescriptionPanel));
-                scrollObject.transform.SetParent(canvasRoot.transform, false);
+                GameObject panelHost = new("DescriptionPanel Host", typeof(RectTransform), typeof(DescriptionPanel));
+                panelHost.transform.SetParent(canvasRoot.transform, false);
+
+                GameObject scrollObject = new("DescriptionScroll", typeof(RectTransform), typeof(Image), typeof(ScrollRect));
+                scrollObject.transform.SetParent(panelHost.transform, false);
                 RectTransform scrollRectTransform = scrollObject.GetComponent<RectTransform>();
                 scrollRectTransform.sizeDelta = new Vector2(620f, 900f);
 
                 ScrollRect scrollRect = scrollObject.GetComponent<ScrollRect>();
-                DescriptionPanel panel = scrollObject.GetComponent<DescriptionPanel>();
+                DescriptionPanel panel = panelHost.GetComponent<DescriptionPanel>();
 
-                string tabsRootName = useLegacyTabs ? "Container - DescriptionCharacters" : "TabsBar";
-                RectTransform tabsBar = CreateRect(tabsRootName, scrollObject.transform, new Vector2(620f, 90f));
+                RectTransform tabsBar = CreateRect("Container - DescriptionCharacters", scrollObject.transform, new Vector2(620f, 90f));
                 tabsBar.anchorMin = new Vector2(0f, 1f);
                 tabsBar.anchorMax = new Vector2(1f, 1f);
                 tabsBar.pivot = new Vector2(0.5f, 1f);
                 tabsBar.anchoredPosition = Vector2.zero;
 
-                string firstTabName = useLegacyTabs ? "Text - CharacterName" : "Tab_0";
-                string secondTabName = useLegacyTabs ? "Text - CharacterName" : "Tab_1";
-                string thirdTabName = useLegacyTabs ? "Text - CharacterName" : "Tab_2";
-                CreateLabel(firstTabName, tabsBar, "Overview");
-                CreateLabel(secondTabName, tabsBar, "Architecture");
-                CreateLabel(thirdTabName, tabsBar, "Trade-offs");
+                CreateLabel("Text - CharacterName", tabsBar, "Overview");
+                CreateLabel("Text - CharacterName", tabsBar, "Architecture");
+                CreateLabel("Text - CharacterName", tabsBar, "Trade-offs");
                 RectTransform underline = CreateRect("ActiveTabUnderline", tabsBar, new Vector2(120f, 4f));
                 underline.anchorMin = new Vector2(0f, 0f);
                 underline.anchorMax = new Vector2(0f, 0f);
@@ -357,95 +303,32 @@ namespace LearningArchitect.Tests.UI
                 viewport.gameObject.AddComponent<Image>();
                 viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
-                DescriptionPanelHarness harness = new(canvasRoot, panel, viewport);
-                harness.BuildCompositeSections();
+                TextMeshProUGUI descriptionText = CreateLabel("DescriptionText", viewport, string.Empty, 20f);
+                descriptionText.rectTransform.anchorMin = new Vector2(0f, 1f);
+                descriptionText.rectTransform.anchorMax = new Vector2(1f, 1f);
+                descriptionText.rectTransform.pivot = new Vector2(0.5f, 1f);
+                descriptionText.rectTransform.offsetMin = new Vector2(16f, 0f);
+                descriptionText.rectTransform.offsetMax = new Vector2(-16f, 0f);
+                descriptionText.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
                 scrollRect.viewport = viewport;
+                scrollRect.content = descriptionText.rectTransform;
                 panel.ScrollRect = scrollRect;
 
                 canvasRoot.SetActive(true);
                 Canvas.ForceUpdateCanvases();
-                return harness;
+                return new DescriptionPanelHarness(canvasRoot, panel, descriptionText);
             }
 
-            public List<SectionSnapshot> GetVisibleSections()
+            public string GetRenderedBody()
             {
                 Canvas.ForceUpdateCanvases();
-
-                RectTransform contentRoot = viewport.Find("ContentRoot") as RectTransform;
-                List<SectionSnapshot> snapshots = new();
-                if (contentRoot == null)
-                    return snapshots;
-
-                for (int i = 0; i < contentRoot.childCount; i++)
-                {
-                    Transform child = contentRoot.GetChild(i);
-                    if (!child.gameObject.activeSelf)
-                        continue;
-
-                    TextMeshProUGUI header = FindDeep(child, "Text - Header")?.GetComponent<TextMeshProUGUI>();
-                    TextMeshProUGUI body = FindDeep(child, "Text - Description")?.GetComponent<TextMeshProUGUI>();
-                    if (header == null || body == null)
-                        continue;
-
-                    snapshots.Add(new SectionSnapshot(child.name, header.text, body.text));
-                }
-
-                return snapshots;
-            }
-
-            public bool HasRuntimeSectionClone()
-            {
-                RectTransform contentRoot = viewport.Find("ContentRoot") as RectTransform;
-                if (contentRoot == null)
-                    return false;
-
-                for (int i = 0; i < contentRoot.childCount; i++)
-                {
-                    if (contentRoot.GetChild(i).name.StartsWith("RuntimeSection_", StringComparison.Ordinal))
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool HasVisibleSection(string header)
-            {
-                List<SectionSnapshot> sections = GetVisibleSections();
-                for (int i = 0; i < sections.Count; i++)
-                {
-                    if (sections[i].Header == header)
-                        return true;
-                }
-
-                return false;
+                return descriptionText.text;
             }
 
             public void Dispose()
             {
                 UnityEngine.Object.DestroyImmediate(root);
-            }
-
-            private void BuildCompositeSections()
-            {
-                sectionRoots.Add(CreateSection("Container - AboutInfo", viewport));
-                sectionRoots.Add(CreateSection("Container - ArchitectureInfo", viewport));
-                sectionRoots.Add(CreateSection("Container - Trade-OffsInfo", viewport));
-
-                RectTransform prosConsRoot = CreateRect("Container - ProsCons", viewport, new Vector2(620f, 240f));
-                sectionRoots.Add(CreateSection("Container - Pros", prosConsRoot));
-                sectionRoots.Add(CreateSection("Container - Cons", prosConsRoot));
-            }
-
-            private static GameObject CreateSection(string sectionName, Transform parent)
-            {
-                RectTransform root = CreateRect(sectionName, parent, new Vector2(620f, 160f));
-                root.gameObject.AddComponent<Image>();
-                root.gameObject.AddComponent<LayoutElement>();
-                CreateLabel("Text - Header", root, sectionName + " Header", 24f);
-                TextMeshProUGUI body = CreateLabel("Text - Description", root, sectionName + " Body", 20f);
-                body.richText = true;
-                return root.gameObject;
             }
 
             private static RectTransform CreateRect(string name, Transform parent, Vector2 size)
@@ -454,9 +337,6 @@ namespace LearningArchitect.Tests.UI
                 node.transform.SetParent(parent, false);
                 RectTransform rect = node.GetComponent<RectTransform>();
                 rect.sizeDelta = size;
-                rect.anchorMin = new Vector2(0f, 1f);
-                rect.anchorMax = new Vector2(1f, 1f);
-                rect.pivot = new Vector2(0.5f, 1f);
                 return rect;
             }
 
@@ -478,24 +358,6 @@ namespace LearningArchitect.Tests.UI
                     label.font = TMP_Settings.defaultFontAsset;
 
                 return label;
-            }
-
-            private static Transform FindDeep(Transform root, string name)
-            {
-                if (root == null)
-                    return null;
-
-                if (root.name == name)
-                    return root;
-
-                for (int i = 0; i < root.childCount; i++)
-                {
-                    Transform match = FindDeep(root.GetChild(i), name);
-                    if (match != null)
-                        return match;
-                }
-
-                return null;
             }
         }
     }

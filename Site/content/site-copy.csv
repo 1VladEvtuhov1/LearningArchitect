@@ -1,0 +1,243 @@
+scope,key,shared,en,ru
+site,site.sections.demoPresentationEnter,,Presentation View,Режим показа
+site,site.sections.demoPresentationExit,,Exit Presentation View,Выйти из режима показа
+site,site.sections.demoQualityLabel,,Demo quality,Режим качества
+site,site.sections.demoQualityCopy,,"Sharper modes increase internal canvas resolution and can cost FPS.","Более резкие режимы поднимают внутреннее разрешение canvas и могут снижать FPS."
+site,site.sections.demoQualityPerformance,,Performance,Быстрее
+site,site.sections.demoQualityBalanced,,Balanced,Баланс
+site,site.sections.demoQualityQuality,,Quality,Четче
+site,site.sections.demoQualityNote,,"Balanced is the safest presentation default.","Balanced — самый безопасный режим для показа."
+site,site.sections.demoQualityNoteLive,,"If the runtime is already live, reload the page after switching profiles for a clean resize.","Если runtime уже запущен, после смены профиля перезагрузи страницу для чистого ресайза."
+site,site.htmlLang,,en,ru
+site,site.title,,LearningArchitect | Architecture Review In The Browser,LearningArchitect | Интерактивный архитектурный showcase
+site,site.description,,"LearningArchitect is a browser-based Unity showcase for discussing runtime architecture, stress scaling, and implementation trade-offs in one guided review flow.","LearningArchitect — это Unity showcase для сравнения runtime-стратегий, stress preset'ов и архитектурных компромиссов в одной общей оболочке."
+site,site.nav.modules,,Modules,Модули
+site,site.nav.architecture,,Architecture Notes,Архитектура
+site,site.nav.demo,,Live Demo,Демо
+site,site.hero.eyebrow,,Unity architecture review in the browser,Интерактивный Unity Architecture Showcase
+site,site.hero.title,,Talk through trade-offs in one browser session.,Trade‑offs прямо в браузере.
+site,site.hero.summary,,"Set the context, open the demo, and compare implementation choices without leaving the page.",Запусти WebGL и сравнивай решения на одной странице.
+site,site.hero.demoCta,,Launch Demo,Запустить демо
+site,site.hero.architectureCta,,Architecture Notes,Заметки по архитектуре
+site,site.hero.sourceCta,,Source on GitHub,Исходники на GitHub
+site,site.hero.chips[0],,7 modules,7 модулей
+site,site.hero.chips[1],,15 variants,15 вариантов
+site,site.hero.chips[2],,Shared stress presets,Общие stress preset'ы
+site,site.hero.chips[3],,WebGL review flow,WebGL portfolio shell
+site,site.hero.demoBadgeLabel,,WebGL,WebGL
+site,site.hero.demoBadgeValue,,Ready,Готово
+site,site.hero.panelLabel,,Why this works in interviews,Почему это удобно для собеседований
+site,site.hero.points[0],,The reviewer gets the framing before the Unity loader takes over.,"Контекст можно прочитать до того, как Unity loader займёт экран."
+site,site.hero.points[1],,The same shell keeps module and stress comparisons consistent.,Одна и та же оболочка держит сравнение модулей и stress preset'ов единым.
+site,site.hero.points[2],,Architecture notes and source stay one click away during the walkthrough.,Архитектурные заметки и код остаются рядом во время показа.
+site,site.hero.stats.modules,,Modules,Модулей
+site,site.hero.stats.variants,,Variants,Вариантов
+site,site.hero.stats.runtime,,Shared Runtime,Общий runtime
+site,site.hero.stats.languages,,Languages,Языка
+site,site.sections.whatEyebrow,,What The Reviewer Sees,Что Это Показывает
+site,site.sections.whatTitle,,"A controlled architecture comparison, not a pile of unrelated scenes.","Сравнение архитектуры, а не набор отдельных сцен."
+site,site.sections.whatFocusLabel,,Focus here,Фокус Здесь
+site,site.sections.whatFocusCopy,,"Track what stays constant across every module: one shell, one preset flow, one comparison surface.","Здесь важно заметить, что остаётся неизменным у всех модулей: одна оболочка, один preset flow, одна поверхность сравнения."
+site,site.sections.insights[0].title,,Comparable runtime pressure,Сопоставимое давление на runtime
+site,site.sections.insights[0].copy,,"Each module goes through the same shell, stress presets, and metrics surface, so differences point back to architecture rather than presentation drift.","Каждый модуль проходит через одну и ту же оболочку, stress preset'ы и поверхность метрик, поэтому различия видны именно в архитектуре."
+site,site.sections.insights[1].title,,Pattern and domain range,Широкий охват паттернов и доменов
+site,site.sections.insights[1].copy,,"The showcase spans AI, pooling, update loops, inventory, animation, VFX delivery, and effect simulation instead of repeating one narrow optimization story.","Showcase охватывает AI, pooling, update loops, inventory, animation, VFX delivery и effect simulation вместо одной узкой истории про оптимизацию."
+site,site.sections.insights[2].title,,Data-driven authoring,Data-driven авторинг
+site,site.sections.insights[2].copy,,"Modules and variants are described through ScriptableObject assets, so the showcase grows by adding data instead of scene-specific wiring.","Модули и варианты связываются через ScriptableObject assets, поэтому проект проще расширять без scene-specific логики."
+site,site.sections.insights[3].title,,Interview-ready presentation,Упаковка под портфолио
+site,site.sections.insights[3].copy,,The browser entry page tells the reviewer what to inspect before the WebGL runtime starts.,"Стартовая страница объясняет, на что смотреть, ещё до запуска WebGL runtime."
+site,site.sections.modulesEyebrow,,Module Explorer,Обзор Модулей
+site,site.sections.modulesTitle,,Pick the best entry point before you open the demo.,Выбери сильный пример перед live-клиентом.
+site,site.sections.modulesCopy,,"Start with one module, then switch variants and presets inside the shared runtime.","Используй один модуль как точку входа, а затем переключай варианты и preset'ы уже в runtime."
+site,site.sections.modulesFocusLabel,,Focus here,Фокус Здесь
+site,site.sections.modulesFocusCopy,,Use this section to decide which module tells your engineering story most clearly before the live demo begins.,"Используй этот блок, чтобы выбрать модуль, который лучше всего рассказывает твою архитектурную историю до живого запуска."
+site,site.sections.moduleLabels.variants,,Variants,Варианты
+site,site.sections.moduleLabels.focus,,Focus,Фокус
+site,site.sections.moduleLabels.try,,What To Try,Что попробовать
+site,site.sections.moduleLabels.signal,,Architecture Signal,Архитектурный сигнал
+site,site.sections.architectureEyebrow,,Architecture Notes,Заметки По Архитектуре
+site,site.sections.architectureTitle,,One shell. Different variants. Shared stress and metrics.,"Одна оболочка, сменные варианты, общий stress и metrics."
+site,site.sections.architectureCopy,,Enough structure to understand the system before opening the repository.,"Этого достаточно, чтобы понять структуру до перехода в репозиторий."
+site,site.sections.architectureFocusLabel,,Focus here,Фокус Здесь
+site,site.sections.architectureFocusCopy,,This section explains why the shell stays stable while the modules underneath it change.,"Здесь зритель должен понять, как shell остаётся стабильным, пока сами модули меняются под ним."
+site,site.sections.stack[0].title,,Showcase Shell,Showcase Shell
+site,site.sections.stack[0].copy,,"The shell owns selection, stress state, localization, and lifecycle instead of pushing that setup into each scene.","Оболочка владеет выбором, stress state, локализацией и lifecycle, а не перекладывает это на scene-specific setup."
+site,site.sections.stack[1].title,,Presentation Shell,Presentation Shell
+site,site.sections.stack[1].copy,,UI presenters subscribe to shared state so the interface stays comparable while modules change underneath it.,"UI presenters подписываются на общий state, поэтому интерфейс остаётся сопоставимым, пока сами модули меняются под ним."
+site,site.sections.stack[2].title,,Module Layer,Module Layer
+site,site.sections.stack[2].copy,,Active variants implement the same stress and lifecycle contract while preserving their own runtime behavior.,"Активные variants реализуют один и тот же stress и lifecycle contract, но сохраняют своё runtime-поведение."
+site,site.sections.stack[3].title,,Data Layer,Data Layer
+site,site.sections.stack[3].copy,,"Module and variant definitions store presets, copy, and prefab references so new comparisons stay data-driven.","ModuleDefinition и VariantDefinition хранят presets, copy и prefab references, поэтому новые сравнения остаются data-driven."
+site,site.sections.runtimeStoryLabel,,Runtime in five steps,Runtime в пяти шагах
+site,site.sections.runtimeStory[0],,Composition root builds the coordinator.,Composition root собирает coordinator.
+site,site.sections.runtimeStory[1],,Coordinator selects the module and variant data.,Coordinator выбирает данные модуля и варианта.
+site,site.sections.runtimeStory[2],,Spawner instantiates the selected variant prefab.,Spawner инстанцирует prefab варианта.
+site,site.sections.runtimeStory[3],,Runtime host validates lifecycle and stress contracts.,Runtime host валидирует lifecycle и stress contracts.
+site,site.sections.runtimeStory[4],,"State hub publishes module, variant, stress, and metrics to the UI.","State hub публикует модуль, вариант, stress и метрики в UI."
+site,site.sections.reviewLabel,,Why this works in interviews,Почему это удобно для портфолио
+site,site.sections.reviewCopy,,The value is not another Unity scene. The value is one disciplined runtime shell for comparing multiple implementation paths under the same rules.,"Ценность не в ещё одной Unity-сцене. Ценность в одной дисциплинированной оболочке, которая сравнивает несколько путей реализации по одинаковым правилам."
+site,site.sections.reviewEyebrow,,Suggested Review Flow,Как Смотреть Демо
+site,site.sections.reviewTitle,,A simple path through the demo.,Что попробовать после запуска build'а.
+site,site.sections.reviewFocusLabel,,Focus here,Фокус Здесь
+site,site.sections.reviewFocusCopy,,This gives the interviewer a clear first click instead of making them guess how the page should be read.,"Эта последовательность показывает интервьюеру, куда кликать в первую очередь, вместо того чтобы оставлять его без сценария."
+site,site.sections.reviewSteps[0].title,,Pick a module family,Выбери семейство модулей
+site,site.sections.reviewSteps[0].copy,,"Start with `Update Loop`, `Pooling`, or `AI`, depending on whether you want to lead with a pattern or a domain problem.","Начни с `Update Loop`, `Pooling` или `AI` в зависимости от того, хочешь ли ты pattern-driven или domain-driven сравнение."
+site,site.sections.reviewSteps[1].title,,Switch variants,Переключай варианты
+site,site.sections.reviewSteps[1].copy,,Use the shared controls to compare how different implementation styles behave under the same conditions.,"Используй общий вариантный control, чтобы сравнить разные implementation styles внутри одной и той же оболочки."
+site,site.sections.reviewSteps[2].title,,Raise the stress preset,Подними stress preset
+site,site.sections.reviewSteps[2].copy,,"Raise the preset in steady steps and watch when ownership, layout, batching, or callback volume starts to matter.","Используй одинаковые preset steps, чтобы увидеть, когда ownership, layout, batching или callback volume начинают иметь значение."
+site,site.sections.reviewSteps[3].title,,Connect behavior to notes,Связывай поведение с заметками
+site,site.sections.reviewSteps[3].copy,,"Keep the architecture notes beside the runtime so the difference is explained, not just shown.","Читай архитектурные карточки рядом с runtime, чтобы система объясняла не только результат на экране, но и причину различий."
+site,site.sections.integrityLabel,,Browser Metrics Note,Заметка о browser-метриках
+site,site.sections.integrityCopy,,"The live runtime is real. Some browser-facing comparisons may use curated reference metrics so architectural deltas stay readable across machines. Treat the page as an architecture review surface, not a lab-grade benchmark.","Runtime на странице настоящий. Часть browser-facing сравнений может использовать curated reference metrics, чтобы архитектурные различия оставались читаемыми на разных машинах. Смотри на эту страницу как на поверхность для архитектурного review, а не как на лабораторный benchmark."
+site,site.sections.demoEyebrow,,Interactive Demo,Интерактивное Демо
+site,site.sections.demoTitle,,Read first. Launch when it helps.,"Прочитай контекст, затем запускай."
+site,site.sections.demoCopy,,The page gets the demo ready in the background. Unity opens only when you want to show it.,Страница заранее готовит WebGL-доставку. Unity instance создаётся только по кнопке.
+site,site.sections.demoInlineCopy,,The demo stays beside the notes and module guide.,"Runtime встроен в страницу: модули, stress preset'ы и заметки рядом."
+site,site.sections.demoFocusLabel,,Focus here,Фокус Здесь
+site,site.sections.demoFocusCopy,,"Use this section as the handoff from explanation to proof: read first, then open the shared runtime when the reviewer is ready.","Этот блок — переход от объяснения к доказательству: сначала чтение, потом запуск общего runtime в нужный момент."
+site,site.sections.demoLabel,,Demo status,Состояние WebGL Host
+site,site.sections.demoFullscreenEnter,,Open Fullscreen,Открыть на весь экран
+site,site.sections.demoFullscreenExit,,Exit Fullscreen,Выйти из полного экрана
+site,site.sections.demoNotesCta,,Read Architecture Notes,Читать заметки по архитектуре
+site,site.sections.demoNote1,,<strong>Review mode:</strong> keep reading while the page gets the demo ready in the background.,"<strong>Режим просмотра:</strong> можно листать и читать страницу, пока host подготавливает loader и build URLs."
+site,site.sections.demoNote2,,<strong>Interview mode:</strong> come back here and open the runtime once the reviewer has enough context.,"<strong>Режим собеседования:</strong> вернись сюда и запусти runtime, когда у зрителя уже есть контекст."
+site,site.sections.posterLabel,,Embedded Unity Runtime,Встроенный Unity Runtime
+site,site.sections.posterTitle,,Open the demo here.,Запусти showcase-оболочку прямо здесь.
+site,site.sections.footerCopy,,A browser-friendly Unity runtime for explaining architecture trade-offs.,Unity runtime для объяснения trade‑offs в одной browser-friendly оболочке.
+site,site.sections.footerTop,,Back to top,Наверх
+site,site.sections.footerArchitecture,,Architecture Notes,Архитектура
+site,site.sections.footerSource,,Source on GitHub,Исходники на GitHub
+site,site.sections.guide.title,,Reading Guide,Маршрут Чтения
+site,site.sections.guide.topTitle,,Overview,Обзор
+site,site.sections.guide.topCopy,,What this project is.,Что это за проект.
+site,site.sections.guide.whatTitle,,Signals,Сигналы
+site,site.sections.guide.whatCopy,,Why the comparison matters.,Почему это сравнение важно.
+site,site.sections.guide.modulesTitle,,Modules,Модули
+site,site.sections.guide.modulesCopy,,Pick the strongest example.,Выбери сильнейший пример.
+site,site.sections.guide.architectureTitle,,Architecture,Архитектура
+site,site.sections.guide.architectureCopy,,How the shell is layered.,Как устроены слои shell.
+site,site.sections.guide.reviewTitle,,Review Flow,Сценарий Показа
+site,site.sections.guide.reviewCopy,,How to walk through the demo.,Как провести по демо.
+site,site.sections.guide.demoTitle,,Launch,Запуск
+site,site.sections.guide.demoCopy,,Where proof starts.,Где начинается proof.
+site,site.demoPhases.idle.pill,,Demo not available,Preload idle
+site,site.demoPhases.idle.pillCopy,,"The demo is not available on this page yet, but the rest of the walkthrough is ready to read.","Подготовка core demo delivery начнётся в фоне, пока ты читаешь страницу."
+site,site.demoPhases.idle.stage,,Demo unavailable,Ожидание конфигурации
+site,site.demoPhases.idle.supporting,,The interactive demo is not available in this version of the page. You can still read the architecture notes and browse the modules below.,"Интерактивное демо пока недоступно на этой странице, но заметки по архитектуре и разбор модулей уже можно смотреть ниже."
+site,site.demoPhases.idle.poster,,The interactive demo is not available in this version of the page.,Интерактивное демо пока недоступно на этой странице.
+site,site.demoPhases.idle.button,,Launch Demo,Запустить демо
+site,site.demoPhases.buildPending.pill,,Demo not available,Build pending
+site,site.demoPhases.buildPending.pillCopy,,"This page is ready, but the interactive demo is not available yet.","Страница готова, но интерактивное демо пока недоступно."
+site,site.demoPhases.buildPending.stage,,Demo unavailable,Build pending
+site,site.demoPhases.buildPending.supporting,,You can still use this page to read the architecture notes and browse the module breakdown.,"Пока демо недоступно, можно продолжить чтение заметок по архитектуре и разбор модулей."
+site,site.demoPhases.buildPending.poster,,The interactive demo is not available yet.,Интерактивное демо пока недоступно.
+site,site.demoPhases.buildPending.button,,Check Demo,Проверить WebGL build
+site,site.demoPhases.preloading.pill,,Getting ready,Preloading
+site,site.demoPhases.preloading.pillCopy,,The page is getting the demo ready in the background while you read.,"Страница подготавливает Unity loader и build artifacts, пока текст остаётся читаемым."
+site,site.demoPhases.preloading.stage,,Preparing demo,Предзагрузка build URL
+site,site.demoPhases.preloading.supporting,,The page is getting the interactive demo ready in the background. You can keep reading until you want to launch it.,Страница прогревает loader и build files в фоне. Можно продолжать чтение до момента запуска.
+site,site.demoPhases.preloading.poster,,The interactive demo is being prepared in the background. It will open only when you click launch.,Core delivery files уже подготавливаются в фоне. Сам Unity runtime instance будет создан только после клика.
+site,site.demoPhases.preloading.button,,Launch While Preparing,Запустить во время подготовки
+site,site.demoPhases.preloadReady.pill,,Ready to launch,Preload ready
+site,site.demoPhases.preloadReady.pillCopy,,The page is ready. Open the interactive demo whenever you want.,Unity loader уже подготовлен. Instance будет создан только по запросу.
+site,site.demoPhases.preloadReady.stage,,Demo ready,Core loader готов
+site,site.demoPhases.preloadReady.supporting,,The page is ready. The interactive demo will open only when you choose to launch it.,Shell уже прогрел Unity loader. Runtime instance инициализируется только в момент запуска.
+site,site.demoPhases.preloadReady.poster,,Everything is ready. Click launch to open the Unity WebGL demo here.,"Host shell готов. Нажми запуск, чтобы создать Unity WebGL instance прямо на этой странице."
+site,site.demoPhases.preloadReady.button,,Launch Demo,Запустить демо
+site,site.demoPhases.preloadPartial.pill,,Launch may not work,Preload partial
+site,site.demoPhases.preloadPartial.pillCopy,,"The page could not finish preparing the demo, but you can still try to open it.","Страница не смогла подтвердить loader, но прямой запуск всё ещё можно попробовать."
+site,site.demoPhases.preloadPartial.stage,,Loader not verified,Loader не подтверждён
+site,site.demoPhases.preloadPartial.supporting,,"The page could not fully prepare the demo in advance, but launch can still try to open it directly.","Страница не смогла полностью подготовить демо заранее, но прямой запуск всё ещё можно попробовать."
+site,site.demoPhases.preloadPartial.poster,,"The demo may still fail to open, but you can try launching it anyway.","Демо всё ещё может не открыться, но прямой запуск всё равно можно попробовать."
+site,site.demoPhases.preloadPartial.button,,Try Launch Anyway,Попробовать запуск
+site,site.demoPhases.loadingRuntime.pill,,Opening demo,Launching
+site,site.demoPhases.loadingRuntime.pillCopy,,"The demo is opening now, after the reviewer already has the context.","Unity runtime создаётся только сейчас, когда у зрителя уже есть контекст."
+site,site.demoPhases.loadingRuntime.stage,,Opening demo,Создание runtime instance
+site,site.demoPhases.loadingRuntime.supporting,,The page is opening the Unity demo now.,Страница создаёт Unity WebGL instance только в момент запуска.
+site,site.demoPhases.loadingRuntime.poster,,"The interactive demo is starting. Once it is ready, the poster will fade away.","Интерактивный runtime запускается. Как только instance будет готов, poster уйдёт с экрана."
+site,site.demoPhases.loadingRuntime.button,,Launching Demo...,Запуск демо...
+site,site.demoPhases.runtimeLive.pill,,Demo is live,Runtime live
+site,site.demoPhases.runtimeLive.pillCopy,,The Unity WebGL demo is now running on this page.,Unity WebGL client уже активен внутри этой же страницы.
+site,site.demoPhases.runtimeLive.stage,,Demo is live,Runtime live
+site,site.demoPhases.runtimeLive.supporting,,The demo is running. You can switch modules and variants without leaving the page.,"Клиент запущен. Теперь можно переключать модули и варианты, не уходя с этой страницы."
+site,site.demoPhases.runtimeLive.poster,,The interactive demo is live.,Интерактивный runtime уже активен.
+site,site.demoPhases.runtimeLive.button,,Demo Running,Демо запущено
+site,site.demoPhases.launchFailed.pill,,Could not open demo,Launch failed
+site,site.demoPhases.launchFailed.pillCopy,,"The page loaded, but the interactive demo could not open.","Страница открылась, но встроенный runtime не запустился."
+site,site.demoPhases.launchFailed.stage,,Launch failed,Запуск не удался
+site,site.demoPhases.launchFailed.supporting,,The demo did not start. You can try again or keep reading the architecture notes below.,"Runtime не стартовал. Можно попробовать ещё раз или продолжить чтение заметок по архитектуре ниже."
+site,site.demoPhases.launchFailed.posterPrefix,,Could not open demo: ,Запуск не удался: 
+site,site.demoPhases.launchFailed.posterSuffix,,<br>You can try again or continue reading the architecture notes below.,"<br>Можно повторить запуск или продолжить чтение заметок по архитектуре ниже."
+site,site.demoPhases.launchFailed.button,,Try Again,Повторить запуск
+site,site.demoPhases.runtimeProgress,,Loading runtime {value}%,Загрузка runtime {value}%
+module,update-loop.id,update-loop,,
+module,update-loop.category,,Architecture Pattern,Архитектурный Паттерн
+module,update-loop.title,,Update Loop Strategies,Стратегии Update Loop
+module,update-loop.summary,,Compare per-object Update with one owner loop under the same stress presets.,Сравнение Update на каждом объекте и одного централизованного owner loop внутри одной оболочки.
+module,update-loop.variants,,"Per-Object, Centralized","На объекте, Централизованный"
+module,update-loop.focus,,"Update ownership, callback volume, and scene noise at scale.","Владение callback'ами, шум сцены и то, как масштабируется ответственность за update."
+module,update-loop.try,,"Switch variants, raise stress, and watch when the code model stops matching runtime cost.","Переключай варианты, поднимай stress preset и смотри, насколько поведение легко связать с кодовой моделью владения."
+module,update-loop.signal,,Shows when MonoBehaviour-per-object stops scaling well.,"Этот модуль показывает, когда понятная MonoBehaviour-модель на каждый объект перестаёт быть хорошим долгосрочным baseline."
+module,update-loop.image,,./assets/images/module-preview-a.png,./assets/images/module-preview-a.png
+module,update-loop.caption,,The comparison stays steady while update ownership moves into one coordinator.,Одна и та же оболочка сравнивает дружелюбную объектную модель с более масштабируемым centralized owner loop.
+module,pooling.id,pooling,,
+module,pooling.category,,Architecture Pattern,Архитектурный Паттерн
+module,pooling.title,,Object Pooling,Object Pooling
+module,pooling.summary,,Compare direct instantiation with a reusable pool under the same review flow.,Сравнение прямой instantiation и reusable pool при одинаковом пользовательском потоке в hub.
+module,pooling.variants,,"Instantiation, Reusable Pool","Instantiation, Reusable Pool"
+module,pooling.focus,,"Lifecycle churn, allocation pressure, and reusable object ownership.","Lifecycle churn, allocation pressure и владение переиспользуемыми runtime-объектами."
+module,pooling.try,,"Raise stress and compare lifetime, re-entry, and reset logic.","Повышай stress и сравнивай, как каждый вариант определяет время жизни объекта и reset logic."
+module,pooling.signal,,"The real question is who owns cleanup, reuse, and spawn flow.","Разница не только в производительности. Она ещё и в том, кто владеет повторным входом, cleanup и spawn coordination."
+module,pooling.image,,./assets/images/module-preview-b.png,./assets/images/module-preview-b.png
+module,pooling.caption,,"Pooling changes who owns object lifetime, not just allocations.","Pooled path переопределяет владение жизненным циклом объектов, а не просто чинит allocations постфактум."
+module,vfx-delivery.id,vfx-delivery,,
+module,vfx-delivery.category,,Architecture Pattern,Архитектурный Паттерн
+module,vfx-delivery.title,,VFX Delivery,VFX Delivery
+module,vfx-delivery.summary,,Compare local bursts with batched pulses for the same visual goal.,Сравнение локальных emitter bursts и batched pulses для более плотных сценариев визуальной обратной связи.
+module,vfx-delivery.variants,,"Emitter Bursts, Batched Pulses","Emitter Bursts, Batched Pulses"
+module,vfx-delivery.focus,,"Effect ownership, density, and rendering-side delivery.","Владение эффектами, плотность presentation и rendering-oriented delivery decisions."
+module,vfx-delivery.try,,Switch between local emitters and batched pulses and watch the boundary move.,"Переключай local emitters и batched pulses и смотри, как одна и та же цель меняет архитектурную границу."
+module,vfx-delivery.signal,,Dense VFX problems are usually ownership and batching problems.,"Плотные VFX-задачи часто оказываются задачами ownership и batching, а не только content authoring."
+module,vfx-delivery.image,,./assets/images/vfx-batched.png,./assets/images/vfx-batched.png
+module,vfx-delivery.caption,,Batching makes delivery architecture visible.,"Batched visual feedback делает архитектурные различия видимыми сильнее, чем isolated one-off emitters."
+module,effects-system.id,effects-system,,
+module,effects-system.category,,Simulation Module,Симуляционный Модуль
+module,effects-system.title,,Effects System,Effects System
+module,effects-system.summary,,Compare object-style effects with chunk-based batched updates.,Показывает разницу между straightforward object-style effects и chunk-based batched updates.
+module,effects-system.variants,,"Indie, Chunk","Indie, Chunk"
+module,effects-system.focus,,Readability versus packed updates for many short-lived effects.,Читаемость против packed update ownership для большого числа мелких transient effects.
+module,effects-system.try,,Raise the same preset and compare hierarchy clarity with batched scale.,Подними один и тот же stress preset в обоих вариантах и сравни hierarchy friendliness с масштабом batched processing.
+module,effects-system.signal,,Shows the shift from object ownership to packed processing.,"Модуль показывает, как система эволюционирует от простого object ownership к явному packed processing."
+module,effects-system.image,,./assets/images/module-preview-b.png,./assets/images/module-preview-b.png
+module,effects-system.caption,,Chunk execution shows the architectural shift without changing the shell.,"Chunk-based execution делает архитектурную историю видимой, не меняя остальную оболочку."
+module,ai-system.id,ai-system,,
+module,ai-system.category,,Simulation Module,Симуляционный Модуль
+module,ai-system.title,,AI System,AI System
+module,ai-system.summary,,"Compare FSM, Utility AI, and Behavior Trees in one review flow.","Сравнение FSM, Utility и Behavior Tree decision models внутри одной общей presentation shell."
+module,ai-system.variants,,"FSM, Utility, Behavior Tree","FSM, Utility, Behavior Tree"
+module,ai-system.focus,,"Decision complexity, explainability, and agent scale.","Сложность decision model, explainability и то, как control logic масштабируется по числу агентов."
+module,ai-system.try,,"Switch models, keep the same preset, and read the trade-offs beside the behavior.","Переключай decision models, держи один и тот же stress preset и читай trade-offs panel рядом с поведением в runtime."
+module,ai-system.signal,,Different AI models change ownership and reasoning cost.,"Здесь вопрос не в одном лучшем AI pattern, а в том, как разные decision models меняют ownership и reasoning cost."
+module,ai-system.image,,./assets/images/module-preview-a.png,./assets/images/module-preview-a.png
+module,ai-system.caption,,Turns an abstract AI discussion into something visible.,AI-модуль делает абстрактный разговор о decision models видимым и сопоставимым.
+module,inventory.id,inventory,,
+module,inventory.category,,Simulation Module,Симуляционный Модуль
+module,inventory.title,,Inventory Systems,Inventory Systems
+module,inventory.summary,,Compare object-rich slots with packed slot processing in a mutation-heavy system.,Сравнение object-rich slot ownership и packed slot processing для mutation-heavy системы.
+module,inventory.variants,,"Object Slots, Packed Slots","Object Slots, Packed Slots"
+module,inventory.focus,,"Data layout, mutability, and runtime convenience.","Data layout, mutability и то, сколько удобства runtime может позволить себе до появления давления."
+module,inventory.try,,Inspect both variants and compare how representation changes ownership.,"Посмотри варианты Inventory и сравни, как representation choices меняют mental model of ownership."
+module,inventory.signal,,Shows what happens when convenient object graphs become hot traffic.,"Inventory очень часто стартует как удобные object graphs. Packed path показывает, что происходит, когда это удобство становится hot runtime traffic."
+module,inventory.image,,./assets/images/inventory-metrics.png,./assets/images/inventory-metrics.png
+module,inventory.caption,,A good example of how layout shapes clarity and scale.,"Inventory полезен как пример: решения по layout влияют и на читаемость кода, и на scaling characteristics."
+module,animation.id,animation,,
+module,animation.category,,Simulation Module,Симуляционный Модуль
+module,animation.title,,Layered Character Animation,Слоистая анимация персонажа
+module,animation.summary,,"Show one character running, shooting, and combining both through Animator layers.","Одна humanoid-модель бежит, стреляет или совмещает оба действия через Animator layers."
+module,animation.variants,,"Run, Shoot, Run + Shoot","Бег, Стрельба, Бег + стрельба"
+module,animation.focus,,"Animator layers, upper-body masking, and locomotion versus combat.","Animator layers, upper-body AvatarMask и разделение locomotion от combat actions."
+module,animation.try,,Open Run + Shoot and watch locomotion stay in the lower body.,"Открой Бег + стрельба и покажи, как ноги продолжают locomotion, пока верх тела проигрывает shooting clip."
+module,animation.signal,,The real job is composing actions without losing responsiveness.,"Animation systems — это не только playback клипов. В production часто нужно компоновать действия, не теряя отзывчивость движения."
+module,animation.image,,./assets/images/module-preview-a.png,./assets/images/module-preview-a.png
+module,animation.caption,,A common gameplay problem: layered locomotion plus combat.,Animation-модуль показывает частую game-dev механику: layered locomotion plus combat.

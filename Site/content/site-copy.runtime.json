@@ -1,0 +1,665 @@
+{
+  "translations": {
+    "en": {
+      "site": {
+        "sections": {
+          "demoPresentationEnter": "Presentation View",
+          "demoPresentationExit": "Exit Presentation View",
+          "demoQualityLabel": "Demo quality",
+          "demoQualityCopy": "Sharper modes increase internal canvas resolution and can cost FPS.",
+          "demoQualityPerformance": "Performance",
+          "demoQualityBalanced": "Balanced",
+          "demoQualityQuality": "Quality",
+          "demoQualityNote": "Balanced is the safest presentation default.",
+          "demoQualityNoteLive": "If the runtime is already live, reload the page after switching profiles for a clean resize.",
+          "whatEyebrow": "What The Reviewer Sees",
+          "whatTitle": "A controlled architecture comparison, not a pile of unrelated scenes.",
+          "whatFocusLabel": "Focus here",
+          "whatFocusCopy": "Track what stays constant across every module: one shell, one preset flow, one comparison surface.",
+          "insights": [
+            {
+              "title": "Comparable runtime pressure",
+              "copy": "Each module goes through the same shell, stress presets, and metrics surface, so differences point back to architecture rather than presentation drift."
+            },
+            {
+              "title": "Pattern and domain range",
+              "copy": "The showcase spans AI, pooling, update loops, inventory, animation, VFX delivery, and effect simulation instead of repeating one narrow optimization story."
+            },
+            {
+              "title": "Data-driven authoring",
+              "copy": "Modules and variants are described through ScriptableObject assets, so the showcase grows by adding data instead of scene-specific wiring."
+            },
+            {
+              "title": "Interview-ready presentation",
+              "copy": "The browser entry page tells the reviewer what to inspect before the WebGL runtime starts."
+            }
+          ],
+          "modulesEyebrow": "Module Explorer",
+          "modulesTitle": "Pick the best entry point before you open the demo.",
+          "modulesCopy": "Start with one module, then switch variants and presets inside the shared runtime.",
+          "modulesFocusLabel": "Focus here",
+          "modulesFocusCopy": "Use this section to decide which module tells your engineering story most clearly before the live demo begins.",
+          "moduleLabels": {
+            "variants": "Variants",
+            "focus": "Focus",
+            "try": "What To Try",
+            "signal": "Architecture Signal"
+          },
+          "architectureEyebrow": "Architecture Notes",
+          "architectureTitle": "One shell. Different variants. Shared stress and metrics.",
+          "architectureCopy": "Enough structure to understand the system before opening the repository.",
+          "architectureFocusLabel": "Focus here",
+          "architectureFocusCopy": "This section explains why the shell stays stable while the modules underneath it change.",
+          "stack": [
+            {
+              "title": "Showcase Shell",
+              "copy": "The shell owns selection, stress state, localization, and lifecycle instead of pushing that setup into each scene."
+            },
+            {
+              "title": "Presentation Shell",
+              "copy": "UI presenters subscribe to shared state so the interface stays comparable while modules change underneath it."
+            },
+            {
+              "title": "Module Layer",
+              "copy": "Active variants implement the same stress and lifecycle contract while preserving their own runtime behavior."
+            },
+            {
+              "title": "Data Layer",
+              "copy": "Module and variant definitions store presets, copy, and prefab references so new comparisons stay data-driven."
+            }
+          ],
+          "runtimeStoryLabel": "Runtime in five steps",
+          "runtimeStory": [
+            "Composition root builds the coordinator.",
+            "Coordinator selects the module and variant data.",
+            "Spawner instantiates the selected variant prefab.",
+            "Runtime host validates lifecycle and stress contracts.",
+            "State hub publishes module, variant, stress, and metrics to the UI."
+          ],
+          "reviewLabel": "Why this works in interviews",
+          "reviewCopy": "The value is not another Unity scene. The value is one disciplined runtime shell for comparing multiple implementation paths under the same rules.",
+          "reviewEyebrow": "Suggested Review Flow",
+          "reviewTitle": "A simple path through the demo.",
+          "reviewFocusLabel": "Focus here",
+          "reviewFocusCopy": "This gives the interviewer a clear first click instead of making them guess how the page should be read.",
+          "reviewSteps": [
+            {
+              "title": "Pick a module family",
+              "copy": "Start with `Update Loop`, `Pooling`, or `AI`, depending on whether you want to lead with a pattern or a domain problem."
+            },
+            {
+              "title": "Switch variants",
+              "copy": "Use the shared controls to compare how different implementation styles behave under the same conditions."
+            },
+            {
+              "title": "Raise the stress preset",
+              "copy": "Raise the preset in steady steps and watch when ownership, layout, batching, or callback volume starts to matter."
+            },
+            {
+              "title": "Connect behavior to notes",
+              "copy": "Keep the architecture notes beside the runtime so the difference is explained, not just shown."
+            }
+          ],
+          "integrityLabel": "Browser Metrics Note",
+          "integrityCopy": "The live runtime is real. Some browser-facing comparisons may use curated reference metrics so architectural deltas stay readable across machines. Treat the page as an architecture review surface, not a lab-grade benchmark.",
+          "demoEyebrow": "Interactive Demo",
+          "demoTitle": "Read first. Launch when it helps.",
+          "demoCopy": "The page gets the demo ready in the background. Unity opens only when you want to show it.",
+          "demoInlineCopy": "The demo stays beside the notes and module guide.",
+          "demoFocusLabel": "Focus here",
+          "demoFocusCopy": "Use this section as the handoff from explanation to proof: read first, then open the shared runtime when the reviewer is ready.",
+          "demoLabel": "Demo status",
+          "demoFullscreenEnter": "Open Fullscreen",
+          "demoFullscreenExit": "Exit Fullscreen",
+          "demoNotesCta": "Read Architecture Notes",
+          "demoNote1": "<strong>Review mode:</strong> keep reading while the page gets the demo ready in the background.",
+          "demoNote2": "<strong>Interview mode:</strong> come back here and open the runtime once the reviewer has enough context.",
+          "posterLabel": "Embedded Unity Runtime",
+          "posterTitle": "Open the demo here.",
+          "footerCopy": "A browser-friendly Unity runtime for explaining architecture trade-offs.",
+          "footerTop": "Back to top",
+          "footerArchitecture": "Architecture Notes",
+          "footerSource": "Source on GitHub",
+          "guide": {
+            "title": "Reading Guide",
+            "topTitle": "Overview",
+            "topCopy": "What this project is.",
+            "whatTitle": "Signals",
+            "whatCopy": "Why the comparison matters.",
+            "modulesTitle": "Modules",
+            "modulesCopy": "Pick the strongest example.",
+            "architectureTitle": "Architecture",
+            "architectureCopy": "How the shell is layered.",
+            "reviewTitle": "Review Flow",
+            "reviewCopy": "How to walk through the demo.",
+            "demoTitle": "Launch",
+            "demoCopy": "Where proof starts."
+          }
+        },
+        "htmlLang": "en",
+        "title": "LearningArchitect | Architecture Review In The Browser",
+        "description": "LearningArchitect is a browser-based Unity showcase for discussing runtime architecture, stress scaling, and implementation trade-offs in one guided review flow.",
+        "nav": {
+          "modules": "Modules",
+          "architecture": "Architecture Notes",
+          "demo": "Live Demo"
+        },
+        "hero": {
+          "eyebrow": "Unity architecture review in the browser",
+          "title": "Talk through trade-offs in one browser session.",
+          "summary": "Set the context, open the demo, and compare implementation choices without leaving the page.",
+          "demoCta": "Launch Demo",
+          "architectureCta": "Architecture Notes",
+          "sourceCta": "Source on GitHub",
+          "chips": [
+            "7 modules",
+            "15 variants",
+            "Shared stress presets",
+            "WebGL review flow"
+          ],
+          "demoBadgeLabel": "WebGL",
+          "demoBadgeValue": "Ready",
+          "panelLabel": "Why this works in interviews",
+          "points": [
+            "The reviewer gets the framing before the Unity loader takes over.",
+            "The same shell keeps module and stress comparisons consistent.",
+            "Architecture notes and source stay one click away during the walkthrough."
+          ],
+          "stats": {
+            "modules": "Modules",
+            "variants": "Variants",
+            "runtime": "Shared Runtime",
+            "languages": "Languages"
+          }
+        },
+        "demoPhases": {
+          "idle": {
+            "pill": "Demo not available",
+            "pillCopy": "The demo is not available on this page yet, but the rest of the walkthrough is ready to read.",
+            "stage": "Demo unavailable",
+            "supporting": "The interactive demo is not available in this version of the page. You can still read the architecture notes and browse the modules below.",
+            "poster": "The interactive demo is not available in this version of the page.",
+            "button": "Launch Demo"
+          },
+          "buildPending": {
+            "pill": "Demo not available",
+            "pillCopy": "This page is ready, but the interactive demo is not available yet.",
+            "stage": "Demo unavailable",
+            "supporting": "You can still use this page to read the architecture notes and browse the module breakdown.",
+            "poster": "The interactive demo is not available yet.",
+            "button": "Check Demo"
+          },
+          "preloading": {
+            "pill": "Getting ready",
+            "pillCopy": "The page is getting the demo ready in the background while you read.",
+            "stage": "Preparing demo",
+            "supporting": "The page is getting the interactive demo ready in the background. You can keep reading until you want to launch it.",
+            "poster": "The interactive demo is being prepared in the background. It will open only when you click launch.",
+            "button": "Launch While Preparing"
+          },
+          "preloadReady": {
+            "pill": "Ready to launch",
+            "pillCopy": "The page is ready. Open the interactive demo whenever you want.",
+            "stage": "Demo ready",
+            "supporting": "The page is ready. The interactive demo will open only when you choose to launch it.",
+            "poster": "Everything is ready. Click launch to open the Unity WebGL demo here.",
+            "button": "Launch Demo"
+          },
+          "preloadPartial": {
+            "pill": "Launch may not work",
+            "pillCopy": "The page could not finish preparing the demo, but you can still try to open it.",
+            "stage": "Loader not verified",
+            "supporting": "The page could not fully prepare the demo in advance, but launch can still try to open it directly.",
+            "poster": "The demo may still fail to open, but you can try launching it anyway.",
+            "button": "Try Launch Anyway"
+          },
+          "loadingRuntime": {
+            "pill": "Opening demo",
+            "pillCopy": "The demo is opening now, after the reviewer already has the context.",
+            "stage": "Opening demo",
+            "supporting": "The page is opening the Unity demo now.",
+            "poster": "The interactive demo is starting. Once it is ready, the poster will fade away.",
+            "button": "Launching Demo..."
+          },
+          "runtimeLive": {
+            "pill": "Demo is live",
+            "pillCopy": "The Unity WebGL demo is now running on this page.",
+            "stage": "Demo is live",
+            "supporting": "The demo is running. You can switch modules and variants without leaving the page.",
+            "poster": "The interactive demo is live.",
+            "button": "Demo Running"
+          },
+          "launchFailed": {
+            "pill": "Could not open demo",
+            "pillCopy": "The page loaded, but the interactive demo could not open.",
+            "stage": "Launch failed",
+            "supporting": "The demo did not start. You can try again or keep reading the architecture notes below.",
+            "posterPrefix": "Could not open demo: ",
+            "posterSuffix": "<br>You can try again or continue reading the architecture notes below.",
+            "button": "Try Again"
+          },
+          "runtimeProgress": "Loading runtime {value}%"
+        }
+      }
+    },
+    "ru": {
+      "site": {
+        "sections": {
+          "demoPresentationEnter": "Режим показа",
+          "demoPresentationExit": "Выйти из режима показа",
+          "demoQualityLabel": "Режим качества",
+          "demoQualityCopy": "Более резкие режимы поднимают внутреннее разрешение canvas и могут снижать FPS.",
+          "demoQualityPerformance": "Быстрее",
+          "demoQualityBalanced": "Баланс",
+          "demoQualityQuality": "Четче",
+          "demoQualityNote": "Balanced — самый безопасный режим для показа.",
+          "demoQualityNoteLive": "Если runtime уже запущен, после смены профиля перезагрузи страницу для чистого ресайза.",
+          "whatEyebrow": "Что Это Показывает",
+          "whatTitle": "Сравнение архитектуры, а не набор отдельных сцен.",
+          "whatFocusLabel": "Фокус Здесь",
+          "whatFocusCopy": "Здесь важно заметить, что остаётся неизменным у всех модулей: одна оболочка, один preset flow, одна поверхность сравнения.",
+          "insights": [
+            {
+              "title": "Сопоставимое давление на runtime",
+              "copy": "Каждый модуль проходит через одну и ту же оболочку, stress preset'ы и поверхность метрик, поэтому различия видны именно в архитектуре."
+            },
+            {
+              "title": "Широкий охват паттернов и доменов",
+              "copy": "Showcase охватывает AI, pooling, update loops, inventory, animation, VFX delivery и effect simulation вместо одной узкой истории про оптимизацию."
+            },
+            {
+              "title": "Data-driven авторинг",
+              "copy": "Модули и варианты связываются через ScriptableObject assets, поэтому проект проще расширять без scene-specific логики."
+            },
+            {
+              "title": "Упаковка под портфолио",
+              "copy": "Стартовая страница объясняет, на что смотреть, ещё до запуска WebGL runtime."
+            }
+          ],
+          "modulesEyebrow": "Обзор Модулей",
+          "modulesTitle": "Выбери сильный пример перед live-клиентом.",
+          "modulesCopy": "Используй один модуль как точку входа, а затем переключай варианты и preset'ы уже в runtime.",
+          "modulesFocusLabel": "Фокус Здесь",
+          "modulesFocusCopy": "Используй этот блок, чтобы выбрать модуль, который лучше всего рассказывает твою архитектурную историю до живого запуска.",
+          "moduleLabels": {
+            "variants": "Варианты",
+            "focus": "Фокус",
+            "try": "Что попробовать",
+            "signal": "Архитектурный сигнал"
+          },
+          "architectureEyebrow": "Заметки По Архитектуре",
+          "architectureTitle": "Одна оболочка, сменные варианты, общий stress и metrics.",
+          "architectureCopy": "Этого достаточно, чтобы понять структуру до перехода в репозиторий.",
+          "architectureFocusLabel": "Фокус Здесь",
+          "architectureFocusCopy": "Здесь зритель должен понять, как shell остаётся стабильным, пока сами модули меняются под ним.",
+          "stack": [
+            {
+              "title": "Showcase Shell",
+              "copy": "Оболочка владеет выбором, stress state, локализацией и lifecycle, а не перекладывает это на scene-specific setup."
+            },
+            {
+              "title": "Presentation Shell",
+              "copy": "UI presenters подписываются на общий state, поэтому интерфейс остаётся сопоставимым, пока сами модули меняются под ним."
+            },
+            {
+              "title": "Module Layer",
+              "copy": "Активные variants реализуют один и тот же stress и lifecycle contract, но сохраняют своё runtime-поведение."
+            },
+            {
+              "title": "Data Layer",
+              "copy": "ModuleDefinition и VariantDefinition хранят presets, copy и prefab references, поэтому новые сравнения остаются data-driven."
+            }
+          ],
+          "runtimeStoryLabel": "Runtime в пяти шагах",
+          "runtimeStory": [
+            "Composition root собирает coordinator.",
+            "Coordinator выбирает данные модуля и варианта.",
+            "Spawner инстанцирует prefab варианта.",
+            "Runtime host валидирует lifecycle и stress contracts.",
+            "State hub публикует модуль, вариант, stress и метрики в UI."
+          ],
+          "reviewLabel": "Почему это удобно для портфолио",
+          "reviewCopy": "Ценность не в ещё одной Unity-сцене. Ценность в одной дисциплинированной оболочке, которая сравнивает несколько путей реализации по одинаковым правилам.",
+          "reviewEyebrow": "Как Смотреть Демо",
+          "reviewTitle": "Что попробовать после запуска build'а.",
+          "reviewFocusLabel": "Фокус Здесь",
+          "reviewFocusCopy": "Эта последовательность показывает интервьюеру, куда кликать в первую очередь, вместо того чтобы оставлять его без сценария.",
+          "reviewSteps": [
+            {
+              "title": "Выбери семейство модулей",
+              "copy": "Начни с `Update Loop`, `Pooling` или `AI` в зависимости от того, хочешь ли ты pattern-driven или domain-driven сравнение."
+            },
+            {
+              "title": "Переключай варианты",
+              "copy": "Используй общий вариантный control, чтобы сравнить разные implementation styles внутри одной и той же оболочки."
+            },
+            {
+              "title": "Подними stress preset",
+              "copy": "Используй одинаковые preset steps, чтобы увидеть, когда ownership, layout, batching или callback volume начинают иметь значение."
+            },
+            {
+              "title": "Связывай поведение с заметками",
+              "copy": "Читай архитектурные карточки рядом с runtime, чтобы система объясняла не только результат на экране, но и причину различий."
+            }
+          ],
+          "integrityLabel": "Заметка о browser-метриках",
+          "integrityCopy": "Runtime на странице настоящий. Часть browser-facing сравнений может использовать curated reference metrics, чтобы архитектурные различия оставались читаемыми на разных машинах. Смотри на эту страницу как на поверхность для архитектурного review, а не как на лабораторный benchmark.",
+          "demoEyebrow": "Интерактивное Демо",
+          "demoTitle": "Прочитай контекст, затем запускай.",
+          "demoCopy": "Страница заранее готовит WebGL-доставку. Unity instance создаётся только по кнопке.",
+          "demoInlineCopy": "Runtime встроен в страницу: модули, stress preset'ы и заметки рядом.",
+          "demoFocusLabel": "Фокус Здесь",
+          "demoFocusCopy": "Этот блок — переход от объяснения к доказательству: сначала чтение, потом запуск общего runtime в нужный момент.",
+          "demoLabel": "Состояние WebGL Host",
+          "demoFullscreenEnter": "Открыть на весь экран",
+          "demoFullscreenExit": "Выйти из полного экрана",
+          "demoNotesCta": "Читать заметки по архитектуре",
+          "demoNote1": "<strong>Режим просмотра:</strong> можно листать и читать страницу, пока host подготавливает loader и build URLs.",
+          "demoNote2": "<strong>Режим собеседования:</strong> вернись сюда и запусти runtime, когда у зрителя уже есть контекст.",
+          "posterLabel": "Встроенный Unity Runtime",
+          "posterTitle": "Запусти showcase-оболочку прямо здесь.",
+          "footerCopy": "Unity runtime для объяснения trade‑offs в одной browser-friendly оболочке.",
+          "footerTop": "Наверх",
+          "footerArchitecture": "Архитектура",
+          "footerSource": "Исходники на GitHub",
+          "guide": {
+            "title": "Маршрут Чтения",
+            "topTitle": "Обзор",
+            "topCopy": "Что это за проект.",
+            "whatTitle": "Сигналы",
+            "whatCopy": "Почему это сравнение важно.",
+            "modulesTitle": "Модули",
+            "modulesCopy": "Выбери сильнейший пример.",
+            "architectureTitle": "Архитектура",
+            "architectureCopy": "Как устроены слои shell.",
+            "reviewTitle": "Сценарий Показа",
+            "reviewCopy": "Как провести по демо.",
+            "demoTitle": "Запуск",
+            "demoCopy": "Где начинается proof."
+          }
+        },
+        "htmlLang": "ru",
+        "title": "LearningArchitect | Интерактивный архитектурный showcase",
+        "description": "LearningArchitect — это Unity showcase для сравнения runtime-стратегий, stress preset'ов и архитектурных компромиссов в одной общей оболочке.",
+        "nav": {
+          "modules": "Модули",
+          "architecture": "Архитектура",
+          "demo": "Демо"
+        },
+        "hero": {
+          "eyebrow": "Интерактивный Unity Architecture Showcase",
+          "title": "Trade‑offs прямо в браузере.",
+          "summary": "Запусти WebGL и сравнивай решения на одной странице.",
+          "demoCta": "Запустить демо",
+          "architectureCta": "Заметки по архитектуре",
+          "sourceCta": "Исходники на GitHub",
+          "chips": [
+            "7 модулей",
+            "15 вариантов",
+            "Общие stress preset'ы",
+            "WebGL portfolio shell"
+          ],
+          "demoBadgeLabel": "WebGL",
+          "demoBadgeValue": "Готово",
+          "panelLabel": "Почему это удобно для собеседований",
+          "points": [
+            "Контекст можно прочитать до того, как Unity loader займёт экран.",
+            "Одна и та же оболочка держит сравнение модулей и stress preset'ов единым.",
+            "Архитектурные заметки и код остаются рядом во время показа."
+          ],
+          "stats": {
+            "modules": "Модулей",
+            "variants": "Вариантов",
+            "runtime": "Общий runtime",
+            "languages": "Языка"
+          }
+        },
+        "demoPhases": {
+          "idle": {
+            "pill": "Preload idle",
+            "pillCopy": "Подготовка core demo delivery начнётся в фоне, пока ты читаешь страницу.",
+            "stage": "Ожидание конфигурации",
+            "supporting": "Интерактивное демо пока недоступно на этой странице, но заметки по архитектуре и разбор модулей уже можно смотреть ниже.",
+            "poster": "Интерактивное демо пока недоступно на этой странице.",
+            "button": "Запустить демо"
+          },
+          "buildPending": {
+            "pill": "Build pending",
+            "pillCopy": "Страница готова, но интерактивное демо пока недоступно.",
+            "stage": "Build pending",
+            "supporting": "Пока демо недоступно, можно продолжить чтение заметок по архитектуре и разбор модулей.",
+            "poster": "Интерактивное демо пока недоступно.",
+            "button": "Проверить WebGL build"
+          },
+          "preloading": {
+            "pill": "Preloading",
+            "pillCopy": "Страница подготавливает Unity loader и build artifacts, пока текст остаётся читаемым.",
+            "stage": "Предзагрузка build URL",
+            "supporting": "Страница прогревает loader и build files в фоне. Можно продолжать чтение до момента запуска.",
+            "poster": "Core delivery files уже подготавливаются в фоне. Сам Unity runtime instance будет создан только после клика.",
+            "button": "Запустить во время подготовки"
+          },
+          "preloadReady": {
+            "pill": "Preload ready",
+            "pillCopy": "Unity loader уже подготовлен. Instance будет создан только по запросу.",
+            "stage": "Core loader готов",
+            "supporting": "Shell уже прогрел Unity loader. Runtime instance инициализируется только в момент запуска.",
+            "poster": "Host shell готов. Нажми запуск, чтобы создать Unity WebGL instance прямо на этой странице.",
+            "button": "Запустить демо"
+          },
+          "preloadPartial": {
+            "pill": "Preload partial",
+            "pillCopy": "Страница не смогла подтвердить loader, но прямой запуск всё ещё можно попробовать.",
+            "stage": "Loader не подтверждён",
+            "supporting": "Страница не смогла полностью подготовить демо заранее, но прямой запуск всё ещё можно попробовать.",
+            "poster": "Демо всё ещё может не открыться, но прямой запуск всё равно можно попробовать.",
+            "button": "Попробовать запуск"
+          },
+          "loadingRuntime": {
+            "pill": "Launching",
+            "pillCopy": "Unity runtime создаётся только сейчас, когда у зрителя уже есть контекст.",
+            "stage": "Создание runtime instance",
+            "supporting": "Страница создаёт Unity WebGL instance только в момент запуска.",
+            "poster": "Интерактивный runtime запускается. Как только instance будет готов, poster уйдёт с экрана.",
+            "button": "Запуск демо..."
+          },
+          "runtimeLive": {
+            "pill": "Runtime live",
+            "pillCopy": "Unity WebGL client уже активен внутри этой же страницы.",
+            "stage": "Runtime live",
+            "supporting": "Клиент запущен. Теперь можно переключать модули и варианты, не уходя с этой страницы.",
+            "poster": "Интерактивный runtime уже активен.",
+            "button": "Демо запущено"
+          },
+          "launchFailed": {
+            "pill": "Launch failed",
+            "pillCopy": "Страница открылась, но встроенный runtime не запустился.",
+            "stage": "Запуск не удался",
+            "supporting": "Runtime не стартовал. Можно попробовать ещё раз или продолжить чтение заметок по архитектуре ниже.",
+            "posterPrefix": "Запуск не удался: ",
+            "posterSuffix": "<br>Можно повторить запуск или продолжить чтение заметок по архитектуре ниже.",
+            "button": "Повторить запуск"
+          },
+          "runtimeProgress": "Загрузка runtime {value}%"
+        }
+      }
+    }
+  },
+  "modules": [
+    {
+      "id": "update-loop",
+      "en": {
+        "category": "Architecture Pattern",
+        "title": "Update Loop Strategies",
+        "summary": "Compare per-object Update with one owner loop under the same stress presets.",
+        "variants": "Per-Object, Centralized",
+        "focus": "Update ownership, callback volume, and scene noise at scale.",
+        "try": "Switch variants, raise stress, and watch when the code model stops matching runtime cost.",
+        "signal": "Shows when MonoBehaviour-per-object stops scaling well.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "The comparison stays steady while update ownership moves into one coordinator."
+      },
+      "ru": {
+        "category": "Архитектурный Паттерн",
+        "title": "Стратегии Update Loop",
+        "summary": "Сравнение Update на каждом объекте и одного централизованного owner loop внутри одной оболочки.",
+        "variants": "На объекте, Централизованный",
+        "focus": "Владение callback'ами, шум сцены и то, как масштабируется ответственность за update.",
+        "try": "Переключай варианты, поднимай stress preset и смотри, насколько поведение легко связать с кодовой моделью владения.",
+        "signal": "Этот модуль показывает, когда понятная MonoBehaviour-модель на каждый объект перестаёт быть хорошим долгосрочным baseline.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "Одна и та же оболочка сравнивает дружелюбную объектную модель с более масштабируемым centralized owner loop."
+      }
+    },
+    {
+      "id": "pooling",
+      "en": {
+        "category": "Architecture Pattern",
+        "title": "Object Pooling",
+        "summary": "Compare direct instantiation with a reusable pool under the same review flow.",
+        "variants": "Instantiation, Reusable Pool",
+        "focus": "Lifecycle churn, allocation pressure, and reusable object ownership.",
+        "try": "Raise stress and compare lifetime, re-entry, and reset logic.",
+        "signal": "The real question is who owns cleanup, reuse, and spawn flow.",
+        "image": "./assets/images/module-preview-b.png",
+        "caption": "Pooling changes who owns object lifetime, not just allocations."
+      },
+      "ru": {
+        "category": "Архитектурный Паттерн",
+        "title": "Object Pooling",
+        "summary": "Сравнение прямой instantiation и reusable pool при одинаковом пользовательском потоке в hub.",
+        "variants": "Instantiation, Reusable Pool",
+        "focus": "Lifecycle churn, allocation pressure и владение переиспользуемыми runtime-объектами.",
+        "try": "Повышай stress и сравнивай, как каждый вариант определяет время жизни объекта и reset logic.",
+        "signal": "Разница не только в производительности. Она ещё и в том, кто владеет повторным входом, cleanup и spawn coordination.",
+        "image": "./assets/images/module-preview-b.png",
+        "caption": "Pooled path переопределяет владение жизненным циклом объектов, а не просто чинит allocations постфактум."
+      }
+    },
+    {
+      "id": "vfx-delivery",
+      "en": {
+        "category": "Architecture Pattern",
+        "title": "VFX Delivery",
+        "summary": "Compare local bursts with batched pulses for the same visual goal.",
+        "variants": "Emitter Bursts, Batched Pulses",
+        "focus": "Effect ownership, density, and rendering-side delivery.",
+        "try": "Switch between local emitters and batched pulses and watch the boundary move.",
+        "signal": "Dense VFX problems are usually ownership and batching problems.",
+        "image": "./assets/images/vfx-batched.png",
+        "caption": "Batching makes delivery architecture visible."
+      },
+      "ru": {
+        "category": "Архитектурный Паттерн",
+        "title": "VFX Delivery",
+        "summary": "Сравнение локальных emitter bursts и batched pulses для более плотных сценариев визуальной обратной связи.",
+        "variants": "Emitter Bursts, Batched Pulses",
+        "focus": "Владение эффектами, плотность presentation и rendering-oriented delivery decisions.",
+        "try": "Переключай local emitters и batched pulses и смотри, как одна и та же цель меняет архитектурную границу.",
+        "signal": "Плотные VFX-задачи часто оказываются задачами ownership и batching, а не только content authoring.",
+        "image": "./assets/images/vfx-batched.png",
+        "caption": "Batched visual feedback делает архитектурные различия видимыми сильнее, чем isolated one-off emitters."
+      }
+    },
+    {
+      "id": "effects-system",
+      "en": {
+        "category": "Simulation Module",
+        "title": "Effects System",
+        "summary": "Compare object-style effects with chunk-based batched updates.",
+        "variants": "Indie, Chunk",
+        "focus": "Readability versus packed updates for many short-lived effects.",
+        "try": "Raise the same preset and compare hierarchy clarity with batched scale.",
+        "signal": "Shows the shift from object ownership to packed processing.",
+        "image": "./assets/images/module-preview-b.png",
+        "caption": "Chunk execution shows the architectural shift without changing the shell."
+      },
+      "ru": {
+        "category": "Симуляционный Модуль",
+        "title": "Effects System",
+        "summary": "Показывает разницу между straightforward object-style effects и chunk-based batched updates.",
+        "variants": "Indie, Chunk",
+        "focus": "Читаемость против packed update ownership для большого числа мелких transient effects.",
+        "try": "Подними один и тот же stress preset в обоих вариантах и сравни hierarchy friendliness с масштабом batched processing.",
+        "signal": "Модуль показывает, как система эволюционирует от простого object ownership к явному packed processing.",
+        "image": "./assets/images/module-preview-b.png",
+        "caption": "Chunk-based execution делает архитектурную историю видимой, не меняя остальную оболочку."
+      }
+    },
+    {
+      "id": "ai-system",
+      "en": {
+        "category": "Simulation Module",
+        "title": "AI System",
+        "summary": "Compare FSM, Utility AI, and Behavior Trees in one review flow.",
+        "variants": "FSM, Utility, Behavior Tree",
+        "focus": "Decision complexity, explainability, and agent scale.",
+        "try": "Switch models, keep the same preset, and read the trade-offs beside the behavior.",
+        "signal": "Different AI models change ownership and reasoning cost.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "Turns an abstract AI discussion into something visible."
+      },
+      "ru": {
+        "category": "Симуляционный Модуль",
+        "title": "AI System",
+        "summary": "Сравнение FSM, Utility и Behavior Tree decision models внутри одной общей presentation shell.",
+        "variants": "FSM, Utility, Behavior Tree",
+        "focus": "Сложность decision model, explainability и то, как control logic масштабируется по числу агентов.",
+        "try": "Переключай decision models, держи один и тот же stress preset и читай trade-offs panel рядом с поведением в runtime.",
+        "signal": "Здесь вопрос не в одном лучшем AI pattern, а в том, как разные decision models меняют ownership и reasoning cost.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "AI-модуль делает абстрактный разговор о decision models видимым и сопоставимым."
+      }
+    },
+    {
+      "id": "inventory",
+      "en": {
+        "category": "Simulation Module",
+        "title": "Inventory Systems",
+        "summary": "Compare object-rich slots with packed slot processing in a mutation-heavy system.",
+        "variants": "Object Slots, Packed Slots",
+        "focus": "Data layout, mutability, and runtime convenience.",
+        "try": "Inspect both variants and compare how representation changes ownership.",
+        "signal": "Shows what happens when convenient object graphs become hot traffic.",
+        "image": "./assets/images/inventory-metrics.png",
+        "caption": "A good example of how layout shapes clarity and scale."
+      },
+      "ru": {
+        "category": "Симуляционный Модуль",
+        "title": "Inventory Systems",
+        "summary": "Сравнение object-rich slot ownership и packed slot processing для mutation-heavy системы.",
+        "variants": "Object Slots, Packed Slots",
+        "focus": "Data layout, mutability и то, сколько удобства runtime может позволить себе до появления давления.",
+        "try": "Посмотри варианты Inventory и сравни, как representation choices меняют mental model of ownership.",
+        "signal": "Inventory очень часто стартует как удобные object graphs. Packed path показывает, что происходит, когда это удобство становится hot runtime traffic.",
+        "image": "./assets/images/inventory-metrics.png",
+        "caption": "Inventory полезен как пример: решения по layout влияют и на читаемость кода, и на scaling characteristics."
+      }
+    },
+    {
+      "id": "animation",
+      "en": {
+        "category": "Simulation Module",
+        "title": "Layered Character Animation",
+        "summary": "Show one character running, shooting, and combining both through Animator layers.",
+        "variants": "Run, Shoot, Run + Shoot",
+        "focus": "Animator layers, upper-body masking, and locomotion versus combat.",
+        "try": "Open Run + Shoot and watch locomotion stay in the lower body.",
+        "signal": "The real job is composing actions without losing responsiveness.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "A common gameplay problem: layered locomotion plus combat."
+      },
+      "ru": {
+        "category": "Симуляционный Модуль",
+        "title": "Слоистая анимация персонажа",
+        "summary": "Одна humanoid-модель бежит, стреляет или совмещает оба действия через Animator layers.",
+        "variants": "Бег, Стрельба, Бег + стрельба",
+        "focus": "Animator layers, upper-body AvatarMask и разделение locomotion от combat actions.",
+        "try": "Открой Бег + стрельба и покажи, как ноги продолжают locomotion, пока верх тела проигрывает shooting clip.",
+        "signal": "Animation systems — это не только playback клипов. В production часто нужно компоновать действия, не теряя отзывчивость движения.",
+        "image": "./assets/images/module-preview-a.png",
+        "caption": "Animation-модуль показывает частую game-dev механику: layered locomotion plus combat."
+      }
+    }
+  ]
+}

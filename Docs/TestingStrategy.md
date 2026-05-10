@@ -83,7 +83,7 @@ Primary targets:
 Examples:
 
 - `DescriptionPanel` hides optional empty sections;
-- tab selection produces the expected section set;
+- tab selection produces the expected rendered section order in the shipped legacy body;
 - localization falls back to ScriptableObject content when table entries are missing.
 
 These tests are useful, but should stay narrower than core/module tests.
@@ -188,7 +188,7 @@ That is a meaningful baseline for shell behavior and module contract safety, but
 
 - PlayMode coverage is intentionally thin and focused on orchestration smoke, not presenter-heavy UI behavior;
 - localization coverage now proves real `ShowcaseContent` lookup and fallback for a narrow slice, but not every visible content surface;
-- validator and rebuild-tool coverage now guard the hub `DescriptionPanel` hierarchy and key authoring contracts, but broader asset-graph drift can still happen outside those checks;
+- validator and `ShowcaseLayoutTool` preserve-normalizer coverage now guard the hub `DescriptionPanel` hierarchy and key authoring contracts, but broader asset-graph drift can still happen outside those checks;
 - deeper asset-level validation around broader authoring contracts is still lighter than the runtime shell coverage.
 
 ## Recommended Next Steps

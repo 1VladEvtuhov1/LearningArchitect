@@ -22,10 +22,11 @@ Review it regularly and trim anything that has become a stable decision or a res
 ### UI State
 
 - the shipped `ArchitectureShowcaseHub` baseline has been restored to the older hand-authored visual layout;
-- `DescriptionPanel` runtime now supports both the legacy `DescriptionText` viewport path and the composite section path;
-- validator also accepts both layouts instead of enforcing composite-only assumptions;
+- `DescriptionPanel` runtime now follows the shipped `DescriptionText` viewport path only;
+- validator now enforces the same shipped layout instead of carrying migration-era dual support;
 - `ShowcaseLayoutTool` public rebuild/apply entrypoints are intentionally left in safe mode so the tool does not silently rewrite the hub again;
-- the remaining UI question is still card specialization depth, but it now sits behind a stable visual baseline instead of replacing it.
+- the remaining `ShowcaseLayoutTool` internals now act only as a small preserve-first normalizer for known drift, not as a UI regeneration system;
+- the remaining UI question is readability/polish on the shipped panel, not parallel layout models.
 
 ### Module Visual State
 
@@ -38,7 +39,7 @@ Review it regularly and trim anything that has become a stable decision or a res
 
 - `Docs/HubAndCarrierAuthoring.md` is now the explicit contract doc for:
   - the hub prefab baseline;
-  - `DescriptionPanel` viewport layouts;
+  - `DescriptionPanel` viewport contract;
   - reusable carrier-prefab wiring.
 
 ### Content Authoring Rule

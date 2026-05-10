@@ -213,13 +213,136 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ValidateHubPrefabLayout_AllowsLegacyDescriptionText_WhenCompositeLayoutIsAbsent()
+        public void ValidateDefinitions_ReportsError_WhenAnimationProfileHasNoAvatar()
+        {
+            VariantDefinitionSO variant = null;
+            ModuleDefinitionSO module = null;
+            GameObject prefab = null;
+            GameObject actorPrefab = null;
+            HumanoidAnimationProfileSO profile = null;
+
+            try
+            {
+                prefab = new GameObject("HumanoidVariantPrefab");
+                prefab.AddComponent<ModuleOnlyRuntimeComponent>();
+                HumanoidAnimationVariant animationVariant = prefab.AddComponent<HumanoidAnimationVariant>();
+                actorPrefab = CreateActorPrefab(withAnimator: true, withCrowdActor: true);
+                profile = CreateHumanoidProfile(actorPrefab, includeAvatar: false, includeAnimatorController: true);
+
+                SerializedObject serializedVariant = new(animationVariant);
+                serializedVariant.FindProperty("animationProfile").objectReferenceValue = profile;
+                serializedVariant.ApplyModifiedPropertiesWithoutUndo();
+
+                variant = CreateVariant("HumanoidVariantNoAvatar", prefab, 1000, 2000, 4000);
+                module = CreateModule("HumanoidModuleNoAvatar", variant);
+
+                ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
+                    new[] { module },
+                    new[] { variant },
+                    ShowcaseLocalizationSnapshot.Empty);
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("requires an assigned avatar")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(prefab);
+                DestroyImmediateSafe(actorPrefab);
+                DestroyImmediateSafe(profile);
+                DestroyImmediateSafe(variant);
+                DestroyImmediateSafe(module);
+            }
+        }
+
+        [Test]
+        public void ValidateDefinitions_ReportsError_WhenAnimationProfileHasNoAnimatorController()
+        {
+            VariantDefinitionSO variant = null;
+            ModuleDefinitionSO module = null;
+            GameObject prefab = null;
+            GameObject actorPrefab = null;
+            HumanoidAnimationProfileSO profile = null;
+
+            try
+            {
+                prefab = new GameObject("HumanoidVariantPrefab");
+                prefab.AddComponent<ModuleOnlyRuntimeComponent>();
+                HumanoidAnimationVariant animationVariant = prefab.AddComponent<HumanoidAnimationVariant>();
+                actorPrefab = CreateActorPrefab(withAnimator: true, withCrowdActor: true);
+                profile = CreateHumanoidProfile(actorPrefab, includeAvatar: true, includeAnimatorController: false);
+
+                SerializedObject serializedVariant = new(animationVariant);
+                serializedVariant.FindProperty("animationProfile").objectReferenceValue = profile;
+                serializedVariant.ApplyModifiedPropertiesWithoutUndo();
+
+                variant = CreateVariant("HumanoidVariantNoController", prefab, 1000, 2000, 4000);
+                module = CreateModule("HumanoidModuleNoController", variant);
+
+                ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
+                    new[] { module },
+                    new[] { variant },
+                    ShowcaseLocalizationSnapshot.Empty);
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("requires an assigned animatorController")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(prefab);
+                DestroyImmediateSafe(actorPrefab);
+                DestroyImmediateSafe(profile);
+                DestroyImmediateSafe(variant);
+                DestroyImmediateSafe(module);
+            }
+        }
+
+        [Test]
+        public void ValidateDefinitions_ReportsError_WhenAnimationProfileActorPrefabHasNoAnimator()
+        {
+            VariantDefinitionSO variant = null;
+            ModuleDefinitionSO module = null;
+            GameObject prefab = null;
+            GameObject actorPrefab = null;
+            HumanoidAnimationProfileSO profile = null;
+
+            try
+            {
+                prefab = new GameObject("HumanoidVariantPrefab");
+                prefab.AddComponent<ModuleOnlyRuntimeComponent>();
+                HumanoidAnimationVariant animationVariant = prefab.AddComponent<HumanoidAnimationVariant>();
+                actorPrefab = CreateActorPrefab(withAnimator: false, withCrowdActor: true);
+                profile = CreateHumanoidProfile(actorPrefab, includeAvatar: true, includeAnimatorController: true);
+
+                SerializedObject serializedVariant = new(animationVariant);
+                serializedVariant.FindProperty("animationProfile").objectReferenceValue = profile;
+                serializedVariant.ApplyModifiedPropertiesWithoutUndo();
+
+                variant = CreateVariant("HumanoidVariantActorNoAnimator", prefab, 1000, 2000, 4000);
+                module = CreateModule("HumanoidModuleActorNoAnimator", variant);
+
+                ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
+                    new[] { module },
+                    new[] { variant },
+                    ShowcaseLocalizationSnapshot.Empty);
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("requires an Animator component in children")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(prefab);
+                DestroyImmediateSafe(actorPrefab);
+                DestroyImmediateSafe(profile);
+                DestroyImmediateSafe(variant);
+                DestroyImmediateSafe(module);
+            }
+        }
+
+        [Test]
+        public void ValidateHubPrefabLayout_AllowsCanonicalLegacyDescriptionLayout()
         {
             GameObject hubPrefab = null;
 
             try
             {
-                hubPrefab = CreateHubPrefabForValidation(includeLegacyDescriptionText: true, omitSectionName: null, includeCompositeSections: false);
+                hubPrefab = CreateHubPrefabForValidation(includeDescriptionText: true, includeTabsRoot: true);
                 ShowcaseValidationReport report = new();
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
@@ -233,18 +356,18 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ValidateHubPrefabLayout_ReportsError_WhenRequiredCompositeSectionIsMissing()
+        public void ValidateHubPrefabLayout_ReportsError_WhenTabsRootIsMissing()
         {
             GameObject hubPrefab = null;
 
             try
             {
-                hubPrefab = CreateHubPrefabForValidation(includeLegacyDescriptionText: false, omitSectionName: "Container - ArchitectureInfo");
+                hubPrefab = CreateHubPrefabForValidation(includeDescriptionText: true, includeTabsRoot: false);
                 ShowcaseValidationReport report = new();
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Container - ArchitectureInfo")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Container - DescriptionCharacters")));
             }
             finally
             {
@@ -253,22 +376,85 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ValidateHubPrefabLayout_ReportsError_WhenDescriptionLayoutIsMissing()
+        public void ValidateHubPrefabLayout_ReportsError_WhenDescriptionTextIsMissing()
         {
             GameObject hubPrefab = null;
 
             try
             {
-                hubPrefab = CreateHubPrefabForValidation(includeLegacyDescriptionText: false, omitSectionName: null, includeCompositeSections: false);
+                hubPrefab = CreateHubPrefabForValidation(includeDescriptionText: false, includeTabsRoot: true);
                 ShowcaseValidationReport report = new();
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("either composite sections or legacy DescriptionText")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("DescriptionText")));
             }
             finally
             {
                 DestroyImmediateSafe(hubPrefab);
+            }
+        }
+
+        [Test]
+        public void ValidateHubSceneInstanceLayout_AllowsOriginAlignedHubAndModuleRoot()
+        {
+            GameObject hubInstance = null;
+
+            try
+            {
+                hubInstance = CreateHubSceneInstance();
+                ShowcaseValidationReport report = new();
+
+                ShowcaseValidator.ValidateHubSceneInstanceLayout(hubInstance, report);
+
+                Assert.That(report.ErrorCount, Is.Zero);
+            }
+            finally
+            {
+                DestroyImmediateSafe(hubInstance);
+            }
+        }
+
+        [Test]
+        public void ValidateHubSceneInstanceLayout_ReportsError_WhenHubIsOffsetFromOrigin()
+        {
+            GameObject hubInstance = null;
+
+            try
+            {
+                hubInstance = CreateHubSceneInstance();
+                hubInstance.transform.localPosition = new Vector3(-75.55f, -20.84f, 0f);
+                ShowcaseValidationReport report = new();
+
+                ShowcaseValidator.ValidateHubSceneInstanceLayout(hubInstance, report);
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Scene hub 'ArchitectureShowcaseHub' must stay at the world origin")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(hubInstance);
+            }
+        }
+
+        [Test]
+        public void ValidateHubSceneInstanceLayout_ReportsError_WhenModuleRootIsOffset()
+        {
+            GameObject hubInstance = null;
+
+            try
+            {
+                hubInstance = CreateHubSceneInstance();
+                Transform moduleRoot = hubInstance.transform.Find("ModuleRoot");
+                moduleRoot.localPosition = new Vector3(2f, 0f, 0f);
+                ShowcaseValidationReport report = new();
+
+                ShowcaseValidator.ValidateHubSceneInstanceLayout(hubInstance, report);
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Scene ModuleRoot must stay aligned with the hub origin")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(hubInstance);
             }
         }
 
@@ -321,6 +507,33 @@ namespace LearningArchitect.Tests.Core
             return variant;
         }
 
+        private static HumanoidAnimationProfileSO CreateHumanoidProfile(GameObject actorPrefab, bool includeAvatar, bool includeAnimatorController)
+        {
+            HumanoidAnimationProfileSO template = AssetDatabase.LoadAssetAtPath<HumanoidAnimationProfileSO>(
+                "Assets/Modules/LayeredCharacterAnimation/Data/Animation_PaladinCombatProfile.asset");
+            Assert.IsNotNull(template, "Could not load Animation_PaladinCombatProfile.asset for validator tests.");
+
+            HumanoidAnimationProfileSO profile = ScriptableObject.CreateInstance<HumanoidAnimationProfileSO>();
+            profile.name = "HumanoidProfileForValidation";
+            SetField(profile, "actorPrefab", actorPrefab);
+            SetField(profile, "avatar", includeAvatar ? template.Avatar : null);
+            SetField(profile, "animatorController", includeAnimatorController ? template.AnimatorController : null);
+            return profile;
+        }
+
+        private static GameObject CreateActorPrefab(bool withAnimator, bool withCrowdActor)
+        {
+            GameObject actorPrefab = new("HumanoidActor");
+            if (withAnimator)
+                actorPrefab.AddComponent<Animator>();
+
+            if (withCrowdActor)
+                actorPrefab.AddComponent<HumanoidCrowdActor>();
+
+            return actorPrefab;
+        }
+
+
         private static void SetField(object target, string fieldName, object value)
         {
             FieldInfo field = target.GetType().GetField(fieldName, PrivateInstance);
@@ -336,46 +549,34 @@ namespace LearningArchitect.Tests.Core
                 UnityEngine.Object.DestroyImmediate(target);
         }
 
-        private static GameObject CreateHubPrefabForValidation(bool includeLegacyDescriptionText, string omitSectionName, bool includeCompositeSections = true)
+        private static GameObject CreateHubPrefabForValidation(bool includeDescriptionText, bool includeTabsRoot)
         {
             GameObject root = new("ArchitectureShowcaseHub", typeof(RectTransform), typeof(DescriptionPanel), typeof(ScrollRect));
             DescriptionPanel panel = root.GetComponent<DescriptionPanel>();
             ScrollRect scrollRect = root.GetComponent<ScrollRect>();
 
-            GameObject tabsBar = CreateNode("TabsBar", root.transform);
-            CreateNode("ActiveTabUnderline", tabsBar.transform);
+            if (includeTabsRoot)
+            {
+                GameObject tabsBar = CreateNode("Container - DescriptionCharacters", root.transform);
+                CreateNode("ActiveTabUnderline", tabsBar.transform);
+            }
 
             GameObject viewportObject = CreateNode("Viewport", root.transform, typeof(RectTransform), typeof(Image), typeof(Mask));
             RectTransform viewport = viewportObject.GetComponent<RectTransform>();
             scrollRect.viewport = viewport;
             panel.ScrollRect = scrollRect;
 
-            if (includeLegacyDescriptionText)
+            if (includeDescriptionText)
                 CreateSection("DescriptionText", viewport.transform, includeTextChildren: false);
-
-            if (includeCompositeSections)
-            {
-                CreateSectionIfRequired("Container - AboutInfo", viewport.transform, omitSectionName);
-                CreateSectionIfRequired("Container - ArchitectureInfo", viewport.transform, omitSectionName);
-                CreateSectionIfRequired("Container - Trade-OffsInfo", viewport.transform, omitSectionName);
-
-                GameObject prosCons = CreateSectionIfRequired("Container - ProsCons", viewport.transform, omitSectionName);
-                if (prosCons != null)
-                {
-                    CreateSectionIfRequired("Container - Pros", prosCons.transform, omitSectionName);
-                    CreateSectionIfRequired("Container - Cons", prosCons.transform, omitSectionName);
-                }
-            }
 
             return root;
         }
 
-        private static GameObject CreateSectionIfRequired(string sectionName, Transform parent, string omitSectionName)
+        private static GameObject CreateHubSceneInstance()
         {
-            if (string.Equals(sectionName, omitSectionName, StringComparison.Ordinal))
-                return null;
-
-            return CreateSection(sectionName, parent, includeTextChildren: true);
+            GameObject hub = new(ShowcaseValidator.HubRootName);
+            CreateNode("ModuleRoot", hub.transform);
+            return hub;
         }
 
         private static GameObject CreateSection(string sectionName, Transform parent, bool includeTextChildren)

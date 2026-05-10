@@ -31,7 +31,8 @@ namespace LearningArchitect.Tests.Core
                 Assert.That(FindDeep(root.transform, "ChartPlaceholder"), Is.Null);
                 Assert.That(FindDeep(root.transform, "Text - InputHints"), Is.Not.Null);
                 Assert.That(FindDeep(root.transform, "InputHints"), Is.Null);
-                Assert.That(FindDeep(root.transform, "ContentRoot"), Is.Not.Null);
+                Assert.That(FindDeep(root.transform, "DescriptionText"), Is.Not.Null);
+                Assert.That(FindDeep(root.transform, "ContentRoot"), Is.Null);
             }
             finally
             {
@@ -40,14 +41,14 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ApplyLayout_RecreatesCompositeDescriptionContent_AndCleansLegacyStressDrift()
+        public void ApplyLayout_PreservesLegacyDescriptionLayout_AndCleansStressDrift()
         {
             GameObject root = null;
 
             try
             {
                 root = CreateMinimalCurrentShapeRoot();
-                RemoveNode(root.transform, "Container - ArchitectureInfo");
+                RemoveNode(root.transform, "DescriptionText");
 
                 Transform nextModuleButton = EnsureNode(root.transform, "Canvas/RootFrame/ModuleInfoPanel/NavigationControlsPanel/NextModuleButton");
                 CreateNode("ActiveGlow", nextModuleButton, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -57,9 +58,8 @@ namespace LearningArchitect.Tests.Core
 
                 InvokeApplyLayout(root);
 
-                Transform contentRoot = FindDeep(root.transform, "ContentRoot");
-                Assert.That(contentRoot, Is.Not.Null);
-                Assert.That(FindDeep(contentRoot, "Container - ArchitectureInfo"), Is.Not.Null);
+                Transform descriptionText = FindDeep(root.transform, "DescriptionText");
+                Assert.That(descriptionText, Is.Not.Null);
 
                 Transform stressContent = EnsureNode(root.transform, "Canvas/RootFrame/StressControlsPanel/Container - StressSection/Container - StressContent");
                 Assert.That(CountDirectChildrenByName(stressSection, "Container - StressSummary"), Is.EqualTo(0));
@@ -120,7 +120,7 @@ namespace LearningArchitect.Tests.Core
             GameObject tabsBar = CreateNode("Container - DescriptionCharacters", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             CreateNode("ActiveTabUnderline", tabsBar.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             GameObject viewport = CreateNode("Viewport", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(RectMask2D));
-            CreateCompositeDescriptionSectionSkeleton(viewport.transform);
+            CreateNode("DescriptionText", viewport.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI), typeof(ContentSizeFitter));
 
             GameObject stressControls = CreateNode("StressControlsPanel", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             GameObject moduleSection = CreateNode("Container - ModuleSection", stressControls.transform, typeof(RectTransform));
@@ -153,24 +153,6 @@ namespace LearningArchitect.Tests.Core
             CreateNode("SystemStatusCard", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
             return root;
-        }
-
-        private static void CreateCompositeDescriptionSectionSkeleton(Transform viewport)
-        {
-            CreateSection("Container - AboutInfo", viewport);
-            CreateSection("Container - ArchitectureInfo", viewport);
-            CreateSection("Container - Trade-OffsInfo", viewport);
-
-            GameObject prosCons = CreateNode("Container - ProsCons", viewport, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateSection("Container - Pros", prosCons.transform);
-            CreateSection("Container - Cons", prosCons.transform);
-        }
-
-        private static void CreateSection(string name, Transform parent)
-        {
-            GameObject section = CreateNode(name, parent, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("Text - Header", section.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
-            CreateNode("Text - Description", section.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
         }
 
         private static void CreateStressButton(string name, Transform parent)

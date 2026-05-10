@@ -362,9 +362,9 @@ The practical authoring contract for the hub prefab, `DescriptionPanel`, and reu
 The hub shell currently keeps two truths that matter:
 
 - the shipped visual baseline is the restored hand-authored prefab layout;
-- runtime support now accepts both the old single-text `DescriptionPanel` viewport path and the newer composite section path.
+- `DescriptionPanel` now follows that shipped single-text viewport path as the actual runtime contract.
 
-In other words, the runtime is more flexible than the current shipped prefab. That flexibility exists to prevent breakage during migration, not to justify automatic layout rebuilding.
+In other words, the shipped prefab is no longer competing with a second runtime authoring model. Tooling should preserve the baseline, not reinterpret it.
 
 ## WebGL Demo Architecture
 
@@ -462,6 +462,7 @@ The project now has one architectural story instead of parallel old and new path
 
 Current validation approach:
 
+- run `./Verify-Showcase.ps1` for the repo-level build and site-copy checks;
 - compile through Unity and `dotnet build`;
 - run Unity EditMode tests;
 - run `Tools/LearningArchitect/Validate Showcase Configuration` when module data, prefab wiring, or localization tables change;

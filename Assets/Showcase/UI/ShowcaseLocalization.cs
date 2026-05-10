@@ -600,13 +600,13 @@ namespace LearningArchitect.UI
                 case "demo_complete":
                     return language == ShowcaseLanguage.Russian ? "ДЕМО ЗАВЕРШЕНО" : "DEMO COMPLETE";
                 case "system_status":
-                    return "SYSTEM STATUS";
+                    return language == ShowcaseLanguage.Russian ? "СОСТОЯНИЕ СИСТЕМЫ" : "SYSTEM STATUS";
                 case "select_module":
-                    return "SELECT MODULE";
+                    return language == ShowcaseLanguage.Russian ? "ВЫБОР МОДУЛЯ" : "SELECT MODULE";
                 case "select_variant":
-                    return "SELECT VARIANT";
+                    return language == ShowcaseLanguage.Russian ? "ВЫБОР ВАРИАНТА" : "SELECT VARIANT";
                 case "stress_test":
-                    return "STRESS TEST";
+                    return language == ShowcaseLanguage.Russian ? "СТРЕСС-ТЕСТ" : "STRESS TEST";
                 case "module_type":
                     return language == ShowcaseLanguage.Russian ? "ТИП МОДУЛЯ" : "MODULE TYPE";
                 case "overview":
@@ -614,13 +614,13 @@ namespace LearningArchitect.UI
                 case "architecture":
                     return language == ShowcaseLanguage.Russian ? "Архитектура" : "Architecture";
                 case "core_idea":
-                    return language == ShowcaseLanguage.Russian ? "РћСЃРЅРѕРІРЅР°СЏ РёРґРµСЏ" : "Core Idea";
+                    return language == ShowcaseLanguage.Russian ? "Ключевая идея" : "Core Idea";
                 case "data_flow":
-                    return language == ShowcaseLanguage.Russian ? "РџРѕС‚РѕРє РґР°РЅРЅС‹С…" : "Data Flow";
+                    return language == ShowcaseLanguage.Russian ? "Поток данных" : "Data Flow";
                 case "runtime_lifecycle":
-                    return language == ShowcaseLanguage.Russian ? "Р–РёР·РЅРµРЅРЅС‹Р№ С†РёРєР» runtime" : "Runtime Lifecycle";
+                    return language == ShowcaseLanguage.Russian ? "Жизненный цикл runtime" : "Runtime Lifecycle";
                 case "why_this_approach":
-                    return language == ShowcaseLanguage.Russian ? "РџРѕС‡РµРјСѓ СЌС‚РѕС‚ РїРѕРґС…РѕРґ" : "Why This Approach";
+                    return language == ShowcaseLanguage.Russian ? "Почему этот подход" : "Why This Approach";
                 case "trade_offs":
                     return language == ShowcaseLanguage.Russian ? "Компромиссы" : "Trade-offs";
                 case "about":
@@ -642,11 +642,11 @@ namespace LearningArchitect.UI
                 case "no_architecture_notes":
                     return language == ShowcaseLanguage.Russian ? "Описание архитектуры отсутствует." : "No architecture notes provided.";
                 case "no_data_flow":
-                    return language == ShowcaseLanguage.Russian ? "РџРѕС‚РѕРє РґР°РЅРЅС‹С… РЅРµ РѕРїРёСЃР°РЅ." : "No data flow notes provided.";
+                    return language == ShowcaseLanguage.Russian ? "Поток данных не описан." : "No data flow notes provided.";
                 case "no_runtime_lifecycle":
-                    return language == ShowcaseLanguage.Russian ? "Р–РёР·РЅРµРЅРЅС‹Р№ С†РёРєР» runtime РЅРµ РѕРїРёСЃР°РЅ." : "No runtime lifecycle notes provided.";
+                    return language == ShowcaseLanguage.Russian ? "Жизненный цикл runtime не описан." : "No runtime lifecycle notes provided.";
                 case "no_why_this_approach":
-                    return language == ShowcaseLanguage.Russian ? "РћР±РѕСЃРЅРѕРІР°РЅРёРµ РІС‹Р±РѕСЂР° РїРѕРґС…РѕРґР° РЅРµ СѓРєР°Р·Р°РЅРѕ." : "No rationale for this approach provided.";
+                    return language == ShowcaseLanguage.Russian ? "Обоснование выбора подхода не указано." : "No rationale for this approach provided.";
                 case "no_problem_statement":
                     return language == ShowcaseLanguage.Russian ? "Постановка проблемы не указана." : "No problem statement provided.";
                 case "no_compare_summary":

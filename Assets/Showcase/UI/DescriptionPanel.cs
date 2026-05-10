@@ -24,129 +24,14 @@ namespace LearningArchitect.UI
             }
 
             public string Title { get; }
-
             public string Value { get; }
-
             public string EmptyFallback { get; }
-
             public bool HideWhenEmpty { get; }
-
             public bool TreatAsList { get; }
-
             public Color BulletColor { get; }
         }
 
-        private sealed class SectionView
-        {
-            private const float VerticalSpacing = 12f;
-
-            private readonly string rootName;
-            private readonly Color defaultBodyColor;
-            private readonly Vector2 bodyBaseMargin;
-
-            private readonly RectTransform root;
-            private readonly RectTransform headerRect;
-            private readonly RectTransform bodyRect;
-            private readonly TextMeshProUGUI header;
-            private readonly TextMeshProUGUI body;
-            private readonly LayoutElement layoutElement;
-
-            public SectionView(string rootName, RectTransform root, TextMeshProUGUI header, TextMeshProUGUI body)
-            {
-                this.rootName = rootName;
-                this.root = root;
-                this.header = header;
-                this.body = body;
-
-                headerRect = header.rectTransform;
-                bodyRect = body.rectTransform;
-                defaultBodyColor = body.color;
-                bodyBaseMargin = new Vector2(body.margin.x, body.margin.z);
-
-                layoutElement = root.GetComponent<LayoutElement>();
-                if (layoutElement == null)
-                    layoutElement = root.gameObject.AddComponent<LayoutElement>();
-
-                PrepareTransforms();
-            }
-
-            public string RootName => rootName;
-
-            public RectTransform Root => root;
-
-            public void SetVisible(bool isVisible)
-            {
-                root.gameObject.SetActive(isVisible);
-            }
-
-            public void ApplyContent(string title, string bodyText, Color titleColor, Color? bodyColor = null)
-            {
-                root.gameObject.SetActive(true);
-
-                header.text = title;
-                header.color = titleColor;
-                body.text = bodyText;
-                body.color = bodyColor ?? defaultBodyColor;
-
-                Layout();
-            }
-
-            public void Relayout()
-            {
-                if (!root.gameObject.activeSelf)
-                    return;
-
-                Layout();
-            }
-
-            private void PrepareTransforms()
-            {
-                root.anchorMin = new Vector2(0f, 1f);
-                root.anchorMax = new Vector2(1f, 1f);
-                root.pivot = new Vector2(0.5f, 1f);
-                root.sizeDelta = new Vector2(0f, root.sizeDelta.y);
-
-                headerRect.anchorMin = new Vector2(0f, 1f);
-                headerRect.anchorMax = new Vector2(1f, 1f);
-                headerRect.pivot = new Vector2(0.5f, 1f);
-                headerRect.anchoredPosition = Vector2.zero;
-                headerRect.sizeDelta = new Vector2(0f, headerRect.sizeDelta.y);
-
-                bodyRect.anchorMin = new Vector2(0f, 1f);
-                bodyRect.anchorMax = new Vector2(1f, 1f);
-                bodyRect.pivot = new Vector2(0.5f, 1f);
-                bodyRect.sizeDelta = new Vector2(0f, bodyRect.sizeDelta.y);
-            }
-
-            private void Layout()
-            {
-                float rootWidth = root.rect.width;
-                if (rootWidth < 1f && root.parent is RectTransform parentRect)
-                    rootWidth = parentRect.rect.width;
-
-                rootWidth = Mathf.Max(1f, rootWidth);
-                float bodyAvailableWidth = Mathf.Max(1f, rootWidth - bodyBaseMargin.x - bodyBaseMargin.y);
-
-                float headerHeight = Mathf.Max(header.preferredHeight, header.fontSize + 4f);
-                float bodyHeight = Mathf.Max(body.GetPreferredValues(body.text, bodyAvailableWidth, 0f).y, body.fontSize + 4f);
-                float totalHeight = Mathf.Ceil(headerHeight + VerticalSpacing + bodyHeight);
-
-                headerRect.anchoredPosition = Vector2.zero;
-                headerRect.sizeDelta = new Vector2(0f, headerHeight);
-
-                bodyRect.anchoredPosition = new Vector2(0f, -(headerHeight + VerticalSpacing));
-                bodyRect.sizeDelta = new Vector2(0f, bodyHeight);
-
-                root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalHeight);
-                layoutElement.minHeight = totalHeight;
-                layoutElement.preferredHeight = totalHeight;
-
-                LayoutRebuilder.ForceRebuildLayoutImmediate(root);
-            }
-        }
-
         [SerializeField] private ScrollRect scrollRect;
-        [SerializeField] private float fadeDuration = 0.16f;
         [SerializeField] private Color activeTabColor = default;
         [SerializeField] private Color inactiveTabColor = default;
         [SerializeField] private Color sectionTitleColor = default;
@@ -154,23 +39,16 @@ namespace LearningArchitect.UI
         [SerializeField] private Color negativeTextColor = default;
 
         private readonly TextMeshProUGUI[] tabLabels = new TextMeshProUGUI[3];
-        private readonly List<SectionView> sectionPool = new(6);
         private readonly List<SectionDefinition> sectionDefinitions = new(6);
         private readonly Vector3[] tabWorldCorners = new Vector3[4];
 
         private RectTransform activeTabUnderline;
-        private Vector3 baseScale = Vector3.one;
-        private RectTransform contentRoot;
-        private CanvasGroup contentCanvasGroup;
         private int currentTabIndex;
         private ModuleDefinitionSO currentModule;
         private bool isInitialized;
-        private float fadeTimer;
         private TextMeshProUGUI legacyDescriptionText;
         private RectTransform tabsBar;
         private VariantDefinitionSO currentVariant;
-        private float lastKnownLayoutWidth = -1f;
-        private bool useLegacyDescriptionText;
 
         public ScrollRect ScrollRect
         {
@@ -208,33 +86,6 @@ namespace LearningArchitect.UI
 
             EnsureTabLayout();
             RefreshTabVisuals();
-
-            if (contentRoot == null)
-                return;
-
-            float currentWidth = contentRoot.rect.width;
-            if (Mathf.Abs(currentWidth - lastKnownLayoutWidth) >= 0.5f)
-                RelayoutVisibleSections();
-        }
-
-        private void Update()
-        {
-            if (!EnsureInitialized())
-                return;
-
-            if (fadeTimer <= 0f)
-                return;
-
-            fadeTimer -= Time.unscaledDeltaTime;
-
-            float normalized = fadeDuration <= 0f ? 1f : 1f - Mathf.Clamp01(fadeTimer / fadeDuration);
-            float eased = normalized * normalized * (3f - 2f * normalized);
-
-            if (contentCanvasGroup != null)
-                contentCanvasGroup.alpha = eased;
-
-            if (contentRoot != null)
-                contentRoot.localScale = baseScale * Mathf.Lerp(0.985f, 1f, eased);
         }
 
         public void SetVariant(VariantDefinitionSO variant)
@@ -251,8 +102,8 @@ namespace LearningArchitect.UI
                 return;
 
             currentTabIndex = Mathf.Clamp(tabIndex, 0, tabLabels.Length - 1);
-            RefreshTabVisuals();
             RebuildContent();
+            RefreshTabVisuals();
         }
 
         public void SetContent(ModuleDefinitionSO module, VariantDefinitionSO variant)
@@ -263,6 +114,7 @@ namespace LearningArchitect.UI
             currentModule = module;
             currentVariant = variant;
             RebuildContent();
+            RefreshTabVisuals();
         }
 
         public void RefreshLocalizedContent()
@@ -278,6 +130,7 @@ namespace LearningArchitect.UI
 
             EnsureTabLayout();
             RebuildContent();
+            RefreshTabVisuals();
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -305,10 +158,6 @@ namespace LearningArchitect.UI
             if (!TryResolveUi())
                 return false;
 
-            baseScale = contentRoot == null ? Vector3.one : contentRoot.localScale;
-            if (contentCanvasGroup == null && contentRoot != null)
-                contentCanvasGroup = contentRoot.gameObject.AddComponent<CanvasGroup>();
-
             isInitialized = true;
             return true;
         }
@@ -333,14 +182,14 @@ namespace LearningArchitect.UI
 
         private bool TryResolveUi()
         {
-            if (scrollRect == null)
+            if (scrollRect == null || scrollRect.viewport == null)
                 return false;
 
             RectTransform panelRoot = scrollRect.transform as RectTransform;
-            if (panelRoot == null || scrollRect.viewport == null)
+            if (panelRoot == null)
                 return false;
 
-            tabsBar = ResolveTabsBar(panelRoot);
+            tabsBar = panelRoot.Find("Container - DescriptionCharacters") as RectTransform;
             if (tabsBar == null)
                 return false;
 
@@ -348,19 +197,18 @@ namespace LearningArchitect.UI
             if (activeTabUnderline == null)
                 return false;
 
+            legacyDescriptionText = FindDeep(scrollRect.viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
+            if (legacyDescriptionText == null)
+                return false;
+
+            legacyDescriptionText.richText = true;
+
             if (!TryResolveTabLabels())
                 return false;
 
             EnsureTabLayout();
-            bool resolvedCompositeUi = TryResolveCompositeUi(scrollRect.viewport) || TryResolveLegacyUi(scrollRect.viewport);
             RefreshTabVisuals();
-            return resolvedCompositeUi;
-        }
-
-        private RectTransform ResolveTabsBar(RectTransform panelRoot)
-        {
-            return panelRoot.Find("TabsBar") as RectTransform
-                   ?? panelRoot.Find("Container - DescriptionCharacters") as RectTransform;
+            return true;
         }
 
         private bool TryResolveTabLabels()
@@ -368,24 +216,7 @@ namespace LearningArchitect.UI
             for (int i = 0; i < tabLabels.Length; i++)
                 tabLabels[i] = null;
 
-            bool foundNamedTabs = true;
-            for (int i = 0; i < tabLabels.Length; i++)
-            {
-                Transform tabTransform = tabsBar.Find("Tab_" + i);
-                if (tabTransform == null)
-                {
-                    foundNamedTabs = false;
-                    break;
-                }
-
-                if (!TryBindTabLabel(i, tabTransform))
-                    return false;
-            }
-
-            if (foundNamedTabs)
-                return true;
-
-            List<TextMeshProUGUI> fallbackLabels = new(tabLabels.Length);
+            List<TextMeshProUGUI> labels = new(tabLabels.Length);
             for (int i = 0; i < tabsBar.childCount; i++)
             {
                 Transform child = tabsBar.GetChild(i);
@@ -394,15 +225,15 @@ namespace LearningArchitect.UI
 
                 TextMeshProUGUI label = child.GetComponent<TextMeshProUGUI>() ?? child.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (label != null)
-                    fallbackLabels.Add(label);
+                    labels.Add(label);
             }
 
-            if (fallbackLabels.Count < tabLabels.Length)
+            if (labels.Count < tabLabels.Length)
                 return false;
 
             for (int i = 0; i < tabLabels.Length; i++)
             {
-                if (!TryBindTabLabel(i, fallbackLabels[i].transform))
+                if (!TryBindTabLabel(i, labels[i].transform))
                     return false;
             }
 
@@ -431,180 +262,18 @@ namespace LearningArchitect.UI
             return true;
         }
 
-        private bool TryResolveCompositeUi(RectTransform viewport)
-        {
-            SectionView overviewSection = ResolveSection(viewport, "Container - AboutInfo");
-            SectionView architectureSection = ResolveSection(viewport, "Container - ArchitectureInfo");
-            SectionView tradeOffsSection = ResolveSection(viewport, "Container - Trade-OffsInfo");
-            RectTransform prosConsRoot = FindDeep(viewport, "Container - ProsCons") as RectTransform;
-            if (prosConsRoot == null)
-                return false;
-
-            SectionView prosSection = ResolveSection(prosConsRoot, "Container - Pros");
-            SectionView consSection = ResolveSection(prosConsRoot, "Container - Cons");
-
-            if (overviewSection == null || architectureSection == null || tradeOffsSection == null || prosSection == null || consSection == null)
-                return false;
-
-            sectionPool.Clear();
-            sectionPool.Add(overviewSection);
-            sectionPool.Add(architectureSection);
-            sectionPool.Add(tradeOffsSection);
-            sectionPool.Add(prosSection);
-            sectionPool.Add(consSection);
-
-            contentRoot = viewport.Find("ContentRoot") as RectTransform;
-            if (contentRoot == null)
-            {
-                GameObject contentObject = new("ContentRoot", typeof(RectTransform), typeof(CanvasRenderer), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-                contentRoot = contentObject.GetComponent<RectTransform>();
-                contentRoot.SetParent(viewport, false);
-            }
-
-            contentRoot.anchorMin = new Vector2(0f, 1f);
-            contentRoot.anchorMax = new Vector2(1f, 1f);
-            contentRoot.pivot = new Vector2(0.5f, 1f);
-            contentRoot.anchoredPosition = Vector2.zero;
-            contentRoot.sizeDelta = new Vector2(0f, 0f);
-
-            VerticalLayoutGroup layoutGroup = GetOrAddComponent<VerticalLayoutGroup>(contentRoot.gameObject);
-            layoutGroup.padding = new RectOffset(0, 0, 0, 0);
-            layoutGroup.spacing = 18f;
-            layoutGroup.childAlignment = TextAnchor.UpperLeft;
-            layoutGroup.childControlWidth = true;
-            layoutGroup.childControlHeight = false;
-            layoutGroup.childForceExpandWidth = false;
-            layoutGroup.childForceExpandHeight = false;
-
-            ContentSizeFitter fitter = GetOrAddComponent<ContentSizeFitter>(contentRoot.gameObject);
-            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            for (int i = 0; i < sectionPool.Count; i++)
-                sectionPool[i].Root.SetParent(contentRoot, false);
-
-            scrollRect.content = contentRoot;
-            contentCanvasGroup = contentRoot.GetComponent<CanvasGroup>();
-            if (contentCanvasGroup == null)
-                contentCanvasGroup = contentRoot.gameObject.AddComponent<CanvasGroup>();
-
-            lastKnownLayoutWidth = contentRoot.rect.width;
-            legacyDescriptionText = null;
-            useLegacyDescriptionText = false;
-
-            return true;
-        }
-
-        private bool TryResolveLegacyUi(RectTransform viewport)
-        {
-            TextMeshProUGUI legacyText = FindDeep(viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
-            if (legacyText == null)
-                return false;
-
-            legacyDescriptionText = legacyText;
-            contentRoot = null;
-            contentCanvasGroup = null;
-            useLegacyDescriptionText = true;
-            return true;
-        }
-
-        private static SectionView ResolveSection(Transform root, string sectionName)
-        {
-            RectTransform sectionRoot = FindDeep(root, sectionName) as RectTransform;
-            if (sectionRoot == null)
-                return null;
-
-            TextMeshProUGUI header = FindDeep(sectionRoot, "Text - Header")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI body = FindDeep(sectionRoot, "Text - Description")?.GetComponent<TextMeshProUGUI>();
-            if (header == null || body == null)
-                return null;
-
-            return new SectionView(sectionName, sectionRoot, header, body);
-        }
-
         private void RebuildContent()
-        {
-            if (useLegacyDescriptionText)
-            {
-                RebuildLegacyContent();
-                return;
-            }
-
-            RebuildCompositeContent();
-        }
-
-        private void RebuildCompositeContent()
-        {
-            if (currentVariant == null)
-            {
-                ShowFallbackComposite();
-                return;
-            }
-
-            string moduleDescription = ShowcaseLocalization.GetModuleDescription(currentModule);
-            string moduleCategory = ShowcaseLocalization.GetModuleCategory(currentModule);
-            string moduleProblem = ShowcaseLocalization.GetModuleProblemStatement(currentModule);
-            string compareSummary = ShowcaseLocalization.GetVariantCompareSummary(currentVariant);
-            string takeaway = ShowcaseLocalization.GetVariantTakeaway(currentVariant);
-            string webGlPreset = ShowcaseLocalization.GetModuleWebGlPresetNote(currentModule);
-            string architectureDescription = ShowcaseLocalization.GetVariantArchitectureDescription(currentVariant);
-            string dataFlow = ShowcaseLocalization.GetVariantDataFlow(currentVariant);
-            string runtimeLifecycle = ShowcaseLocalization.GetVariantRuntimeLifecycle(currentVariant);
-            string whyThisApproach = ShowcaseLocalization.GetVariantWhyThisApproach(currentVariant);
-            string tradeOffs = ShowcaseLocalization.GetVariantTradeOffs(currentVariant);
-            string pros = ShowcaseLocalization.GetVariantPros(currentVariant);
-            string cons = ShowcaseLocalization.GetVariantCons(currentVariant);
-
-            sectionDefinitions.Clear();
-
-            switch (currentTabIndex)
-            {
-                case 0:
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("about"), moduleDescription, ShowcaseLocalization.GetText("realtime_preview"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("compare"), compareSummary, ShowcaseLocalization.GetText("no_compare_summary"));
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("webgl_preset"), webGlPreset);
-                    break;
-
-                case 1:
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("core_idea"), architectureDescription, ShowcaseLocalization.GetText("no_architecture_notes"));
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("data_flow"), dataFlow);
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("runtime_lifecycle"), runtimeLifecycle);
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("why_this_approach"), string.IsNullOrWhiteSpace(whyThisApproach) ? compareSummary : whyThisApproach);
-                    AddOptionalListSection(ShowcaseLocalization.GetText("strengths"), pros, positiveTextColor);
-                    AddRequiredListSection(ShowcaseLocalization.GetText("watch_out"), cons, ShowcaseLocalization.GetText("no_constraints"), negativeTextColor);
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
-                    break;
-
-                default:
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("compare"), compareSummary, ShowcaseLocalization.GetText("no_compare_summary"));
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("trade_offs"), tradeOffs, ShowcaseLocalization.GetText("no_tradeoffs"));
-                    AddOptionalListSection(ShowcaseLocalization.GetText("pros"), pros, positiveTextColor);
-                    AddOptionalListSection(ShowcaseLocalization.GetText("cons"), cons, negativeTextColor);
-                    AddOptionalTextSection(ShowcaseLocalization.GetText("takeaway"), takeaway);
-                    break;
-            }
-
-            ApplyCompositeSections();
-            PlayCompositeFade();
-            ResetScroll();
-            RefreshTabVisuals();
-        }
-
-        private void RebuildLegacyContent()
         {
             if (legacyDescriptionText == null)
                 return;
 
             if (currentVariant == null)
             {
-                legacyDescriptionText.text = BuildLegacyFallback();
+                legacyDescriptionText.text = BuildLegacySection(
+                    ShowcaseLocalization.GetText("overview"),
+                    ShowcaseLocalization.GetText("no_variant"),
+                    sectionTitleColor);
                 ResetScroll();
-                RefreshTabVisuals();
                 return;
             }
 
@@ -659,40 +328,6 @@ namespace LearningArchitect.UI
             legacyDescriptionText.text = BuildLegacyBody();
             LayoutRebuilder.ForceRebuildLayoutImmediate(legacyDescriptionText.rectTransform);
             ResetScroll();
-            RefreshTabVisuals();
-        }
-
-        private void ApplySection(SectionView section, int siblingIndex, string title, string body)
-        {
-            if (section == null)
-                return;
-
-            section.Root.SetSiblingIndex(siblingIndex);
-            section.ApplyContent(title, body, ResolveSectionTitleColor(title));
-        }
-
-        private void ShowFallbackComposite()
-        {
-            sectionDefinitions.Clear();
-            sectionDefinitions.Add(new SectionDefinition(
-                ShowcaseLocalization.GetText("overview"),
-                ShowcaseLocalization.GetText("no_variant"),
-                ShowcaseLocalization.GetText("no_variant"),
-                false));
-
-            ApplyCompositeSections();
-
-            PlayCompositeFade();
-            ResetScroll();
-            RefreshTabVisuals();
-        }
-
-        private string BuildLegacyFallback()
-        {
-            return BuildLegacySection(
-                ShowcaseLocalization.GetText("overview"),
-                ShowcaseLocalization.GetText("no_variant"),
-                sectionTitleColor);
         }
 
         private string BuildLegacyBody()
@@ -721,51 +356,11 @@ namespace LearningArchitect.UI
             return "<color=" + ToHex(titleColor) + "><b>" + title + "</b></color>\n" + body;
         }
 
-        private void PlayCompositeFade()
-        {
-            if (contentCanvasGroup != null)
-                contentCanvasGroup.alpha = 0f;
-
-            if (contentRoot != null)
-            {
-                contentRoot.localScale = baseScale * 0.985f;
-                LayoutRebuilder.ForceRebuildLayoutImmediate(contentRoot);
-                lastKnownLayoutWidth = contentRoot.rect.width;
-            }
-
-            fadeTimer = fadeDuration;
-        }
-
-        private void RelayoutVisibleSections()
-        {
-            float preservedScroll = scrollRect.verticalNormalizedPosition;
-
-            for (int i = 0; i < sectionPool.Count; i++)
-                sectionPool[i].Relayout();
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRoot);
-            lastKnownLayoutWidth = contentRoot.rect.width;
-
-            Canvas.ForceUpdateCanvases();
-            scrollRect.verticalNormalizedPosition = preservedScroll;
-        }
-
-        private void RefreshTabVisuals()
-        {
-            for (int i = 0; i < tabLabels.Length; i++)
-            {
-                if (tabLabels[i] == null)
-                    continue;
-
-                tabLabels[i].color = i == currentTabIndex ? activeTabColor : inactiveTabColor;
-                tabLabels[i].fontStyle = i == currentTabIndex ? FontStyles.Bold : FontStyles.Normal;
-            }
-
-            UpdateUnderlineLayout();
-        }
-
         private void ResetScroll()
         {
+            if (scrollRect == null)
+                return;
+
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 1f;
         }
@@ -775,6 +370,7 @@ namespace LearningArchitect.UI
             string prosTitle = ShowcaseLocalization.GetText("pros");
             string consTitle = ShowcaseLocalization.GetText("cons");
             string strengthsTitle = ShowcaseLocalization.GetText("strengths");
+            string watchOutTitle = ShowcaseLocalization.GetText("watch_out");
 
             if (string.Equals(title, prosTitle, StringComparison.Ordinal) ||
                 string.Equals(title, strengthsTitle, StringComparison.Ordinal))
@@ -782,8 +378,11 @@ namespace LearningArchitect.UI
                 return positiveTextColor;
             }
 
-            if (string.Equals(title, consTitle, StringComparison.Ordinal))
+            if (string.Equals(title, consTitle, StringComparison.Ordinal) ||
+                string.Equals(title, watchOutTitle, StringComparison.Ordinal))
+            {
                 return negativeTextColor;
+            }
 
             return sectionTitleColor;
         }
@@ -808,24 +407,6 @@ namespace LearningArchitect.UI
             sectionDefinitions.Add(new SectionDefinition(title, value, fallback, false, true, bulletColor));
         }
 
-        private void ApplyCompositeSections()
-        {
-            EnsureSectionPoolSize(sectionDefinitions.Count);
-
-            int visibleIndex = 0;
-            for (int i = 0; i < sectionDefinitions.Count; i++)
-            {
-                if (!TryResolveSectionBody(sectionDefinitions[i], out string body))
-                    continue;
-
-                ApplySection(sectionPool[visibleIndex], visibleIndex, sectionDefinitions[i].Title, body);
-                visibleIndex++;
-            }
-
-            for (int i = visibleIndex; i < sectionPool.Count; i++)
-                sectionPool[i].SetVisible(false);
-        }
-
         private bool TryResolveSectionBody(SectionDefinition definition, out string body)
         {
             string resolved = definition.TreatAsList
@@ -845,24 +426,6 @@ namespace LearningArchitect.UI
 
             body = resolved;
             return !string.IsNullOrWhiteSpace(body);
-        }
-
-        private void EnsureSectionPoolSize(int requiredCount)
-        {
-            if (requiredCount <= sectionPool.Count || sectionPool.Count == 0)
-                return;
-
-            SectionView template = sectionPool[0];
-            while (sectionPool.Count < requiredCount)
-            {
-                GameObject clone = Instantiate(template.Root.gameObject, contentRoot, false);
-                clone.name = "RuntimeSection_" + sectionPool.Count;
-                SectionView cloneView = ResolveSectionFromRoot(clone.GetComponent<RectTransform>(), clone.name);
-                if (cloneView == null)
-                    break;
-
-                sectionPool.Add(cloneView);
-            }
         }
 
         private void EnsureTabLayout()
@@ -885,6 +448,20 @@ namespace LearningArchitect.UI
                 rect.anchoredPosition = Vector2.zero;
                 label.alignment = TextAlignmentOptions.Center;
             }
+        }
+
+        private void RefreshTabVisuals()
+        {
+            for (int i = 0; i < tabLabels.Length; i++)
+            {
+                if (tabLabels[i] == null)
+                    continue;
+
+                tabLabels[i].color = i == currentTabIndex ? activeTabColor : inactiveTabColor;
+                tabLabels[i].fontStyle = i == currentTabIndex ? FontStyles.Bold : FontStyles.Normal;
+            }
+
+            UpdateUnderlineLayout();
         }
 
         private void UpdateUnderlineLayout()
@@ -954,25 +531,6 @@ namespace LearningArchitect.UI
         private static string ToHex(Color color)
         {
             return "#" + ColorUtility.ToHtmlStringRGB(color);
-        }
-
-        private static SectionView ResolveSectionFromRoot(RectTransform sectionRoot, string sectionName)
-        {
-            if (sectionRoot == null)
-                return null;
-
-            TextMeshProUGUI header = FindDeep(sectionRoot, "Text - Header")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI body = FindDeep(sectionRoot, "Text - Description")?.GetComponent<TextMeshProUGUI>();
-            if (header == null || body == null)
-                return null;
-
-            return new SectionView(sectionName, sectionRoot, header, body);
-        }
-
-        private static T GetOrAddComponent<T>(GameObject target) where T : Component
-        {
-            T component = target.GetComponent<T>();
-            return component != null ? component : target.AddComponent<T>();
         }
 
         private static Transform FindDeep(Transform root, string name)

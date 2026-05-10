@@ -204,6 +204,16 @@ namespace LearningArchitect.Modules.Animation3D
 
             if (!animationProfile.HasActorPrefab)
                 throw new InvalidOperationException($"{nameof(HumanoidAnimationVariant)} requires an actor prefab on {animationProfile.name}.");
+
+            if (!animationProfile.HasAvatar)
+                throw new InvalidOperationException($"{nameof(HumanoidAnimationVariant)} requires an avatar on {animationProfile.name}.");
+
+            if (!animationProfile.HasAnimatorController)
+                throw new InvalidOperationException($"{nameof(HumanoidAnimationVariant)} requires an animator controller on {animationProfile.name}.");
+
+            if (!animationProfile.ActorPrefabHasAnimator)
+                throw new InvalidOperationException(
+                    $"{nameof(HumanoidAnimationVariant)} requires an Animator on actor prefab '{animationProfile.ActorPrefab.name}'.");
         }
 
         private void ClearVisuals()

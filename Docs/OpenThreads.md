@@ -15,7 +15,7 @@ Do not use it for:
 
 ## Current Threads
 
-### T-001: Finish Description Panel Card Model
+### T-001: Verify Description Panel On Real Long-Form Content
 
 Status:
 
@@ -23,28 +23,27 @@ Status:
 
 Goal:
 
-- move `DescriptionPanel` toward a cleaner per-card model with stronger tab composition and card-specific behavior without destabilizing the restored hub baseline.
+- verify that the shipped `DescriptionText`-based panel remains readable and stable for long `RU` and `EN` content.
 
 Known State:
 
-- the panel already supports both the legacy text viewport and the composite section UI;
+- the panel now follows the shipped `Viewport -> DescriptionText` contract only;
 - tabs are auto-laid out instead of relying on old absolute positions;
-- `DescriptionPanelTests` already cover section visibility, tab structure, and legacy-tab fallback;
-- optional sections can now hide;
-- the current shipped prefab still uses the legacy `DescriptionText` baseline, so richer card work is no longer allowed to assume composite-only authoring.
+- `DescriptionPanelTests` now cover section ordering, hidden optional sections, fallback text, and bullet formatting against the shipped contract;
+- optional sections can still hide cleanly inside the rendered body.
 
 Next Useful Steps:
 
 1. verify panel behavior in Unity for long `RU` and `EN` strings on the restored baseline;
-2. decide whether `pros/cons` should stay text-backed or become row-based list items if the project returns to card-specialized layouts;
-3. decide how far the panel should move from section remapping toward truly distinct card layouts before another prefab migration is attempted.
+2. tune spacing, wrapping, and scroll feel only if a real readability issue appears in the shipped prefab;
+3. avoid inventing a second authoring model unless there is a deliberate visual redesign.
 
 Primary Files:
 
 - `Assets/Showcase/UI/DescriptionPanel.cs`
 - `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
 
-### T-002: Align Prefab, Description Panel, And Editor Tooling
+### T-002: Keep Prefab, Description Panel, And Editor Tooling Locked To One Contract
 
 Status:
 
@@ -52,21 +51,22 @@ Status:
 
 Goal:
 
-- keep prefab structure, `DescriptionPanel`, validator rules, and `ShowcaseLayoutTool` consistent around the real shipped hub baseline.
+- keep prefab structure, `DescriptionPanel`, validator rules, and `ShowcaseLayoutTool` consistent around one shipped hub baseline.
 
 Known State:
 
 - the current hub prefab is again the visual source of truth;
 - `NewUIManager` has been removed from the current tree;
-- the hub prefab currently uses the legacy `DescriptionText` viewport path while runtime and validator accept both legacy and composite layouts;
+- the hub prefab, runtime, and validator now all use the legacy `DescriptionText` viewport path;
 - `ShowcaseLayoutTool` public rebuild/apply entrypoints are intentionally in safe mode because automatic normalization already proved too destructive;
+- the remaining private `ShowcaseLayoutTool` path is now a preserve-first normalizer for a few known drift cases, not a layout generator;
 - this area still matters because prefab layout, compatibility code, and validator expectations are all part of the same teaching-critical contract.
 
 Next Useful Steps:
 
 1. keep the prefab, not the rebuild tool, as the long-term source of truth unless there is a very strong reason to reverse that;
 2. verify whether other UI cards need validator-style structural contracts without introducing another auto-rebuild path;
-3. decide whether `ShowcaseLayoutTool` should stay limited to safe helpers or be redesigned from scratch around preservation instead of regeneration.
+3. keep `ShowcaseLayoutTool` preserve-only unless a full redesign is explicitly justified.
 
 Primary Files:
 
@@ -93,7 +93,8 @@ Known State:
 - `LearningArchitect.Showcase.PlayMode` now adds a thin runtime smoke layer for activation and stress propagation;
 - validator coverage now includes missing `animationProfile` and missing humanoid `actorPrefab` authoring failures;
 - validator coverage also includes the required `DescriptionPanel` prefab hierarchy;
-- `ShowcaseLayoutToolTests` now cover the rebuild flow against the current prefab naming scheme and drift-cleanup scenarios;
+- `ShowcaseLayoutToolTests` now cover preserve-only normalization and drift-cleanup scenarios;
+- `ShowcaseLayoutToolTests` are now explicitly guarding preserve/normalization behavior, not layout generation;
 - `ShowcaseLocalizationTableTests` now exercise both real table lookups and fallback behavior against configured localization assets;
 - the remaining gap is broader localization/asset-graph coverage, not the absence of baseline runtime smoke.
 
