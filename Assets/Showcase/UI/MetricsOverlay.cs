@@ -287,13 +287,13 @@ namespace LearningArchitect.UI
             RectTransform placeholder = chartPlaceholder;
             if (placeholder == null)
             {
-                Canvas canvas = FindCanvasByChild(transform, "RootFrame");
+                Canvas canvas = FindCanvasByChild(transform, "Container - Root");
                 if (canvas == null)
                     return;
 
-                placeholder = FindDeep(canvas.transform, "ChartPlaceholder") as RectTransform;
+                placeholder = FindDeep(canvas.transform, "Container - ChartPlaceholder") as RectTransform;
                 if (placeholder == null)
-                    placeholder = FindDeep(canvas.transform, "Container - ChartPlaceholder") as RectTransform;
+                    placeholder = FindDeep(canvas.transform, "ChartPlaceholder") as RectTransform;
             }
 
             if (placeholder == null)
@@ -308,7 +308,9 @@ namespace LearningArchitect.UI
             chartBackgroundImage.color = GetGraphBackgroundTint();
             chartBackgroundImage.raycastTarget = false;
 
-            Transform graphTransform = placeholder.Find("PerformanceGraph");
+            Transform graphTransform = placeholder.Find("Graph - Performance");
+            if (graphTransform == null)
+                graphTransform = placeholder.Find("PerformanceGraph");
             if (graphTransform == null)
                 return;
 
@@ -488,11 +490,14 @@ namespace LearningArchitect.UI
 
         private void TryResolveStructuredCard()
         {
-            Transform performanceCard = FindDeep(transform, "PerformanceCard");
+            Transform performanceCard = FindDeep(transform, "Container - Performance");
             if (performanceCard == null)
                 return;
 
-            performanceHeaderText = FindDeep(performanceCard, "Text - Header")?.GetComponent<TextMeshProUGUI>();
+            performanceHeaderText = FindDeep(performanceCard, "Text - PerformanceHeader")?.GetComponent<TextMeshProUGUI>();
+            if (performanceHeaderText == null)
+                performanceHeaderText = FindDeep(performanceCard, "Text - Header")?.GetComponent<TextMeshProUGUI>();
+
             performanceInsightText = FindDeep(performanceCard, "Text - PerformanceInsight")?.GetComponent<TextMeshProUGUI>();
             chartPlaceholder = FindDeep(performanceCard, "Container - ChartPlaceholder") as RectTransform;
             chartSummaryText = FindDeep(chartPlaceholder, "Label")?.GetComponent<TextMeshProUGUI>();
@@ -554,6 +559,7 @@ namespace LearningArchitect.UI
         private MetricRow[] ResolveMetricRows(Transform performanceCard)
         {
             Transform statsContainer =
+                FindDeep(performanceCard, "Layout - PerformanceStats") ??
                 FindDeep(performanceCard, "Container - PerformanceStats") ??
                 FindDeep(performanceCard, "Container - PerfomanceStats");
             if (statsContainer == null)

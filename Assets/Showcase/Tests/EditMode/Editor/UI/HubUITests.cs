@@ -45,9 +45,9 @@ namespace LearningArchitect.Tests.UI
                 CreatePrimaryText(root.transform, "Text - ModuleValue");
                 CreatePrimaryText(root.transform, "Text - VariantValue");
 
-                GameObject modulePanel = new GameObject("ModuleInfoPanel", typeof(RectTransform));
+                GameObject modulePanel = new GameObject("Container - ModuleInfo", typeof(RectTransform));
                 modulePanel.transform.SetParent(root.transform, false);
-                GameObject moduleStats = new GameObject("HorizontalLayout - ModuleStats", typeof(RectTransform));
+                GameObject moduleStats = new GameObject("Layout - ModuleStats", typeof(RectTransform));
                 moduleStats.transform.SetParent(modulePanel.transform, false);
 
                 for (int i = 0; i < 5; i++)

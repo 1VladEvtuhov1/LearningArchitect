@@ -373,11 +373,11 @@ namespace LearningArchitect.UI
 
         private bool TryResolveStructuredUi()
         {
-            Canvas canvas = FindCanvasByChild(transform, "StressControlsPanel");
+            Canvas canvas = FindCanvasByChild(transform, "Container - StressControls");
             if (canvas == null)
                 return false;
 
-            Transform panel = FindDeep(canvas.transform, "StressControlsPanel");
+            Transform panel = FindDeep(canvas.transform, "Container - StressControls");
             if (panel == null)
                 return false;
 
@@ -388,6 +388,7 @@ namespace LearningArchitect.UI
                   ?? FindDeep(panel, "Text - StressStatus")?.GetComponent<TextMeshProUGUI>();
 
             Transform presetRoot = FindDeep(panel, "HorizontalLayout - StressPresets")
+                                   ?? FindDeep(panel, "Layout - StressPresets")
                                    ?? FindDeep(panel, "HorizontalLayout - StressButtons")
                                    ?? FindDeep(panel, "StressButtonsRow");
             CollectButtons(presetRoot);

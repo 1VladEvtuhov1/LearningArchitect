@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 1599616493434864684}
   - component: {fileID: 5253181147558916750}
   m_Layer: 0
-  m_Name: Container - PerformanceStats
+  m_Name: Layout - PerformanceStats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 2862929512167843342}
   - component: {fileID: 4316242877397970467}
   m_Layer: 0
-  m_Name: PerformanceCard
+  m_Name: Container - Performance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -428,7 +428,7 @@ GameObject:
   - component: {fileID: 7060594021862732651}
   - component: {fileID: 5067782616113272379}
   m_Layer: 0
-  m_Name: Text - CharacterName
+  m_Name: Text - ArchitectureTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -738,7 +738,7 @@ GameObject:
   - component: {fileID: 88453992330878372}
   - component: {fileID: 4345048798325486810}
   m_Layer: 0
-  m_Name: Text -StatName
+  m_Name: Text - StatName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1180,7 +1180,7 @@ GameObject:
   - component: {fileID: 5900867323860210017}
   - component: {fileID: 8317044073740188241}
   m_Layer: 0
-  m_Name: SystemStatusCard
+  m_Name: Container - SystemStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1251,7 +1251,7 @@ GameObject:
   - component: {fileID: 4773465344368126730}
   - component: {fileID: 7679599349578095997}
   m_Layer: 0
-  m_Name: NextVariantButton
+  m_Name: Button - PrevVariant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1483,7 +1483,7 @@ GameObject:
   - component: {fileID: 4655096176961048848}
   - component: {fileID: 6138946269993406793}
   m_Layer: 0
-  m_Name: PreviousVariantButton
+  m_Name: Button - NextVariant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1678,7 +1678,7 @@ GameObject:
   - component: {fileID: 5107423500805589501}
   - component: {fileID: 3991227950781711191}
   m_Layer: 0
-  m_Name: HeaderLine
+  m_Name: Container - Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2028,7 +2028,7 @@ GameObject:
   - component: {fileID: 1431798410014016947}
   - component: {fileID: 2169804398155207748}
   m_Layer: 0
-  m_Name: StatusTitle
+  m_Name: Text - StatusTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2165,7 +2165,7 @@ GameObject:
   - component: {fileID: 8159253209657259680}
   - component: {fileID: 8128081949452007416}
   m_Layer: 0
-  m_Name: DescriptionPanel
+  m_Name: Scroll - Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2258,7 +2258,7 @@ GameObject:
   - component: {fileID: 7952905312877074235}
   - component: {fileID: 7634638511982780521}
   m_Layer: 0
-  m_Name: HorizontalLayout - StressPresets
+  m_Name: Layout - StressPresets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2722,7 +2722,7 @@ GameObject:
   - component: {fileID: 6659702222227710432}
   - component: {fileID: 6646274150732807987}
   m_Layer: 0
-  m_Name: BottomShade
+  m_Name: Image - BottomShade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2797,7 +2797,7 @@ GameObject:
   - component: {fileID: 8375922654252244493}
   - component: {fileID: 7886064650247816915}
   m_Layer: 0
-  m_Name: Label
+  m_Name: Text - LanguageLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3966,7 +3966,7 @@ GameObject:
   - component: {fileID: 3760303253590891541}
   - component: {fileID: 7645874772551868287}
   m_Layer: 0
-  m_Name: NavigationControlsPanel
+  m_Name: Container - NavigationControls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4117,7 +4117,7 @@ GameObject:
   - component: {fileID: 1867418904202075823}
   - component: {fileID: 5066189500981576384}
   m_Layer: 0
-  m_Name: ActiveTabUnderline
+  m_Name: Image - ActiveTabUnderline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4584,7 +4584,7 @@ GameObject:
   - component: {fileID: 4703036980212278473}
   - component: {fileID: 2856890763159310959}
   m_Layer: 0
-  m_Name: HorizontalLayout - ModuleStats
+  m_Name: Layout - ModuleStats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4727,7 +4727,7 @@ GameObject:
   - component: {fileID: 6028083205578692175}
   - component: {fileID: 1703131067538180436}
   m_Layer: 0
-  m_Name: Text -StatValue
+  m_Name: Text - StatValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5210,7 +5210,7 @@ GameObject:
   - component: {fileID: 4563928940856551012}
   - component: {fileID: 3079917063915728969}
   m_Layer: 0
-  m_Name: Text -StatValue
+  m_Name: Text - StatValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5421,7 +5421,7 @@ GameObject:
   - component: {fileID: 52932628347849521}
   - component: {fileID: 7326671494337705057}
   m_Layer: 0
-  m_Name: Text -StatName
+  m_Name: Text - StatName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5555,7 +5555,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4379908005600007410}
   m_Layer: 0
-  m_Name: Container - Stat (1)
+  m_Name: Container - MetricRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5731,7 +5731,7 @@ GameObject:
   - component: {fileID: 5515228096558488400}
   - component: {fileID: 1278911479601256720}
   m_Layer: 0
-  m_Name: Viewport
+  m_Name: Container - Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5821,7 +5821,7 @@ GameObject:
   - component: {fileID: 8265727725016834345}
   - component: {fileID: 6198140688935774210}
   m_Layer: 0
-  m_Name: StatusMetric_0
+  m_Name: Text - CpuMetric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5957,7 +5957,7 @@ GameObject:
   - component: {fileID: 8633558737738736934}
   - component: {fileID: 2537885763522981263}
   m_Layer: 0
-  m_Name: Text -StatValue
+  m_Name: Text - StatValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6303,7 +6303,7 @@ GameObject:
   m_Component:
   - component: {fileID: 658471860825035326}
   m_Layer: 0
-  m_Name: Container - Stat (2)
+  m_Name: Container - MetricRow (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6504,7 +6504,7 @@ GameObject:
   - component: {fileID: 3761754474348998904}
   - component: {fileID: 1131364625134691152}
   m_Layer: 0
-  m_Name: ModuleInfoPanel
+  m_Name: Container - ModuleInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6528,6 +6528,7 @@ RectTransform:
   - {fileID: 7414939897975202635}
   - {fileID: 4143792386434114889}
   - {fileID: 4703036980212278473}
+  - {fileID: 7149733202574967338}
   m_Father: {fileID: 3520721025459121697}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -6555,7 +6556,7 @@ GameObject:
   - component: {fileID: 1921571534498433237}
   - component: {fileID: 4045018360968230411}
   m_Layer: 0
-  m_Name: StatusMetric_1
+  m_Name: Text - GpuMetric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6692,7 +6693,7 @@ GameObject:
   - component: {fileID: 23603571161207281}
   - component: {fileID: 69733275973836329}
   m_Layer: 0
-  m_Name: Canvas
+  m_Name: Canvas - Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6958,7 +6959,7 @@ GameObject:
   - component: {fileID: 7202574474028893593}
   - component: {fileID: 876409418081997137}
   m_Layer: 0
-  m_Name: StatusBar_0
+  m_Name: Image - CpuBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7034,7 +7035,7 @@ GameObject:
   - component: {fileID: 8773260415572539601}
   - component: {fileID: 7715842623449071835}
   m_Layer: 0
-  m_Name: PerformanceGraph
+  m_Name: Graph - Performance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7104,7 +7105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6886349220947088651}
   m_Layer: 0
-  m_Name: Container - Stat (3)
+  m_Name: Container - MetricRow (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7280,7 +7281,7 @@ GameObject:
   - component: {fileID: 58122565434004269}
   - component: {fileID: 8659667624422549437}
   m_Layer: 0
-  m_Name: LanguageToggleButton
+  m_Name: Button - LanguageToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7401,7 +7402,7 @@ GameObject:
   - component: {fileID: 5291695524199415220}
   - component: {fileID: 196677565600828726}
   m_Layer: 0
-  m_Name: PreviousModuleButton
+  m_Name: Button - PrevModule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7696,7 +7697,7 @@ GameObject:
   - component: {fileID: 3532434347126085379}
   - component: {fileID: 3875180815079103362}
   m_Layer: 0
-  m_Name: Container - DescriptionCharacters
+  m_Name: Layout - DescriptionTabs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8224,7 +8225,7 @@ GameObject:
   - component: {fileID: 3526389178600686378}
   - component: {fileID: 5335087720291387268}
   m_Layer: 0
-  m_Name: StatusBar_1
+  m_Name: Image - GpuBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8436,7 +8437,7 @@ GameObject:
   - component: {fileID: 8979189462912527605}
   - component: {fileID: 5550143209541630672}
   m_Layer: 0
-  m_Name: Text -StatName
+  m_Name: Text - StatName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8573,7 +8574,7 @@ GameObject:
   - component: {fileID: 6757411084471821554}
   - component: {fileID: 5223192668962844963}
   m_Layer: 0
-  m_Name: DescriptionText
+  m_Name: Text - Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8770,7 +8771,7 @@ GameObject:
   - component: {fileID: 8815514616416566789}
   - component: {fileID: 3131750190882558225}
   m_Layer: 0
-  m_Name: NextModuleButton
+  m_Name: Button - NextModule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9002,7 +9003,7 @@ GameObject:
   - component: {fileID: 627817003869915874}
   - component: {fileID: 4065816958996553341}
   m_Layer: 0
-  m_Name: Text - CharacterName
+  m_Name: Text - TradeOffsTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9138,7 +9139,7 @@ GameObject:
   - component: {fileID: 6961615701683643541}
   - component: {fileID: 6182973886421099745}
   m_Layer: 0
-  m_Name: UnderlineGlow
+  m_Name: Image - UnderlineGlow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9214,7 +9215,7 @@ GameObject:
   - component: {fileID: 1660929974266314002}
   - component: {fileID: 5333986595867592726}
   m_Layer: 0
-  m_Name: VariantSelector
+  m_Name: Button - VariantSelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9337,7 +9338,7 @@ GameObject:
   - component: {fileID: 5623822710490746157}
   - component: {fileID: 3720709176454125547}
   m_Layer: 0
-  m_Name: ShowcaseBackgroundTint
+  m_Name: Image - BackgroundTint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9664,7 +9665,7 @@ GameObject:
   - component: {fileID: 3539983115800417328}
   - component: {fileID: 6679308079970566013}
   m_Layer: 0
-  m_Name: StressControlsPanel
+  m_Name: Container - StressControls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9939,7 +9940,7 @@ GameObject:
   - component: {fileID: 2310190456203262376}
   - component: {fileID: 8868113011080958390}
   m_Layer: 0
-  m_Name: Text - CharacterName
+  m_Name: Text - OverviewTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10075,7 +10076,7 @@ GameObject:
   - component: {fileID: 2671317063887211446}
   - component: {fileID: 7976705620680816749}
   m_Layer: 0
-  m_Name: Breadcrumb
+  m_Name: Text - Breadcrumb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10212,7 +10213,7 @@ GameObject:
   - component: {fileID: 5569172003859015904}
   - component: {fileID: 173319338357182642}
   m_Layer: 0
-  m_Name: ModuleSelector
+  m_Name: Button - ModuleSelector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10408,7 +10409,7 @@ GameObject:
   - component: {fileID: 1032412083548375826}
   - component: {fileID: 1565708546086657067}
   m_Layer: 0
-  m_Name: Text - Header
+  m_Name: Text - PerformanceHeader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10544,7 +10545,7 @@ GameObject:
   - component: {fileID: 4627118101082630535}
   - component: {fileID: 473168732983141333}
   m_Layer: 0
-  m_Name: LeftAccent
+  m_Name: Image - Accent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10619,7 +10620,7 @@ GameObject:
   - component: {fileID: 5412141631947507659}
   - component: {fileID: 7834393812054589899}
   m_Layer: 0
-  m_Name: StatusMetric_2
+  m_Name: Text - MemMetric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10820,7 +10821,7 @@ GameObject:
   - component: {fileID: 2770817386242335287}
   - component: {fileID: 1427777970148481675}
   m_Layer: 0
-  m_Name: StatusBar_2
+  m_Name: Image - MemBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11033,7 +11034,7 @@ GameObject:
   - component: {fileID: 2124033317910527204}
   - component: {fileID: 7297823620658105915}
   m_Layer: 0
-  m_Name: RootFrame
+  m_Name: Container - Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12032,3 +12033,139 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &9201026767661533079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7149733202574967338}
+  - component: {fileID: 8750238057041189027}
+  - component: {fileID: 6247778945136821367}
+  m_Layer: 0
+  m_Name: Text - InputHints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7149733202574967338
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201026767661533079}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3761754474348998904}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &8750238057041189027
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201026767661533079}
+  m_CullTransparentMesh: 1
+--- !u!114 &6247778945136821367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201026767661533079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 14babf5713326de47a7b956b0abf66a8, type: 2}
+  m_sharedMaterial: {fileID: -1234607859966131369, guid: 14babf5713326de47a7b956b0abf66a8, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: 0
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}

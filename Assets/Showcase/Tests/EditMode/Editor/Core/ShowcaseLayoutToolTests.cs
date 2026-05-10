@@ -23,7 +23,7 @@ namespace LearningArchitect.Tests.Core
 
                 Assert.DoesNotThrow(() => InvokeApplyLayout(root));
 
-                Assert.That(FindDeep(root.transform, "ModuleInfoPanel"), Is.Not.Null);
+                Assert.That(FindDeep(root.transform, "Container - ModuleInfo"), Is.Not.Null);
                 Assert.That(FindDeep(root.transform, "HeaderPanel"), Is.Null);
                 Assert.That(FindDeep(root.transform, "Text - ModuleName"), Is.Not.Null);
                 Assert.That(FindDeep(root.transform, "ModuleName"), Is.Null);
@@ -31,7 +31,7 @@ namespace LearningArchitect.Tests.Core
                 Assert.That(FindDeep(root.transform, "ChartPlaceholder"), Is.Null);
                 Assert.That(FindDeep(root.transform, "Text - InputHints"), Is.Not.Null);
                 Assert.That(FindDeep(root.transform, "InputHints"), Is.Null);
-                Assert.That(FindDeep(root.transform, "DescriptionText"), Is.Not.Null);
+                Assert.That(FindDeep(root.transform, "Text - Description"), Is.Not.Null);
                 Assert.That(FindDeep(root.transform, "ContentRoot"), Is.Null);
             }
             finally
@@ -48,20 +48,20 @@ namespace LearningArchitect.Tests.Core
             try
             {
                 root = CreateMinimalCurrentShapeRoot();
-                RemoveNode(root.transform, "DescriptionText");
+                RemoveNode(root.transform, "Text - Description");
 
-                Transform nextModuleButton = EnsureNode(root.transform, "Canvas/RootFrame/ModuleInfoPanel/NavigationControlsPanel/NextModuleButton");
+                Transform nextModuleButton = EnsureNode(root.transform, "Canvas/Container - Root/Container - ModuleInfo/Container - NavigationControls/Button - NextModule");
                 CreateNode("ActiveGlow", nextModuleButton, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
-                Transform stressSection = EnsureNode(root.transform, "Canvas/RootFrame/StressControlsPanel/Container - StressSection");
+                Transform stressSection = EnsureNode(root.transform, "Canvas/Container - Root/Container - StressControls/Container - StressSection");
                 CreateNode("Container - StressSummary", stressSection, typeof(RectTransform));
 
                 InvokeApplyLayout(root);
 
-                Transform descriptionText = FindDeep(root.transform, "DescriptionText");
+                Transform descriptionText = FindDeep(root.transform, "Text - Description");
                 Assert.That(descriptionText, Is.Not.Null);
 
-                Transform stressContent = EnsureNode(root.transform, "Canvas/RootFrame/StressControlsPanel/Container - StressSection/Container - StressContent");
+                Transform stressContent = EnsureNode(root.transform, "Canvas/Container - Root/Container - StressControls/Container - StressSection/Container - StressContent");
                 Assert.That(CountDirectChildrenByName(stressSection, "Container - StressSummary"), Is.EqualTo(0));
                 Assert.That(CountDirectChildrenByName(stressContent, "Container - StressSummary"), Is.EqualTo(1));
 
@@ -96,53 +96,53 @@ namespace LearningArchitect.Tests.Core
                 typeof(CanvasScaler),
                 typeof(GraphicRaycaster));
 
-            GameObject rootFrame = CreateNode("RootFrame", canvasObject.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("ShowcaseBackgroundTint", canvasObject.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject rootFrame = CreateNode("Container - Root", canvasObject.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Image - BackgroundTint", canvasObject.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             CreateNode("TransitionOverlay", canvasObject.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(CanvasGroup));
 
-            GameObject headerLine = CreateNode("HeaderLine", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("Breadcrumb", headerLine.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
+            GameObject headerLine = CreateNode("Container - Header", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Text - Breadcrumb", headerLine.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
 
-            GameObject moduleInfoPanel = CreateNode("ModuleInfoPanel", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject moduleInfoPanel = CreateNode("Container - ModuleInfo", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             CreateNode("Image - ModuleIcon", moduleInfoPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             CreateNode("Text - ModuleName", moduleInfoPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Text - VariantName", moduleInfoPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
-            CreateNode("NavigationControlsPanel", moduleInfoPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("HorizontalLayout - ModuleStats", moduleInfoPanel.transform, typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            CreateNode("Container - NavigationControls", moduleInfoPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Layout - ModuleStats", moduleInfoPanel.transform, typeof(RectTransform), typeof(HorizontalLayoutGroup));
 
-            GameObject performanceCard = CreateNode("PerformanceCard", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("Text - Header", performanceCard.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
+            GameObject performanceCard = CreateNode("Container - Performance", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Text - PerformanceHeader", performanceCard.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Text - PerformanceInsight", performanceCard.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Container - ChartPlaceholder", performanceCard.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("Container - PerformanceStats", performanceCard.transform, typeof(RectTransform), typeof(VerticalLayoutGroup));
+            CreateNode("Layout - PerformanceStats", performanceCard.transform, typeof(RectTransform), typeof(VerticalLayoutGroup));
 
-            GameObject descriptionPanel = CreateNode("DescriptionPanel", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            GameObject tabsBar = CreateNode("Container - DescriptionCharacters", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            CreateNode("ActiveTabUnderline", tabsBar.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            GameObject viewport = CreateNode("Viewport", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(RectMask2D));
-            CreateNode("DescriptionText", viewport.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI), typeof(ContentSizeFitter));
+            GameObject descriptionPanel = CreateNode("Scroll - Description", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject tabsBar = CreateNode("Layout - DescriptionTabs", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Image - ActiveTabUnderline", tabsBar.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject viewport = CreateNode("Container - Viewport", descriptionPanel.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(RectMask2D));
+            CreateNode("Text - Description", viewport.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI), typeof(ContentSizeFitter));
 
-            GameObject stressControls = CreateNode("StressControlsPanel", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            GameObject stressControls = CreateNode("Container - StressControls", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             GameObject moduleSection = CreateNode("Container - ModuleSection", stressControls.transform, typeof(RectTransform));
-            GameObject moduleSelector = CreateNode("ModuleSelector", moduleSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            GameObject moduleSelector = CreateNode("Button - ModuleSelector", moduleSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
             CreateNode("Text - ModuleHeader", moduleSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Text - ModuleValue", moduleSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Image - ModuleSelectorIcon", moduleSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
             GameObject variantSection = CreateNode("Container - VariantSection", stressControls.transform, typeof(RectTransform));
-            GameObject variantSelector = CreateNode("VariantSelector", variantSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            GameObject variantSelector = CreateNode("Button - VariantSelector", variantSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
             CreateNode("Text - VariantHeader", variantSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Text - VariantValue", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
-            GameObject previousVariantButton = CreateNode("PreviousVariantButton", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            GameObject previousVariantButton = CreateNode("Button - PrevVariant", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
             CreateNode("Label", previousVariantButton.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
-            GameObject nextVariantButton = CreateNode("NextVariantButton", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            GameObject nextVariantButton = CreateNode("Button - NextVariant", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
             CreateNode("Label", nextVariantButton.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Image - VariantSelectorIcon", variantSelector.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
             GameObject stressSection = CreateNode("Container - StressSection", stressControls.transform, typeof(RectTransform));
             CreateNode("Text - StressHeader", stressSection.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             GameObject stressContent = CreateNode("Container - StressContent", stressSection.transform, typeof(RectTransform));
-            GameObject stressRow = CreateNode("HorizontalLayout - StressPresets", stressContent.transform, typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            GameObject stressRow = CreateNode("Layout - StressPresets", stressContent.transform, typeof(RectTransform), typeof(HorizontalLayoutGroup));
             CreateStressButton("Button - StressPreset01", stressRow.transform);
             CreateStressButton("Button - StressPreset02", stressRow.transform);
             CreateStressButton("Button - StressPreset03", stressRow.transform);
@@ -150,7 +150,7 @@ namespace LearningArchitect.Tests.Core
             CreateNode("Text - StressSummary", stressSummary.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI));
             CreateNode("Image - StressStatusIcon", stressSummary.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
-            CreateNode("SystemStatusCard", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            CreateNode("Container - SystemStatus", rootFrame.transform, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 
             return root;
         }

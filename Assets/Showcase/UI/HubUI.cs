@@ -101,6 +101,9 @@ namespace LearningArchitect.UI
         {
             ApplyPaletteDefaults();
             TryResolveModuleStats();
+            inputHints = inputHints != null
+                ? inputHints
+                : FindDeepChild(transform, "Text - InputHints")?.GetComponent<TextMeshProUGUI>();
             Validate();
 
             moduleBaseScale = moduleName.rectTransform.localScale;
@@ -343,7 +346,8 @@ namespace LearningArchitect.UI
         {
             moduleStatsContainer = moduleStatsContainer != null
                 ? moduleStatsContainer
-                : FindDeepChild(transform, "HorizontalLayout - ModuleStats") as RectTransform
+                : FindDeepChild(transform, "Layout - ModuleStats") as RectTransform
+                ?? FindDeepChild(transform, "HorizontalLayout - ModuleStats") as RectTransform
                   ?? FindDeepChild(transform, "HootizontalLayout - ModuleStats") as RectTransform;
 
             if (moduleStatsContainer == null)

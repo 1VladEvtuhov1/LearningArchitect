@@ -591,16 +591,19 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            if (FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
+            if (FindDeep(descriptionPanel.transform, "Layout - DescriptionTabs") == null &&
+                FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
             {
-                report.AddError("DescriptionPanel is missing 'Container - DescriptionCharacters'.", descriptionPanel);
+                report.AddError("DescriptionPanel is missing 'Layout - DescriptionTabs'.", descriptionPanel);
             }
 
-            if (FindDeep(descriptionPanel.transform, "ActiveTabUnderline") == null)
-                report.AddError("DescriptionPanel is missing ActiveTabUnderline.", descriptionPanel);
+            if (FindDeep(descriptionPanel.transform, "Image - ActiveTabUnderline") == null &&
+                FindDeep(descriptionPanel.transform, "ActiveTabUnderline") == null)
+                report.AddError("DescriptionPanel is missing Image - ActiveTabUnderline.", descriptionPanel);
 
-            if (FindDeep(viewport, "DescriptionText") == null)
-                report.AddError("DescriptionPanel viewport must provide 'DescriptionText'.", viewport);
+            if (FindDeep(viewport, "Text - Description") == null &&
+                FindDeep(viewport, "DescriptionText") == null)
+                report.AddError("DescriptionPanel viewport must provide 'Text - Description'.", viewport);
         }
 
         internal static void ValidateHubSceneLayout(ShowcaseValidationReport report)

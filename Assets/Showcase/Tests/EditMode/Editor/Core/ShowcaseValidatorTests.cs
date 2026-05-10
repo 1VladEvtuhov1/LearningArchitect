@@ -367,7 +367,7 @@ namespace LearningArchitect.Tests.Core
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Container - DescriptionCharacters")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Layout - DescriptionTabs")));
             }
             finally
             {
@@ -387,7 +387,7 @@ namespace LearningArchitect.Tests.Core
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("DescriptionText")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Text - Description")));
             }
             finally
             {
@@ -557,17 +557,17 @@ namespace LearningArchitect.Tests.Core
 
             if (includeTabsRoot)
             {
-                GameObject tabsBar = CreateNode("Container - DescriptionCharacters", root.transform);
-                CreateNode("ActiveTabUnderline", tabsBar.transform);
+                GameObject tabsBar = CreateNode("Layout - DescriptionTabs", root.transform);
+                CreateNode("Image - ActiveTabUnderline", tabsBar.transform);
             }
 
-            GameObject viewportObject = CreateNode("Viewport", root.transform, typeof(RectTransform), typeof(Image), typeof(Mask));
+            GameObject viewportObject = CreateNode("Container - Viewport", root.transform, typeof(RectTransform), typeof(Image), typeof(Mask));
             RectTransform viewport = viewportObject.GetComponent<RectTransform>();
             scrollRect.viewport = viewport;
             panel.ScrollRect = scrollRect;
 
             if (includeDescriptionText)
-                CreateSection("DescriptionText", viewport.transform, includeTextChildren: false);
+                CreateSection("Text - Description", viewport.transform, includeTextChildren: false);
 
             return root;
         }
@@ -585,7 +585,7 @@ namespace LearningArchitect.Tests.Core
             if (!includeTextChildren)
                 return section;
 
-            CreateNode("Text - Header", section.transform);
+            CreateNode("Text - PerformanceHeader", section.transform);
             CreateNode("Text - Description", section.transform);
             return section;
         }

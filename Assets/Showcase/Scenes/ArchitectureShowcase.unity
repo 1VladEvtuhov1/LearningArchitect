@@ -707,6 +707,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1071866947447480001, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_Name
+      value: Button - NextVariantButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1259977005845731335, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_Name
+      value: Button - PreviousVariantButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1883788303821003709, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: inputHints
+      value: 
+      objectReference: {fileID: 1173858211}
+    - target: {fileID: 2334002244851800884, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2878790803989756232, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -803,6 +819,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6434880979202654816, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_Name
+      value: Button - PreviousModuleButton
+      objectReference: {fileID: 0}
     - target: {fileID: 6886349220947088651, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -818,6 +838,10 @@ PrefabInstance:
     - target: {fileID: 6886349220947088651, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384960783863548067, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_Name
+      value: Button - NextModuleButton
       objectReference: {fileID: 0}
     - target: {fileID: 7432631382183431585, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
       propertyPath: m_LocalPosition.x
@@ -873,6 +897,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7518525529760695294, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873691270744586527, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7990080773706768120, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
@@ -972,6 +1000,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+--- !u!114 &1173858211 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6247778945136821367, guid: 9c6dc9606b2ac7a46bedc0a5ab47c548, type: 3}
+  m_PrefabInstance: {fileID: 1173858210}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &1620201041
 GameObject:
   m_ObjectHideFlags: 0

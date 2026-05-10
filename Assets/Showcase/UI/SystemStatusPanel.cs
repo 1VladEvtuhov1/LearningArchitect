@@ -90,20 +90,22 @@ namespace LearningArchitect.UI
 
         private void ResolveUi()
         {
-            Canvas canvas = FindCanvasByChild(transform, "RootFrame");
+            Canvas canvas = FindCanvasByChild(transform, "Container - Root");
             if (canvas == null)
-                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires a canvas containing RootFrame.");
+                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires a canvas containing Container - Root.");
 
-            Transform card = FindDeep(canvas.transform, "SystemStatusCard");
+            Transform card = FindDeep(canvas.transform, "Container - SystemStatus");
             if (card == null)
-                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires SystemStatusCard.");
+                throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires Container - SystemStatus.");
 
+            string[] metricNames = { "Text - CpuMetric", "Text - GpuMetric", "Text - MemMetric" };
+            string[] barNames = { "Image - CpuBar", "Image - GpuBar", "Image - MemBar" };
             for (int i = 0; i < 3; i++)
             {
-                Transform metric = FindDeep(card, "StatusMetric_" + i);
-                Transform bar = FindDeep(card, "StatusBar_" + i);
+                Transform metric = FindDeep(card, metricNames[i]);
+                Transform bar = FindDeep(card, barNames[i]);
                 if (metric == null || bar == null)
-                    throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires StatusMetric_{i} and StatusBar_{i}.");
+                    throw new InvalidOperationException($"{nameof(SystemStatusPanel)} requires {metricNames[i]} and {barNames[i]}.");
 
                 metricLabels[i] = metric.GetComponent<TextMeshProUGUI>();
                 metricBars[i] = bar.GetComponent<RectTransform>();

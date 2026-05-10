@@ -333,11 +333,11 @@ namespace LearningArchitect.UI
 
         private void ResolveButton()
         {
-            Canvas canvas = FindCanvasByChild(transform, "RootFrame");
+            Canvas canvas = FindCanvasByChild(transform, "Container - Root");
             if (canvas == null)
                 return;
 
-            Transform buttonTransform = FindDeep(canvas.transform, "LanguageToggleButton");
+            Transform buttonTransform = FindDeep(canvas.transform, "Button - LanguageToggle");
             if (buttonTransform == null)
                 return;
 
@@ -354,17 +354,21 @@ namespace LearningArchitect.UI
 
         private void ApplyChromeTexts()
         {
-            Canvas canvas = FindCanvasByChild(transform, "RootFrame");
+            Canvas canvas = FindCanvasByChild(transform, "Container - Root");
             if (canvas == null)
                 return;
 
+            SetText(canvas.transform, "Text - Breadcrumb", GetText("breadcrumb"), true);
             SetText(canvas.transform, "Breadcrumb", GetText("breadcrumb"), true);
             SetText(canvas.transform, "Text - ModuleHeader", GetText("select_module"));
             SetText(canvas.transform, "Text - VariantHeader", GetText("select_variant"));
             SetText(canvas.transform, "Text - StressHeader", GetText("stress_test"));
-            SetText(canvas.transform, "StatusTitle", GetText("system_status"));
+            SetText(canvas.transform, "Text - StatusTitle", GetText("system_status"));
+            SetText(canvas.transform, "Text - OverviewTab", GetText("overview"));
             SetText(canvas.transform, "Tab_0", GetText("overview"));
+            SetText(canvas.transform, "Text - ArchitectureTab", GetText("architecture"));
             SetText(canvas.transform, "Tab_1", GetText("architecture"));
+            SetText(canvas.transform, "Text - TradeOffsTab", GetText("trade_offs"));
             SetText(canvas.transform, "Tab_2", GetText("trade_offs"));
 
             string[] statKeys = { "module", "variant", "loaded", "orbit", "zoom" };

@@ -282,20 +282,20 @@ namespace LearningArchitect.Tests.UI
                 ScrollRect scrollRect = scrollObject.GetComponent<ScrollRect>();
                 DescriptionPanel panel = panelHost.GetComponent<DescriptionPanel>();
 
-                RectTransform tabsBar = CreateRect("Container - DescriptionCharacters", scrollObject.transform, new Vector2(620f, 90f));
+                RectTransform tabsBar = CreateRect("Layout - DescriptionTabs", scrollObject.transform, new Vector2(620f, 90f));
                 tabsBar.anchorMin = new Vector2(0f, 1f);
                 tabsBar.anchorMax = new Vector2(1f, 1f);
                 tabsBar.pivot = new Vector2(0.5f, 1f);
                 tabsBar.anchoredPosition = Vector2.zero;
 
-                CreateLabel("Text - CharacterName", tabsBar, "Overview");
-                CreateLabel("Text - CharacterName", tabsBar, "Architecture");
-                CreateLabel("Text - CharacterName", tabsBar, "Trade-offs");
-                RectTransform underline = CreateRect("ActiveTabUnderline", tabsBar, new Vector2(120f, 4f));
+                CreateLabel("Text - OverviewTab", tabsBar, "Overview");
+                CreateLabel("Text - ArchitectureTab", tabsBar, "Architecture");
+                CreateLabel("Text - TradeOffsTab", tabsBar, "Trade-offs");
+                RectTransform underline = CreateRect("Image - ActiveTabUnderline", tabsBar, new Vector2(120f, 4f));
                 underline.anchorMin = new Vector2(0f, 0f);
                 underline.anchorMax = new Vector2(0f, 0f);
 
-                RectTransform viewport = CreateRect("Viewport", scrollObject.transform, new Vector2(620f, 760f));
+                RectTransform viewport = CreateRect("Container - Viewport", scrollObject.transform, new Vector2(620f, 760f));
                 viewport.anchorMin = new Vector2(0f, 0f);
                 viewport.anchorMax = new Vector2(1f, 1f);
                 viewport.offsetMin = new Vector2(0f, 0f);
@@ -303,7 +303,7 @@ namespace LearningArchitect.Tests.UI
                 viewport.gameObject.AddComponent<Image>();
                 viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
 
-                TextMeshProUGUI descriptionText = CreateLabel("DescriptionText", viewport, string.Empty, 20f);
+                TextMeshProUGUI descriptionText = CreateLabel("Text - Description", viewport, string.Empty, 20f);
                 descriptionText.rectTransform.anchorMin = new Vector2(0f, 1f);
                 descriptionText.rectTransform.anchorMax = new Vector2(1f, 1f);
                 descriptionText.rectTransform.pivot = new Vector2(0.5f, 1f);

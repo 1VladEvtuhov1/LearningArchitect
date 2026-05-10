@@ -189,15 +189,18 @@ namespace LearningArchitect.UI
             if (panelRoot == null)
                 return false;
 
-            tabsBar = panelRoot.Find("Container - DescriptionCharacters") as RectTransform;
+            tabsBar = panelRoot.Find("Layout - DescriptionTabs") as RectTransform
+                ?? panelRoot.Find("Container - DescriptionCharacters") as RectTransform;
             if (tabsBar == null)
                 return false;
 
-            activeTabUnderline = FindDeep(tabsBar, "ActiveTabUnderline") as RectTransform;
+            activeTabUnderline = FindDeep(tabsBar, "Image - ActiveTabUnderline") as RectTransform
+                ?? FindDeep(tabsBar, "ActiveTabUnderline") as RectTransform;
             if (activeTabUnderline == null)
                 return false;
 
-            legacyDescriptionText = FindDeep(scrollRect.viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
+            legacyDescriptionText = FindDeep(scrollRect.viewport, "Text - Description")?.GetComponent<TextMeshProUGUI>()
+                ?? FindDeep(scrollRect.viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
             if (legacyDescriptionText == null)
                 return false;
 

@@ -38,11 +38,11 @@ namespace LearningArchitect.Editor
             if (prefabRoot == null)
                 return;
 
-            Canvas canvas = FindCanvasByChild(prefabRoot.transform, "RootFrame");
+            Canvas canvas = FindCanvasByChild(prefabRoot.transform, "Container - Root");
             if (canvas == null)
                 return;
 
-            Transform rootFrame = FindDeep(canvas.transform, "RootFrame");
+            Transform rootFrame = FindDeep(canvas.transform, "Container - Root");
             if (rootFrame == null)
                 return;
 
@@ -54,23 +54,25 @@ namespace LearningArchitect.Editor
 
         private static void NormalizeModuleInfoPanel(Transform rootFrame)
         {
-            RectTransform moduleInfoPanel = FindDeepAny(rootFrame, "ModuleInfoPanel", "HeaderPanel") as RectTransform;
+            RectTransform moduleInfoPanel = FindDeepAny(rootFrame, "Container - ModuleInfo", "ModuleInfoPanel", "HeaderPanel") as RectTransform;
             if (moduleInfoPanel == null)
                 return;
 
-            moduleInfoPanel.name = "ModuleInfoPanel";
+            moduleInfoPanel.name = "Container - ModuleInfo";
             EnsureTextChild(moduleInfoPanel, "Text - InputHints", "Realtime architecture preview");
         }
 
         private static void NormalizeDescriptionPanel(Transform rootFrame)
         {
-            RectTransform descriptionPanel = FindDeep(rootFrame, "DescriptionPanel") as RectTransform;
+            RectTransform descriptionPanel = FindDeep(rootFrame, "Scroll - Description") as RectTransform
+                ?? FindDeep(rootFrame, "DescriptionPanel") as RectTransform;
             if (descriptionPanel == null)
                 return;
 
             NormalizeTabsBar(descriptionPanel);
 
-            RectTransform viewport = FindDeep(descriptionPanel, "Viewport") as RectTransform;
+            RectTransform viewport = FindDeep(descriptionPanel, "Container - Viewport") as RectTransform
+                ?? FindDeep(descriptionPanel, "Viewport") as RectTransform;
             if (viewport == null)
                 return;
 
@@ -78,23 +80,24 @@ namespace LearningArchitect.Editor
             if (scrollRect != null)
             {
                 scrollRect.viewport = viewport;
-                scrollRect.content = FindDeep(viewport, "DescriptionText") as RectTransform;
+                scrollRect.content = FindDeep(viewport, "Text - Description") as RectTransform
+                    ?? FindDeep(viewport, "DescriptionText") as RectTransform;
                 scrollRect.horizontal = false;
                 scrollRect.vertical = true;
                 scrollRect.movementType = ScrollRect.MovementType.Clamped;
             }
 
-            EnsureTextChild(viewport, "DescriptionText", "Description placeholder");
+            EnsureTextChild(viewport, "Text - Description", "Description placeholder");
         }
 
         private static void NormalizeTabsBar(RectTransform descriptionPanel)
         {
-            RectTransform tabsBar = FindDeepAny(descriptionPanel, "Container - DescriptionCharacters", "TabsBar") as RectTransform;
+            RectTransform tabsBar = FindDeepAny(descriptionPanel, "Layout - DescriptionTabs", "Container - DescriptionCharacters", "TabsBar") as RectTransform;
             if (tabsBar == null)
                 return;
 
-            tabsBar.name = "Container - DescriptionCharacters";
-            EnsureRectChild(tabsBar, "ActiveTabUnderline");
+            tabsBar.name = "Layout - DescriptionTabs";
+            EnsureRectChild(tabsBar, "Image - ActiveTabUnderline");
         }
 
         private static void NormalizeStressControls(Transform rootFrame)
@@ -128,8 +131,8 @@ namespace LearningArchitect.Editor
 
         private static void NormalizeNavigationControls(Transform rootFrame)
         {
-            NormalizeGlow(FindDeep(rootFrame, "NextModuleButton"));
-            NormalizeGlow(FindDeep(rootFrame, "PreviousModuleButton"));
+            NormalizeGlow(FindDeep(rootFrame, "Button - NextModule") ?? FindDeep(rootFrame, "NextModuleButton"));
+            NormalizeGlow(FindDeep(rootFrame, "Button - PrevModule") ?? FindDeep(rootFrame, "PreviousModuleButton"));
         }
 
         private static void NormalizeGlow(Transform button)

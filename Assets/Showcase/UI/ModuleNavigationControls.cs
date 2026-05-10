@@ -215,30 +215,30 @@ namespace LearningArchitect.UI
 
         private void ResolveUi()
         {
-            Canvas canvas = FindCanvasByChild(transform, "RootFrame");
+            Canvas canvas = FindCanvasByChild(transform, "Container - Root");
             if (canvas == null)
             {
-                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires a canvas containing RootFrame.");
+                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires a canvas containing Container - Root.");
             }
 
-            Transform existing = FindDescendant(canvas.transform, "NavigationControlsPanel");
+            Transform existing = FindDescendant(canvas.transform, "Container - NavigationControls");
             if (existing == null)
             {
-                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires NavigationControlsPanel.");
+                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires Container - NavigationControls.");
             }
 
             panelRoot = existing.GetComponent<RectTransform>();
             if (panelRoot == null)
             {
-                throw new InvalidOperationException("NavigationControlsPanel requires RectTransform.");
+                throw new InvalidOperationException("Container - NavigationControls requires RectTransform.");
             }
 
-            previousModuleButton = FindButton(panelRoot, "PreviousModuleButton", out previousModuleLabel);
-            nextModuleButton = FindButton(panelRoot, "NextModuleButton", out nextModuleLabel);
-            previousVariantButton = FindButton(canvas.transform, "PreviousVariantButton", out previousVariantLabel);
-            nextVariantButton = FindButton(canvas.transform, "NextVariantButton", out nextVariantLabel);
-            moduleSelectorButton = FindButton(canvas.transform, "ModuleSelector", out _);
-            variantSelectorButton = FindButton(canvas.transform, "VariantSelector", out _);
+            previousModuleButton = FindButton(panelRoot, "Button - PrevModule", out previousModuleLabel);
+            nextModuleButton = FindButton(panelRoot, "Button - NextModule", out nextModuleLabel);
+            previousVariantButton = FindButton(canvas.transform, "Button - PrevVariant", out previousVariantLabel);
+            nextVariantButton = FindButton(canvas.transform, "Button - NextVariant", out nextVariantLabel);
+            moduleSelectorButton = FindButton(canvas.transform, "Button - ModuleSelector", out _);
+            variantSelectorButton = FindButton(canvas.transform, "Button - VariantSelector", out _);
         }
 
         private void BindButtons()
