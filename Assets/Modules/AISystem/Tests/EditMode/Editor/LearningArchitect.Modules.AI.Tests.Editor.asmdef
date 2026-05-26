@@ -1,7 +1,8 @@
 {
   "name": "LearningArchitect.Modules.AI.Tests.Editor",
   "references": [
-    "LearningArchitect.Modules.AI"
+    "LearningArchitect.Modules.AI",
+    "LearningArchitect.Showcase"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

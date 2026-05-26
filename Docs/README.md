@@ -66,6 +66,13 @@ If you are preparing delivery or a demo:
 - `HumanoidAnimationSetup.md`
   - the current setup and regeneration workflow for the layered humanoid animation module.
 
+### Planned Modules (design docs)
+
+- `Modules/InterviewArena/README.md`
+  - planned WebGL multiplayer arena module; full spec under `Modules/InterviewArena/docs/`.
+- `Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+  - fit, risks, and phased integration with the existing showcase hub.
+
 ## Source-Of-Truth Rules
 
 Use these boundaries to avoid document drift:
@@ -76,6 +83,11 @@ Use these boundaries to avoid document drift:
 - keep only unresolved work in `OpenThreads.md`;
 - keep only short-lived state in `WorkingMemory.md`;
 - keep runbooks and procedures out of architecture docs unless they are part of the architectural story.
+
+### Localization content
+
+- All **visible** module and variant prose is authored in **`ShowcaseContent`** (`ShowcaseContent_en` / `ShowcaseContent_ru`). Shared hub chrome (tabs, headers, module **category** labels derived from `ShowcaseModuleCategory`) lives in **`ShowcaseUI`**.
+- `ModuleDefinitionSO` / `VariantDefinitionSO` under `Assets/Modules/*/Data` hold **`localizationKey`**, taxonomy, prefab references, and stress counts only — not duplicate EN/RU strings. Details: `Architecture.md`.
 
 ## When To Update Which File
 

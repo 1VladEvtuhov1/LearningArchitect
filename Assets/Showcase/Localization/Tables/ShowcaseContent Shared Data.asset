@@ -903,6 +903,66 @@ MonoBehaviour:
     m_Key: animation_shootvariant.cons
     m_Metadata:
       m_Items: []
+  - m_Id: 5020180168908800
+    m_Key: recruiter_demo.step_01.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180248600576
+    m_Key: recruiter_demo.step_02.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180248600577
+    m_Key: recruiter_demo.step_03.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794880
+    m_Key: recruiter_demo.step_04.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794881
+    m_Key: recruiter_demo.step_05.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794882
+    m_Key: recruiter_demo.step_06.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794883
+    m_Key: recruiter_demo.step_07.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794884
+    m_Key: recruiter_demo.step_08.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794885
+    m_Key: recruiter_demo.step_09.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794886
+    m_Key: recruiter_demo.step_10.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794887
+    m_Key: recruiter_demo.step_11.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794888
+    m_Key: recruiter_demo.step_12.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794889
+    m_Key: recruiter_demo.step_13.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794890
+    m_Key: recruiter_demo.step_14.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794891
+    m_Key: recruiter_demo.step_15.note
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

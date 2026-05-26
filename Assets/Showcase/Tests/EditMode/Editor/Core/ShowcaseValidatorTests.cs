@@ -5,6 +5,7 @@ using LearningArchitect.EditorTools;
 using LearningArchitect.Modules.Animation3D;
 using LearningArchitect.UI;
 using NUnit.Framework;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,7 +48,7 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ValidateDefinitions_ReportsError_WhenStressPresetLabelsMismatchPresetCount()
+        public void ValidateDefinitions_ReportsErrors_WhenShowcaseContentTablesUnavailable()
         {
             VariantDefinitionSO variant = null;
             ModuleDefinitionSO module = null;
@@ -56,16 +57,16 @@ namespace LearningArchitect.Tests.Core
             try
             {
                 prefab = ShowcaseCoreTestFactory.CreateRuntimePrefab("VariantPrefab");
-                variant = CreateVariant("VariantLabels", prefab, 500, 1000, 2000);
-                SetField(variant, "stressPresetLabels", new[] { "Low", "Mid" });
-                module = CreateModule("ModuleLabels", variant);
+                variant = CreateVariant("VariantContent", prefab, 1000);
+                module = CreateModule("ModuleContent", variant);
 
                 ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
                     new[] { module },
                     new[] { variant },
                     ShowcaseLocalizationSnapshot.Empty);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("stress preset labels do not match")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue =>
+                    issue.Message.Contains("missing English string table for 'ShowcaseContent'")));
             }
             finally
             {
@@ -76,7 +77,7 @@ namespace LearningArchitect.Tests.Core
         }
 
         [Test]
-        public void ValidateDefinitions_ReportsError_WhenRequiredArchitectureContentIsMissing()
+        public void ValidateDefinitions_ReportsErrors_WhenSyntheticKeysMissingFromShowcaseContent()
         {
             VariantDefinitionSO variant = null;
             ModuleDefinitionSO module = null;
@@ -85,20 +86,53 @@ namespace LearningArchitect.Tests.Core
             try
             {
                 prefab = ShowcaseCoreTestFactory.CreateRuntimePrefab("VariantPrefab");
-                variant = CreateVariant("VariantContent", prefab, 1000);
-                SetField(variant, "architectureDescription", string.Empty);
-                SetField(variant, "architectureDescriptionRu", string.Empty);
-                SetField(variant, "dataFlow", string.Empty);
-                SetField(variant, "dataFlowRu", string.Empty);
-                module = CreateModule("ModuleContent", variant);
+                variant = CreateVariant("VariantMissingTableEntry", prefab, 1000, 2000, 3000);
+                module = CreateModule("ModuleMissingTableEntry", variant);
+                SetField(module, "localizationKey", "validator.synthetic_missing_module");
+                SetField(variant, "localizationKey", "validator.synthetic_missing_variant");
+
+                ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
+                    new[] { module },
+                    new[] { variant },
+                    ShowcaseValidator.CaptureLocalizationSnapshot());
+
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue =>
+                    issue.Message.Contains("Module description is missing English ShowcaseContent entry")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue =>
+                    issue.Message.Contains("Variant architecture description is missing Russian ShowcaseContent entry")));
+            }
+            finally
+            {
+                DestroyImmediateSafe(prefab);
+                DestroyImmediateSafe(variant);
+                DestroyImmediateSafe(module);
+            }
+        }
+
+        [Test]
+        public void ValidateDefinitions_ReportsError_WhenLocalizationKeysAreMissing()
+        {
+            VariantDefinitionSO variant = null;
+            ModuleDefinitionSO module = null;
+            GameObject prefab = null;
+
+            try
+            {
+                prefab = ShowcaseCoreTestFactory.CreateRuntimePrefab("VariantPrefab");
+                variant = CreateVariant("VariantWithoutLocalizationKey", prefab, 1000, 2000, 3000);
+                module = CreateModule("ModuleWithoutLocalizationKey", variant);
+                SetField(module, "localizationKey", string.Empty);
+                SetField(variant, "localizationKey", string.Empty);
 
                 ShowcaseValidationReport report = ShowcaseValidator.ValidateDefinitions(
                     new[] { module },
                     new[] { variant },
                     ShowcaseLocalizationSnapshot.Empty);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("architecture description is missing English content")));
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("data flow is missing Russian content")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(
+                    issue => issue.Message.Contains("ModuleDefinitionSO requires an explicit localizationKey.")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(
+                    issue => issue.Message.Contains("VariantDefinitionSO requires an explicit localizationKey.")));
             }
             finally
             {
@@ -367,7 +401,7 @@ namespace LearningArchitect.Tests.Core
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Layout - DescriptionTabs")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("tabsBar")));
             }
             finally
             {
@@ -387,7 +421,7 @@ namespace LearningArchitect.Tests.Core
 
                 ShowcaseValidator.ValidateHubPrefabLayout(hubPrefab, report);
 
-                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("Text - Description")));
+                Assert.That(report.Issues, Has.Some.Matches<ShowcaseValidationIssue>(issue => issue.Message.Contains("legacyDescriptionText")));
             }
             finally
             {
@@ -462,18 +496,7 @@ namespace LearningArchitect.Tests.Core
         {
             ModuleDefinitionSO module = ScriptableObject.CreateInstance<ModuleDefinitionSO>();
             module.name = assetName;
-            SetField(module, "moduleName", assetName);
-            SetField(module, "moduleNameRu", assetName + " RU");
-            SetField(module, "thesis", "Module thesis");
-            SetField(module, "thesisRu", "Тезис модуля");
-            SetField(module, "description", "Module description");
-            SetField(module, "descriptionRu", "Описание модуля");
-            SetField(module, "problemStatement", "Module problem");
-            SetField(module, "problemStatementRu", "Проблема модуля");
-            SetField(module, "activeItemLabel", "Active agents");
-            SetField(module, "activeItemLabelRu", "Активные агенты");
-            SetField(module, "webGlPresetNote", "WebGL note");
-            SetField(module, "webGlPresetNoteRu", "Заметка WebGL");
+            SetField(module, "localizationKey", assetName.ToLowerInvariant());
             SetField(module, "variants", variants);
             return module;
         }
@@ -482,28 +505,9 @@ namespace LearningArchitect.Tests.Core
         {
             VariantDefinitionSO variant = ScriptableObject.CreateInstance<VariantDefinitionSO>();
             variant.name = assetName;
-            SetField(variant, "variantName", assetName);
-            SetField(variant, "variantNameRu", assetName + " RU");
+            SetField(variant, "localizationKey", assetName.ToLowerInvariant());
             SetField(variant, "prefab", prefab);
             SetField(variant, "stressPresets", stressPresets);
-            SetField(variant, "architectureDescription", "Architecture body");
-            SetField(variant, "architectureDescriptionRu", "Архитектура");
-            SetField(variant, "dataFlow", "Input -> Simulation -> View");
-            SetField(variant, "dataFlowRu", "Ввод -> Симуляция -> Представление");
-            SetField(variant, "runtimeLifecycle", "Bootstrap, simulate, release");
-            SetField(variant, "runtimeLifecycleRu", "Запуск, симуляция, освобождение");
-            SetField(variant, "whyThisApproach", "Clear ownership");
-            SetField(variant, "whyThisApproachRu", "Явное владение");
-            SetField(variant, "compareSummary", "Compares well against the naive baseline.");
-            SetField(variant, "compareSummaryRu", "Хорошо сравнивается с наивной базой.");
-            SetField(variant, "takeaway", "Use when coordination matters.");
-            SetField(variant, "takeawayRu", "Использовать, когда важна координация.");
-            SetField(variant, "tradeOffs", "More setup, less per-frame duplication.");
-            SetField(variant, "tradeOffsRu", "Больше настройки, меньше дублирования в кадре.");
-            SetField(variant, "pros", "- Stable");
-            SetField(variant, "prosRu", "- Стабильно");
-            SetField(variant, "cons", "- More authoring discipline");
-            SetField(variant, "consRu", "- Требует дисциплины при наполнении");
             return variant;
         }
 
@@ -551,23 +555,95 @@ namespace LearningArchitect.Tests.Core
 
         private static GameObject CreateHubPrefabForValidation(bool includeDescriptionText, bool includeTabsRoot)
         {
-            GameObject root = new("ArchitectureShowcaseHub", typeof(RectTransform), typeof(DescriptionPanel), typeof(ScrollRect));
+            GameObject root = new(
+                "ArchitectureShowcaseHub",
+                typeof(RectTransform),
+                typeof(DescriptionPanel),
+                typeof(ScrollRect),
+                typeof(HubUI),
+                typeof(ModuleNavigationControls),
+                typeof(StressTestControlsView),
+                typeof(StressTestControls),
+                typeof(ShowcaseLocalization));
+
             DescriptionPanel panel = root.GetComponent<DescriptionPanel>();
             ScrollRect scrollRect = root.GetComponent<ScrollRect>();
+            HubUI hubUi = root.GetComponent<HubUI>();
+            ModuleNavigationControls navigation = root.GetComponent<ModuleNavigationControls>();
+            StressTestControlsView stressView = root.GetComponent<StressTestControlsView>();
+            StressTestControls stressControls = root.GetComponent<StressTestControls>();
+            ShowcaseLocalization localization = root.GetComponent<ShowcaseLocalization>();
 
-            if (includeTabsRoot)
-            {
-                GameObject tabsBar = CreateNode("Layout - DescriptionTabs", root.transform);
-                CreateNode("Image - ActiveTabUnderline", tabsBar.transform);
-            }
+            GameObject tabsBarObject = includeTabsRoot
+                ? CreateNode("Layout - DescriptionTabs", root.transform)
+                : CreateNode("Layout - DescriptionTabs Missing", root.transform);
+            RectTransform tabsBar = includeTabsRoot ? tabsBarObject.GetComponent<RectTransform>() : null;
+            GameObject activeUnderlineObject = CreateNode("Image - ActiveTabUnderline", tabsBarObject.transform, typeof(RectTransform), typeof(Image));
+            RectTransform activeUnderline = activeUnderlineObject.GetComponent<RectTransform>();
+
+            TextMeshProUGUI overviewTabLabel = CreateTextNode("Text - OverviewTab", tabsBarObject.transform);
+            TextMeshProUGUI architectureTabLabel = CreateTextNode("Text - ArchitectureTab", tabsBarObject.transform);
+            TextMeshProUGUI tradeOffsTabLabel = CreateTextNode("Text - TradeOffsTab", tabsBarObject.transform);
 
             GameObject viewportObject = CreateNode("Container - Viewport", root.transform, typeof(RectTransform), typeof(Image), typeof(Mask));
             RectTransform viewport = viewportObject.GetComponent<RectTransform>();
             scrollRect.viewport = viewport;
             panel.ScrollRect = scrollRect;
 
-            if (includeDescriptionText)
-                CreateSection("Text - Description", viewport.transform, includeTextChildren: false);
+            TextMeshProUGUI descriptionText = includeDescriptionText
+                ? CreateTextNode("Text - Description", viewport.transform)
+                : CreateTextNode("Text - Description Missing", viewport.transform);
+
+            SetField(panel, "tabsBar", tabsBar);
+            SetField(panel, "activeTabUnderline", activeUnderline);
+            SetField(panel, "legacyDescriptionText", includeDescriptionText ? descriptionText : null);
+            SetField(panel, "overviewTabLabel", overviewTabLabel);
+            SetField(panel, "architectureTabLabel", architectureTabLabel);
+            SetField(panel, "tradeOffsTabLabel", tradeOffsTabLabel);
+
+            TextMeshProUGUI moduleName = CreateTextNode("Text - ModuleName", root.transform);
+            TextMeshProUGUI variantName = CreateTextNode("Text - VariantName", root.transform);
+            TextMeshProUGUI moduleSelectorName = CreateTextNode("Text - ModuleSelectorName", root.transform);
+            TextMeshProUGUI variantSelectorName = CreateTextNode("Text - VariantSelectorName", root.transform);
+            RectTransform moduleStatsContainer = CreateNode("Container - ModuleStats", root.transform).GetComponent<RectTransform>();
+            SetField(hubUi, "moduleName", moduleName);
+            SetField(hubUi, "variantName", variantName);
+            SetField(hubUi, "moduleSelectorName", moduleSelectorName);
+            SetField(hubUi, "variantSelectorName", variantSelectorName);
+            SetField(hubUi, "moduleStatsContainer", moduleStatsContainer);
+            SetField(hubUi, "moduleStats", CreateModuleStatBindings(moduleStatsContainer));
+
+            Button previousModuleButton = CreateButtonNode("Button - PrevModule", root.transform);
+            Button nextModuleButton = CreateButtonNode("Button - NextModule", root.transform);
+            Button previousVariantButton = CreateButtonNode("Button - PrevVariant", root.transform);
+            Button nextVariantButton = CreateButtonNode("Button - NextVariant", root.transform);
+            Button moduleSelectorButton = CreateButtonNode("Button - ModuleSelector", root.transform);
+            Button variantSelectorButton = CreateButtonNode("Button - VariantSelector", root.transform);
+            SetField(navigation, "_previousModuleButton", previousModuleButton);
+            SetField(navigation, "_previousModuleLabel", CreateButtonLabel(previousModuleButton.transform, "‹"));
+            SetField(navigation, "_nextModuleButton", nextModuleButton);
+            SetField(navigation, "_nextModuleLabel", CreateButtonLabel(nextModuleButton.transform, "›"));
+            SetField(navigation, "_previousVariantButton", previousVariantButton);
+            SetField(navigation, "_previousVariantLabel", CreateButtonLabel(previousVariantButton.transform, "‹"));
+            SetField(navigation, "_nextVariantButton", nextVariantButton);
+            SetField(navigation, "_nextVariantLabel", CreateButtonLabel(nextVariantButton.transform, "›"));
+            SetField(navigation, "_moduleSelectorButton", moduleSelectorButton);
+            SetField(navigation, "_variantSelectorButton", variantSelectorButton);
+
+            SetField(stressView, "_presetButtons", CreateStressPresetBindings(root.transform));
+            SetField(stressControls, "_view", stressView);
+
+            Button languageToggleButton = CreateButtonNode("Button - LanguageToggle", root.transform);
+            SetField(localization, "languageToggleButton", languageToggleButton);
+            SetField(localization, "languageToggleLabel", CreateButtonLabel(languageToggleButton.transform, "EN"));
+            SetField(localization, "breadcrumbText", CreateTextNode("Text - Breadcrumb", root.transform));
+            SetField(localization, "moduleHeaderText", CreateTextNode("Text - ModuleHeader", root.transform));
+            SetField(localization, "variantHeaderText", CreateTextNode("Text - VariantHeader", root.transform));
+            SetField(localization, "stressHeaderText", CreateTextNode("Text - StressHeader", root.transform));
+            SetField(localization, "statusTitleText", CreateTextNode("Text - StatusTitle", root.transform));
+            SetField(localization, "overviewTabText", overviewTabLabel);
+            SetField(localization, "architectureTabText", architectureTabLabel);
+            SetField(localization, "tradeOffsTabText", tradeOffsTabLabel);
 
             return root;
         }
@@ -599,6 +675,66 @@ namespace LearningArchitect.Tests.Core
             GameObject node = new(name, nodeComponents);
             node.transform.SetParent(parent, false);
             return node;
+        }
+
+        private static TextMeshProUGUI CreateTextNode(string name, Transform parent)
+        {
+            GameObject node = CreateNode(name, parent, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            return node.GetComponent<TextMeshProUGUI>();
+        }
+
+        private static Button CreateButtonNode(string name, Transform parent)
+        {
+            GameObject node = CreateNode(name, parent, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            return node.GetComponent<Button>();
+        }
+
+        private static TextMeshProUGUI CreateButtonLabel(Transform buttonTransform, string text)
+        {
+            TextMeshProUGUI label = CreateTextNode("Text - Label", buttonTransform);
+            label.text = text;
+            return label;
+        }
+
+        private static Array CreateModuleStatBindings(Transform moduleStatsRoot)
+        {
+            Type bindingType = typeof(HubUI).GetNestedType("ModuleStatBinding", BindingFlags.NonPublic);
+            Assert.IsNotNull(bindingType, "HubUI.ModuleStatBinding was not found.");
+
+            Array bindings = Array.CreateInstance(bindingType, 5);
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject statRootObject = CreateNode("Container - ModuleStat (" + i + ")", moduleStatsRoot);
+                RectTransform statRoot = statRootObject.GetComponent<RectTransform>();
+                TextMeshProUGUI label = CreateTextNode("Text - ModuleStatLabel", statRootObject.transform);
+                TextMeshProUGUI value = CreateTextNode("Text - ModuleStatValue", statRootObject.transform);
+                object binding = Activator.CreateInstance(bindingType);
+                bindingType.GetField("root").SetValue(binding, statRoot);
+                bindingType.GetField("label").SetValue(binding, label);
+                bindingType.GetField("value").SetValue(binding, value);
+                bindings.SetValue(binding, i);
+            }
+
+            return bindings;
+        }
+
+        private static Array CreateStressPresetBindings(Transform parent)
+        {
+            Type bindingType = typeof(StressTestControlsView).GetNestedType("PresetButtonView", BindingFlags.Public | BindingFlags.NonPublic);
+            Assert.IsNotNull(bindingType, "StressTestControlsView.PresetButtonView was not found.");
+
+            Array bindings = Array.CreateInstance(bindingType, 3);
+            for (int i = 0; i < 3; i++)
+            {
+                Button button = CreateButtonNode("Button - StressPreset (" + i + ")", parent);
+                TextMeshProUGUI label = CreateButtonLabel(button.transform, "Preset " + i);
+                object binding = Activator.CreateInstance(bindingType);
+                bindingType.GetField("_button", PrivateInstance).SetValue(binding, button);
+                bindingType.GetField("_label", PrivateInstance).SetValue(binding, label);
+                bindings.SetValue(binding, i);
+            }
+
+            return bindings;
         }
     }
 

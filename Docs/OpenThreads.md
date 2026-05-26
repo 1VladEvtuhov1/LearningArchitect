@@ -29,7 +29,7 @@ Known State:
 
 - the panel now follows the shipped `Viewport -> DescriptionText` contract only;
 - tabs are auto-laid out instead of relying on old absolute positions;
-- `DescriptionPanelTests` now cover section ordering, hidden optional sections, fallback text, and bullet formatting against the shipped contract;
+- `DescriptionPanelTests` now cover section ordering, hidden optional sections, optional-body handling, and bullet formatting against the shipped contract;
 - optional sections can still hide cleanly inside the rendered body.
 
 Next Useful Steps:
@@ -58,15 +58,15 @@ Known State:
 - the current hub prefab is again the visual source of truth;
 - `NewUIManager` has been removed from the current tree;
 - the hub prefab, runtime, and validator now all use the legacy `DescriptionText` viewport path;
-- `ShowcaseLayoutTool` public rebuild/apply entrypoints are intentionally in safe mode because automatic normalization already proved too destructive;
-- the remaining private `ShowcaseLayoutTool` path is now a preserve-first normalizer for a few known drift cases, not a layout generator;
+- `ShowcaseLayoutTool` is now an explicit safe-mode stub only;
+- legacy layout normalization code has been removed instead of being kept behind disabled paths;
 - this area still matters because prefab layout, compatibility code, and validator expectations are all part of the same teaching-critical contract.
 
 Next Useful Steps:
 
 1. keep the prefab, not the rebuild tool, as the long-term source of truth unless there is a very strong reason to reverse that;
 2. verify whether other UI cards need validator-style structural contracts without introducing another auto-rebuild path;
-3. keep `ShowcaseLayoutTool` preserve-only unless a full redesign is explicitly justified.
+3. only reintroduce layout tooling if a fully explicit, non-destructive contract is designed first.
 
 Primary Files:
 
@@ -93,9 +93,8 @@ Known State:
 - `LearningArchitect.Showcase.PlayMode` now adds a thin runtime smoke layer for activation and stress propagation;
 - validator coverage now includes missing `animationProfile` and missing humanoid `actorPrefab` authoring failures;
 - validator coverage also includes the required `DescriptionPanel` prefab hierarchy;
-- `ShowcaseLayoutToolTests` now cover preserve-only normalization and drift-cleanup scenarios;
-- `ShowcaseLayoutToolTests` are now explicitly guarding preserve/normalization behavior, not layout generation;
-- `ShowcaseLocalizationTableTests` now exercise both real table lookups and fallback behavior against configured localization assets;
+- `ShowcaseLayoutToolTests` now only guard that the deprecated editor entrypoints stay in safe mode and do not pretend to normalize layout;
+- `ShowcaseLocalizationTableTests` now exercise real `ShowcaseContent` lookups and explicit missing-marker behavior against configured localization assets;
 - the remaining gap is broader localization/asset-graph coverage, not the absence of baseline runtime smoke.
 
 Next Useful Steps:
@@ -169,3 +168,64 @@ Primary Files:
 - `Assets/Showcase/Runtime/ShowcaseVisualInstanceFactory.cs`
 - `Assets/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
 - `Assets/Editor/ShowcaseValidator.cs`
+
+### T-006: Tighten Recruiter Demo Content Contract
+
+Status:
+
+- in progress
+
+Goal:
+
+- keep the guided recruiter-review flow aligned with the project's data-driven story and localization contract.
+
+Known State:
+
+- the current guided demo shell is localized for its chrome text;
+- `RecruiterDemoScenarioSO` now owns ordered steps, note localization keys, durations, stress modes, and camera cues;
+- `RecruiterDemoController` now references `ModuleDefinitionSO` and `VariantDefinitionSO` directly through the scenario asset instead of routing by `asset.name`;
+- recruiter-demo step notes now resolve through `ShowcaseContent` keys instead of bilingual strings inside the scenario asset.
+
+Next Useful Steps:
+
+1. add focused validator/test coverage only if the scenario gains another authoring contract beyond the current required note keys and direct references;
+2. keep the scenario small and explicit rather than rebuilding a second full content-management layer around it;
+
+Primary Files:
+
+- `Assets/Showcase/UI/RecruiterDemoController.cs`
+- `Assets/Showcase/Runtime/RecruiterDemoScenarioSO.cs`
+- `Assets/Showcase/Data/RecruiterDemoScenario.asset`
+- `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset`
+- `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`
+
+### T-007: Interview Arena Module (Planned)
+
+Status:
+
+- planning
+
+Goal:
+
+- separate `InterviewArena` scene + hub launch dock (not an 8th `ModuleDefinitionSO`); phased gameplay: local movement → lobby mock → server-backed run.
+
+Known State:
+
+- full design package lives in `Docs/Modules/InterviewArena/` (imported from `Assets/Content/interview-arena-project-docs`);
+- integration assessment and phased rollout documented in `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`;
+- Cursor rules: `.cursor/rules/interview-arena.mdc`;
+- architecture core in code (`GameStateMachine`, `InterviewArenaRuntimeContext`, `PhysicsQueryService`, buffered input, slope locomotion);
+- player mechanics polished without requiring a configured scene (prefab fields may stay empty).
+
+Next Useful Steps:
+
+1. run **Learning Architect → Interview Arena → Setup Interview Arena Scenes** in Unity (refresh scene + build settings + hub dock);
+2. Play Mode: WASD move, Space jump, Shift dash, reach green finish portal;
+4. add `ShowcaseContent` keys for game screens when UI grows;
+5. choose backend stack (`docs/11_BACKEND_STACK_OPTIONS.md`) before MVP2 lobby.
+
+Primary Files:
+
+- `Docs/Modules/InterviewArena/README.md`
+- `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+- `Docs/Modules/InterviewArena/docs/04_BACKLOG.md`

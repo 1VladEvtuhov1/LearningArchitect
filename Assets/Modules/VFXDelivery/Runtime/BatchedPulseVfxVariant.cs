@@ -8,9 +8,6 @@ namespace LearningArchitect.Modules.VFX
     public sealed class BatchedPulseVfxVariant : MonoBehaviour, IShowcaseStressTarget, IShowcaseMetricsSource
     {
         [SerializeField] private int count = 3200;
-        [SerializeField] private int visibleCount = 180;
-        [SerializeField] private int[] visibleCountStressPresets = { 800, 2400, 4800 };
-        [SerializeField] private int[] visibleCountPresets = { 120, 180, 240 };
         [SerializeField] private int visualLimit = 260;
         [SerializeField] private float radius = 6.8f;
         [SerializeField] private float pulseLifetime = 1.05f;
@@ -54,13 +51,14 @@ namespace LearningArchitect.Modules.VFX
                 }
 
                 Vector3 nextPosition = positions[i] + (velocities[i] * deltaTime);
-                if (nextPosition.sqrMagnitude > radiusSquared)
+                Vector2 planar = new Vector2(nextPosition.x, nextPosition.z);
+                if (planar.sqrMagnitude > radiusSquared)
                 {
                     velocities[i] = -velocities[i];
                     nextPosition = positions[i] + (velocities[i] * deltaTime);
                 }
 
-                positions[i] = nextPosition;
+                positions[i] = ShowcaseSpawnLayout.ClampToSurface(nextPosition);
             }
 
             for (int i = 0; i < visuals.Length; i++)
@@ -90,18 +88,19 @@ namespace LearningArchitect.Modules.VFX
         {
             ClearVisuals();
 
-            positions = new Vector3[targetCount];
-            velocities = new Vector3[targetCount];
-            lifetimes = new float[targetCount];
-            amplitudes = new float[targetCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            positions = new Vector3[spawnCount];
+            velocities = new Vector3[spawnCount];
+            lifetimes = new float[spawnCount];
+            amplitudes = new float[spawnCount];
 
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < spawnCount; i++)
                 RespawnPulse(i);
 
-            int visible = Mathf.Min(targetCount, Mathf.Min(ResolveVisibleCount(targetCount), visualLimit));
-            visuals = new Transform[visible];
-            renderers = new Renderer[visible];
-            for (int i = 0; i < visible; i++)
+            visuals = new Transform[spawnCount];
+            renderers = new Renderer[spawnCount];
+            for (int i = 0; i < spawnCount; i++)
             {
                 GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
                     transform,
@@ -140,36 +139,6 @@ namespace LearningArchitect.Modules.VFX
             propertyBlock.SetColor("_BaseColor", color);
             propertyBlock.SetColor("_Color", color);
             renderers[visualIndex].SetPropertyBlock(propertyBlock);
-        }
-
-        private int ResolveVisibleCount(int targetCount)
-        {
-            if (visibleCountStressPresets == null || visibleCountPresets == null)
-                return visibleCount;
-
-            int pairCount = Mathf.Min(visibleCountStressPresets.Length, visibleCountPresets.Length);
-            if (pairCount == 0)
-                return visibleCount;
-
-            for (int i = 0; i < pairCount; i++)
-            {
-                if (visibleCountStressPresets[i] == targetCount)
-                    return Mathf.Max(1, visibleCountPresets[i]);
-            }
-
-            int bestIndex = 0;
-            int smallestDistance = Mathf.Abs(visibleCountStressPresets[0] - targetCount);
-            for (int i = 1; i < pairCount; i++)
-            {
-                int distance = Mathf.Abs(visibleCountStressPresets[i] - targetCount);
-                if (distance < smallestDistance)
-                {
-                    smallestDistance = distance;
-                    bestIndex = i;
-                }
-            }
-
-            return Mathf.Max(1, visibleCountPresets[bestIndex]);
         }
 
         private void ClearVisuals()

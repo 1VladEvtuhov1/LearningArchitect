@@ -20,14 +20,8 @@ That means:
 - prefer small, explicit prefab edits plus validation over automatic layout regeneration.
 
 The public rebuild entrypoints in `ShowcaseLayoutTool` are currently left in safe mode for exactly this reason.
-
-The remaining private layout helper is no longer a full UI generator.
-It should be treated only as a preserve-first normalizer for a few known drift cases:
-
-- `ModuleInfoPanel` naming compatibility
-- `DescriptionPanel` baseline wiring
-- stress summary branch cleanup
-- navigation glow cleanup
+The tool intentionally does not keep a hidden private normalizer or compatibility mutator behind those entrypoints.
+If the hub needs structural changes, make them explicitly in the prefab and update validation/tests to match.
 
 ## Hub Prefab Contract
 
@@ -119,6 +113,18 @@ For humanoid animation:
 - assign `animationProfile`;
 - the profile must assign `actorPrefab`.
 
+## Content Identity Contract
+
+Module and variant assets are also part of the authored runtime contract.
+
+That means:
+
+- real `ModuleDefinitionSO` and `VariantDefinitionSO` assets must assign an explicit `localizationKey`;
+- `asset.name` is not a valid runtime localization id;
+- if a module or variant is renamed in the Project view, the localization identity should stay stable unless you intentionally migrate the localization keys and tables together.
+
+Visible hub copy resolves **only** through localization tables (`ShowcaseContent` for module/variant prose, `ShowcaseUI` for shared chrome including module category labels). ScriptableObjects supply keys and wiring, not a second locale-specific text layer.
+
 ## Safe Change Workflow
 
 When changing hub UI or carrier wiring:
@@ -127,4 +133,5 @@ When changing hub UI or carrier wiring:
 2. run `Tools/LearningArchitect/Validate Showcase Configuration`;
 3. run the relevant EditMode tests;
 4. run the thin PlayMode smoke suite if runtime wiring changed;
-5. only then update docs if the contract itself changed.
+5. if module or variant **copy** changed, verify the relevant `ShowcaseContent` rows (and any new `ShowcaseUI` keys); if only prefabs, keys, or stress counts changed, verify `ModuleDefinitionSO` / `VariantDefinitionSO` and run the validator;
+6. only then update docs if the contract itself changed.

@@ -18,7 +18,6 @@ namespace LearningArchitect.UI
 
         [SerializeField] private TextMeshProUGUI moduleName;
         [SerializeField] private TextMeshProUGUI variantName;
-        [SerializeField] private TextMeshProUGUI inputHints;
         [SerializeField] private TextMeshProUGUI moduleSelectorName;
         [SerializeField] private TextMeshProUGUI variantSelectorName;
         [Header("Module Stats")]
@@ -28,16 +27,12 @@ namespace LearningArchitect.UI
         [Header("Feedback")]
         [SerializeField] private Color moduleColor = default;
         [SerializeField] private Color variantColor = default;
-        [SerializeField] private Color hintColor = default;
         [SerializeField] private Color pulseColor = default;
         [SerializeField] private float pulseDuration = 0.18f;
         [SerializeField] private float pulseScale = 1.08f;
 
-        private float hintsPulse;
-        private string hintOverrideText = string.Empty;
         private float modulePulse;
         private string moduleSelectorOverrideText = string.Empty;
-        private Vector3 hintsBaseScale = Vector3.one;
         private Vector3 moduleBaseScale = Vector3.one;
         private float variantPulse;
         private string variantSelectorOverrideText = string.Empty;
@@ -53,12 +48,6 @@ namespace LearningArchitect.UI
         {
             get => variantName;
             set => variantName = value;
-        }
-
-        public TextMeshProUGUI InputHints
-        {
-            get => inputHints;
-            set => inputHints = value;
         }
 
         public TextMeshProUGUI ModuleSelectorName
@@ -85,12 +74,6 @@ namespace LearningArchitect.UI
             set => variantColor = value;
         }
 
-        public Color HintColor
-        {
-            get => hintColor;
-            set => hintColor = value;
-        }
-
         public Color PulseColor
         {
             get => pulseColor;
@@ -99,32 +82,33 @@ namespace LearningArchitect.UI
 
         private void Awake()
         {
+            InitializeLayout();
+        }
+
+        /// <summary>EditMode tests: runs the same setup as <see cref="Awake"/> without relying on reflection.</summary>
+        internal void RunInitializeForEditModeTests()
+        {
+            InitializeLayout();
+        }
+
+        private void InitializeLayout()
+        {
             ApplyPaletteDefaults();
-            TryResolveModuleStats();
-            inputHints = inputHints != null
-                ? inputHints
-                : FindDeepChild(transform, "Text - InputHints")?.GetComponent<TextMeshProUGUI>();
             Validate();
 
             moduleBaseScale = moduleName.rectTransform.localScale;
             variantBaseScale = variantName.rectTransform.localScale;
-            if (inputHints != null)
-            {
-                hintsBaseScale = inputHints.rectTransform.localScale;
-            }
         }
 
         private void OnValidate()
         {
             ApplyPaletteDefaults();
-            TryResolveModuleStats();
         }
 
         private void Update()
         {
             AnimateText(moduleName, moduleBaseScale, ref modulePulse, moduleColor);
             AnimateText(variantName, variantBaseScale, ref variantPulse, variantColor);
-            AnimateText(inputHints, hintsBaseScale, ref hintsPulse, hintColor);
         }
 
         public void ShowSelection(ModuleDefinitionSO module, VariantDefinitionSO variant)
@@ -137,18 +121,6 @@ namespace LearningArchitect.UI
             string variantTitle = ShowcaseLocalization.GetVariantName(variant);
             variantName.text = "<b>" + variantTitle + "</b>";
             variantName.color = variantColor;
-
-            if (inputHints != null)
-            {
-                string thesis = ShowcaseLocalization.GetModuleThesis(module);
-                string defaultHint = string.IsNullOrWhiteSpace(thesis)
-                    ? ShowcaseLocalization.GetText("realtime_preview")
-                    : thesis;
-                inputHints.text = string.IsNullOrWhiteSpace(hintOverrideText)
-                    ? defaultHint
-                    : hintOverrideText;
-                inputHints.color = hintColor;
-            }
 
             moduleSelectorName.text = string.IsNullOrWhiteSpace(moduleSelectorOverrideText)
                 ? ShowcaseLocalization.GetModuleName(module)
@@ -163,16 +135,6 @@ namespace LearningArchitect.UI
             ApplyModuleStats(module, variant);
         }
 
-        public void SetHintOverride(string text)
-        {
-            hintOverrideText = text ?? string.Empty;
-        }
-
-        public void ClearHintOverride()
-        {
-            hintOverrideText = string.Empty;
-        }
-
         public void SetSelectorContext(string moduleSelectorText, string variantSelectorText)
         {
             moduleSelectorOverrideText = moduleSelectorText ?? string.Empty;
@@ -185,40 +147,19 @@ namespace LearningArchitect.UI
                 variantSelectorName.text = variantSelectorOverrideText;
         }
 
-        public void ShowContextHint(string text)
-        {
-            if (inputHints == null)
-                return;
-
-            inputHints.text = text ?? string.Empty;
-            inputHints.color = hintColor;
-        }
-
         public void PlayModuleSwitchFeedback(int direction)
         {
             modulePulse = pulseDuration;
-            hintsPulse = pulseDuration;
-
-            if (inputHints != null)
-                inputHints.text = direction < 0 ? ShowcaseLocalization.GetText("switching_module_prev") : ShowcaseLocalization.GetText("switching_module_next");
         }
 
         public void PlayVariantSwitchFeedback(int direction)
         {
             variantPulse = pulseDuration;
-            hintsPulse = pulseDuration;
-
-            if (inputHints != null)
-                inputHints.text = direction < 0 ? ShowcaseLocalization.GetText("switching_variant_prev") : ShowcaseLocalization.GetText("switching_variant_next");
         }
 
         public void PlayCategorySwitchFeedback()
         {
             modulePulse = pulseDuration;
-            hintsPulse = pulseDuration;
-
-            if (inputHints != null)
-                inputHints.text = "Switching category";
         }
 
         private void AnimateText(TextMeshProUGUI target, Vector3 baseScale, ref float timer, Color baseColor)
@@ -245,9 +186,6 @@ namespace LearningArchitect.UI
             if (variantColor == default)
                 variantColor = ShowcasePalette.AccentMain;
 
-            if (hintColor == default)
-                hintColor = ShowcasePalette.TextMuted;
-
             if (pulseColor == default)
                 pulseColor = ShowcasePalette.AccentStrong;
         }
@@ -256,6 +194,12 @@ namespace LearningArchitect.UI
         {
             if (moduleName == null || variantName == null || moduleSelectorName == null || variantSelectorName == null)
                 throw new InvalidOperationException($"{nameof(HubUI)} requires all primary text references to be assigned.");
+
+            for (int i = 0; i < moduleStats.Length; i++)
+            {
+                if (moduleStats[i].root == null || moduleStats[i].label == null || moduleStats[i].value == null)
+                    throw new InvalidOperationException($"{nameof(HubUI)} requires all module stat bindings to be assigned.");
+            }
         }
 
         private void ApplyModuleStats(ModuleDefinitionSO module, VariantDefinitionSO variant)
@@ -332,7 +276,7 @@ namespace LearningArchitect.UI
             if (module == null)
                 return ShowcaseLocalization.GetText("na");
 
-            return GetStatValueOrDefault(module.GetActiveItemLabel(ShowcaseLocalization.CurrentLanguage));
+            return GetStatValueOrDefault(ShowcaseLocalization.GetModuleActiveItemLabel(module));
         }
 
         private static string GetStatValueOrDefault(string value)
@@ -340,62 +284,6 @@ namespace LearningArchitect.UI
             return string.IsNullOrWhiteSpace(value)
                 ? ShowcaseLocalization.GetText("na")
                 : value;
-        }
-
-        private void TryResolveModuleStats()
-        {
-            moduleStatsContainer = moduleStatsContainer != null
-                ? moduleStatsContainer
-                : FindDeepChild(transform, "Layout - ModuleStats") as RectTransform
-                ?? FindDeepChild(transform, "HorizontalLayout - ModuleStats") as RectTransform
-                  ?? FindDeepChild(transform, "HootizontalLayout - ModuleStats") as RectTransform;
-
-            if (moduleStatsContainer == null)
-            {
-                moduleStats = Array.Empty<ModuleStatBinding>();
-                return;
-            }
-
-            List<ModuleStatBinding> resolvedBindings = new List<ModuleStatBinding>();
-            for (int i = 0; i < moduleStatsContainer.childCount; i++)
-            {
-                RectTransform statRoot = moduleStatsContainer.GetChild(i) as RectTransform;
-                if (statRoot == null)
-                    continue;
-
-                TextMeshProUGUI label = FindDeepChild(statRoot, "Text - StatLabel")?.GetComponent<TextMeshProUGUI>();
-                TextMeshProUGUI value = FindDeepChild(statRoot, "Text - StatValue")?.GetComponent<TextMeshProUGUI>();
-                if (label == null && value == null)
-                    continue;
-
-                resolvedBindings.Add(new ModuleStatBinding
-                {
-                    root = statRoot,
-                    label = label,
-                    value = value
-                });
-            }
-
-            moduleStats = resolvedBindings.ToArray();
-        }
-
-        private static Transform FindDeepChild(Transform parent, string targetName)
-        {
-            if (parent == null)
-                return null;
-
-            if (parent.name == targetName)
-                return parent;
-
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                Transform child = parent.GetChild(i);
-                Transform found = FindDeepChild(child, targetName);
-                if (found != null)
-                    return found;
-            }
-
-            return null;
         }
 
         private static string BuildModuleTitleMarkup(string category, string title)

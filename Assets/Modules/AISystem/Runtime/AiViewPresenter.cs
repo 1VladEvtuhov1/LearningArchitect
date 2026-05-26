@@ -14,7 +14,13 @@ namespace LearningArchitect.Modules.AI
         private int requestedVisibleCount;
         private int visualLimit;
         private Transform[] visuals;
+        private Vector3[] previousPositions;
         private bool configured;
+
+        private const float MinFacingDistance = 0.2f;
+        private const float MinFacingDistanceSquared = MinFacingDistance * MinFacingDistance;
+        private const float MinMovementFacingSquared = 0.0025f;
+        private const float RotationLerpSpeed = 14f;
 
         public int VisibleCount => visuals == null ? 0 : visuals.Length;
 
@@ -50,6 +56,7 @@ namespace LearningArchitect.Modules.AI
 
             int visible = Mathf.Min(world.Count, Mathf.Min(requestedVisibleCount, visualLimit));
             visuals = new Transform[visible];
+            previousPositions = new Vector3[visible];
 
             for (int i = 0; i < visible; i++)
             {
@@ -59,33 +66,61 @@ namespace LearningArchitect.Modules.AI
                     visualPrefab,
                     visualScale);
                 marker.transform.localPosition = world.Positions[i];
-
+                previousPositions[i] = world.Positions[i];
+                ApplyOrientation(marker.transform, world.Positions[i], world.Targets[i], i, 0f);
                 visuals[i] = marker.transform;
             }
         }
 
-        public void Sync(AiWorld world)
+        public void Sync(AiWorld world, float deltaTime)
         {
             EnsureConfigured();
 
             if (world == null)
                 throw new ArgumentNullException(nameof(world));
-            if (visuals == null)
+            if (visuals == null || previousPositions == null)
                 throw new InvalidOperationException($"{nameof(AiViewPresenter)} visuals are not built.");
 
             for (int i = 0; i < visuals.Length; i++)
             {
                 Transform visual = visuals[i];
                 visual.localPosition = world.Positions[i];
-
-                if (!orientToTarget)
-                    continue;
-
-                Vector3 direction = world.Targets[i] - world.Positions[i];
-                visual.up = direction.sqrMagnitude > 0.0001f
-                    ? direction.normalized
-                    : Vector3.up;
+                ApplyOrientation(visual, world.Positions[i], world.Targets[i], i, deltaTime);
             }
+        }
+
+        private void ApplyOrientation(Transform visual, Vector3 position, Vector3 target, int agentIndex, float deltaTime)
+        {
+            if (!orientToTarget)
+                return;
+
+            Vector3 movement = position - previousPositions[agentIndex];
+            movement.y = 0f;
+
+            Vector3 toTarget = target - position;
+            toTarget.y = 0f;
+
+            Vector3 faceDirection;
+            if (movement.sqrMagnitude > MinMovementFacingSquared)
+                faceDirection = movement;
+            else if (toTarget.sqrMagnitude > MinFacingDistanceSquared)
+                faceDirection = toTarget;
+            else
+            {
+                previousPositions[agentIndex] = position;
+                return;
+            }
+
+            Quaternion targetRotation = Quaternion.LookRotation(faceDirection.normalized, Vector3.up);
+            if (deltaTime <= 0f)
+                visual.localRotation = targetRotation;
+            else
+            {
+                float blend = 1f - Mathf.Exp(-RotationLerpSpeed * deltaTime);
+                visual.localRotation = Quaternion.Slerp(visual.localRotation, targetRotation, blend);
+            }
+
+            previousPositions[agentIndex] = position;
         }
 
         public void Dispose()
@@ -112,6 +147,7 @@ namespace LearningArchitect.Modules.AI
             }
 
             visuals = null;
+            previousPositions = null;
         }
 
         private static void DestroyObject(UnityEngine.Object target)

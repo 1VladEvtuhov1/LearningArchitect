@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed0f4a08819bca64c9c58234f5a7c14d, type: 3}
   m_Name: AISystemModule
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Core.ModuleDefinitionSO
-  localizationKey: 
+  localizationKey: aisystemmodule
   category: 0
   categoryLabel: Simulation Module
   categoryLabelRu: "\u0421\u0438\u043C\u0443\u043B\u044F\u0446\u0438\u043E\u043D\u043D\u044B\u0439

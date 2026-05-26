@@ -11,13 +11,15 @@ namespace LearningArchitect.UI
         public bool enableOrbit = true;
         public Vector3 targetPosition = Vector3.zero;
         public float distance = 12.5f;
-        public float minDistance = 8f;
-        public float maxDistance = 17f;
+        public float minDistance = 4f;
+        public float maxDistance = 28f;
         public float yaw = 0f;
         public float pitch = 23f;
         public float orbitSpeed = 80f;
-        public float zoomSpeed = 2.5f;
+        public float zoomSpeed = 5.5f;
         public float keyboardOrbitSpeed = 28f;
+        public float rotationSmoothTime = 0.1f;
+        public float zoomSmoothTime = 0.08f;
 
         [Header("Idle Drift")]
         public Vector3 positionAmplitude = new Vector3(0.08f, 0.025f, 0f);
@@ -31,6 +33,17 @@ namespace LearningArchitect.UI
         private float targetCueDistanceOffset;
         private float targetCuePitchOffset;
         private float targetCueYawOffset;
+
+        private float targetYaw;
+        private float targetPitch;
+        private float targetDistance;
+        private float displayYaw;
+        private float displayPitch;
+        private float displayDistance;
+        private float yawVelocity;
+        private float pitchVelocity;
+        private float distanceVelocity;
+
         private Vector2 previousPointerPosition;
         private bool hasPointerPosition;
 
@@ -45,6 +58,10 @@ namespace LearningArchitect.UI
                 yaw = Mathf.Atan2(flat.x, -flat.z) * Mathf.Rad2Deg;
                 pitch = Mathf.Asin(offset.y / distance) * Mathf.Rad2Deg;
             }
+
+            targetYaw = displayYaw = yaw;
+            targetPitch = displayPitch = pitch;
+            targetDistance = displayDistance = distance;
         }
 
         private void Update()
@@ -52,7 +69,15 @@ namespace LearningArchitect.UI
             if (enableOrbit)
                 UpdateOrbitInput();
 
-            float cueLerp = 1f - Mathf.Exp(-demoCueBlendSpeed * Time.unscaledDeltaTime);
+            float deltaTime = Time.unscaledDeltaTime;
+            float rotationLerp = 1f - Mathf.Exp(-deltaTime / Mathf.Max(0.001f, rotationSmoothTime));
+            float zoomLerp = 1f - Mathf.Exp(-deltaTime / Mathf.Max(0.001f, zoomSmoothTime));
+
+            displayYaw = Mathf.LerpAngle(displayYaw, targetYaw, rotationLerp);
+            displayPitch = Mathf.Lerp(displayPitch, targetPitch, rotationLerp);
+            displayDistance = Mathf.Lerp(displayDistance, targetDistance, zoomLerp);
+
+            float cueLerp = 1f - Mathf.Exp(-demoCueBlendSpeed * deltaTime);
             cueYawOffset = Mathf.Lerp(cueYawOffset, targetCueYawOffset, cueLerp);
             cuePitchOffset = Mathf.Lerp(cuePitchOffset, targetCuePitchOffset, cueLerp);
             cueDistanceOffset = Mathf.Lerp(cueDistanceOffset, targetCueDistanceOffset, cueLerp);
@@ -68,10 +93,13 @@ namespace LearningArchitect.UI
                 Mathf.Sin(time) * rotationAmplitude.y,
                 Mathf.Sin(time * 0.67f) * rotationAmplitude.z);
 
-            pitch = Mathf.Clamp(pitch, 12f, 55f);
-            distance = Mathf.Clamp(distance, minDistance, maxDistance);
+            targetPitch = Mathf.Clamp(targetPitch, minPitch, maxPitch);
+            targetDistance = Mathf.Clamp(targetDistance, minDistance, maxDistance);
+            yaw = displayYaw;
+            pitch = displayPitch;
+            distance = displayDistance;
 
-            float finalPitch = Mathf.Clamp(pitch + cuePitchOffset, 10f, 58f);
+            float finalPitch = Mathf.Clamp(pitch + cuePitchOffset, minPitch, maxPitch);
             float finalDistance = Mathf.Clamp(distance + cueDistanceOffset, minDistance, maxDistance);
             float finalYaw = yaw + cueYawOffset;
 
@@ -99,7 +127,7 @@ namespace LearningArchitect.UI
         private void UpdateOrbitInput()
         {
             float horizontal = 0f;
-            float scroll = 0f;
+            float scrollUnits = 0f;
             bool orbitHeld = false;
             Vector2 pointerPosition = Vector2.zero;
 
@@ -112,9 +140,9 @@ namespace LearningArchitect.UI
                 if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
                     horizontal += 1f;
                 if (keyboard.qKey.isPressed)
-                    scroll -= 1f;
+                    scrollUnits += 1f;
                 if (keyboard.eKey.isPressed)
-                    scroll += 1f;
+                    scrollUnits -= 1f;
             }
 
             Mouse mouse = Mouse.current;
@@ -122,7 +150,7 @@ namespace LearningArchitect.UI
             {
                 orbitHeld = mouse.rightButton.isPressed;
                 pointerPosition = mouse.position.ReadValue();
-                scroll += mouse.scroll.ReadValue().y * 0.01f;
+                scrollUnits += NormalizeScrollDelta(mouse.scroll.ReadValue().y);
             }
 #endif
 
@@ -132,24 +160,24 @@ namespace LearningArchitect.UI
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
                 horizontal += 1f;
             if (Input.GetKey(KeyCode.Q))
-                scroll -= 1f;
+                scrollUnits += 1f;
             if (Input.GetKey(KeyCode.E))
-                scroll += 1f;
+                scrollUnits -= 1f;
 
             orbitHeld = orbitHeld || Input.GetMouseButton(1);
             pointerPosition = Input.mousePosition;
-            scroll += Input.mouseScrollDelta.y;
+            scrollUnits += NormalizeScrollDelta(Input.mouseScrollDelta.y);
 #endif
 
-            yaw += horizontal * keyboardOrbitSpeed * Time.unscaledDeltaTime;
+            targetYaw += horizontal * keyboardOrbitSpeed * Time.unscaledDeltaTime;
 
             if (orbitHeld)
             {
                 if (hasPointerPosition)
                 {
                     Vector2 delta = pointerPosition - previousPointerPosition;
-                    yaw += delta.x * orbitSpeed * 0.01f;
-                    pitch -= delta.y * orbitSpeed * 0.01f;
+                    targetYaw += delta.x * orbitSpeed * 0.01f;
+                    targetPitch -= delta.y * orbitSpeed * 0.01f;
                 }
 
                 previousPointerPosition = pointerPosition;
@@ -160,8 +188,30 @@ namespace LearningArchitect.UI
                 hasPointerPosition = false;
             }
 
-            if (Mathf.Abs(scroll) > 0.001f)
-                distance -= scroll * zoomSpeed;
+            if (Mathf.Abs(scrollUnits) > 0.001f)
+            {
+                float zoomDelta = scrollUnits * zoomSpeed;
+                if (Mathf.Abs(scrollUnits) <= 1.01f && scrollUnits != 0f)
+                    zoomDelta = scrollUnits * zoomSpeed * Time.unscaledDeltaTime * 60f;
+
+                targetDistance -= zoomDelta;
+            }
         }
+
+        private static float NormalizeScrollDelta(float rawDelta)
+        {
+            if (Mathf.Abs(rawDelta) < 0.001f)
+                return 0f;
+
+#if ENABLE_INPUT_SYSTEM
+            if (Mathf.Abs(rawDelta) >= 10f)
+                return Mathf.Sign(rawDelta) * Mathf.Clamp(Mathf.Abs(rawDelta) / 120f, 0.05f, 2.5f);
+#endif
+
+            return Mathf.Clamp(rawDelta, -2.5f, 2.5f);
+        }
+
+        private const float minPitch = 8f;
+        private const float maxPitch = 72f;
     }
 }

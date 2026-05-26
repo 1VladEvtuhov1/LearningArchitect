@@ -11,8 +11,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - InterviewArena_Ground
+  - InterviewArena_Player
+  - InterviewArena_Enemy
+  - InterviewArena_Projectile
   - 
   - 
   - 

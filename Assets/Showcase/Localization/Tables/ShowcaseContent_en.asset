@@ -1264,6 +1264,71 @@ MonoBehaviour:
       enough for shooter locomotion'
     m_Metadata:
       m_Items: []
+  - m_Id: 5020180168908800
+    m_Localized: 'Readable baseline: one Update per mover.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180248600576
+    m_Localized: One owner loop replaces callback pressure.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180248600577
+    m_Localized: Spawn churn appears immediately under repeated load.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794880
+    m_Localized: Reuse stabilizes the steady-state runtime path.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794881
+    m_Localized: Object-level logic is easy to read at small counts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794882
+    m_Localized: Decoupling simulation from visuals unlocks scale.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794883
+    m_Localized: Explicit state is easiest to debug and explain.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794884
+    m_Localized: Scoring trades traceability for adaptation.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794885
+    m_Localized: Branch structure keeps intent readable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794886
+    m_Localized: Object-rich slots are readable but spend more work on ownership
+      and mutation paths.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794887
+    m_Localized: Packed arrays keep the transfer loop tight under heavier load.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794888
+    m_Localized: Baseline locomotion keeps the character readable before combat is
+      layered in.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794889
+    m_Localized: Animator layers keep shooting responsive while locomotion continues
+      underneath.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794890
+    m_Localized: One emitter per node is straightforward but scales visible authoring
+      cost quickly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5020180252794891
+    m_Localized: Shared pulse rendering keeps the visible layer cheaper than emitter-per-event
+      playback.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

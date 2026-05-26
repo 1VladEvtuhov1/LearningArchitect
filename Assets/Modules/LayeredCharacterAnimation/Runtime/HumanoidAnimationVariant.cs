@@ -22,7 +22,6 @@ namespace LearningArchitect.Modules.Animation3D
 
         [Header("Crowd")]
         [SerializeField] private int count = 72;
-        [SerializeField] private int visibleCount = 42;
         [SerializeField] private int visualLimit = 56;
         [SerializeField] private float radius = 6.2f;
         [SerializeField] private float moveSpeed = 1.25f;
@@ -66,13 +65,14 @@ namespace LearningArchitect.Modules.Animation3D
                 if (shouldMoveRoot)
                 {
                     Vector3 position = positions[i] + (velocities[i] * deltaTime);
-                    if (position.sqrMagnitude > radiusSquared)
+                    Vector2 planar = new Vector2(position.x, position.z);
+                    if (planar.sqrMagnitude > radiusSquared)
                     {
                         velocities[i] = -velocities[i];
                         position = positions[i] + (velocities[i] * deltaTime);
                     }
 
-                    positions[i] = position;
+                    positions[i] = ShowcaseSpawnLayout.ClampToSurface(position);
                 }
 
                 phases[i] += deltaTime * cycleSpeed * (0.85f + ((i % 5) * 0.06f));
@@ -111,11 +111,13 @@ namespace LearningArchitect.Modules.Animation3D
             EnsureAnimationProfileConfigured();
             ClearVisuals();
 
-            positions = new Vector3[targetCount];
-            velocities = new Vector3[targetCount];
-            phases = new float[targetCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            positions = new Vector3[spawnCount];
+            velocities = new Vector3[spawnCount];
+            phases = new float[spawnCount];
 
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 positions[i] = translateActors
                     ? ShowcaseSpawnLayout.RandomPointOnPlatform(radius, spawnPadding)
@@ -123,14 +125,13 @@ namespace LearningArchitect.Modules.Animation3D
                 velocities[i] = translateActors
                     ? ShowcaseSpawnLayout.RandomVelocity(moveSpeed, 0.05f)
                     : GetPresentationForward() * moveSpeed;
-                positions[i].y = 0f;
+                positions[i].y = ShowcaseSpawnLayout.SurfaceY;
                 velocities[i].y = 0f;
                 phases[i] = i * 0.37f;
             }
 
-            int visible = Mathf.Min(targetCount, Mathf.Min(visibleCount, visualLimit));
-            visuals = new HumanoidVisual[visible];
-            for (int i = 0; i < visible; i++)
+            visuals = new HumanoidVisual[spawnCount];
+            for (int i = 0; i < spawnCount; i++)
                 visuals[i] = CreateVisual(i);
         }
 

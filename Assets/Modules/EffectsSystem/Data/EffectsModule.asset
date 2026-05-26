@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed0f4a08819bca64c9c58234f5a7c14d, type: 3}
   m_Name: EffectsModule
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Core.ModuleDefinitionSO
+  localizationKey: effectsmodule
   category: 0
   moduleName: Effects System
   thesis: Compare a readable object-centric effect loop with a batched data-oriented

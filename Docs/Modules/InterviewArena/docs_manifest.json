@@ -1,0 +1,24 @@
+{
+  "project": "Interview Arena",
+  "hostRepository": "LearningArchitect",
+  "canonicalPath": "Docs/Modules/InterviewArena",
+  "createdFor": "Unity WebGL multiplayer interview preparation module (showcase hub integration)",
+  "files": [
+    "../../.cursor/rules/interview-arena.mdc",
+    "README.md",
+    "INTEGRATION_ASSESSMENT.md",
+    "docs/00_PROJECT_BRIEF.md",
+    "docs/01_ARCHITECTURE.md",
+    "docs/02_LOBBY_AND_ACCOUNTS.md",
+    "docs/03_UNITY_MODULES.md",
+    "docs/04_BACKLOG.md",
+    "docs/05_CURSOR_RULES.md",
+    "docs/06_GITHUB_WORKFLOW.md",
+    "docs/07_INTERVIEW_TOPICS_MAP.md",
+    "docs/08_TECHNICAL_DECISIONS.md",
+    "docs/09_SERVER_API_DRAFT.md",
+    "docs/10_FIRST_TASKS_FOR_CURSOR.md",
+    "docs/11_BACKEND_STACK_OPTIONS.md",
+    "source-package.gitignore"
+  ]
+}

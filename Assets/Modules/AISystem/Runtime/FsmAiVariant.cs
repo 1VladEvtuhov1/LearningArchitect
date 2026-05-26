@@ -9,10 +9,7 @@ namespace LearningArchitect.Modules.AI
         private const int MoveState = 1;
         private const uint SeedSalt = 0xF51A23D1u;
 
-        [SerializeField] private int count = 5000;
-        [SerializeField] private int visibleCount = 220;
-        [SerializeField] private int[] visibleCountStressPresets = { 500, 2000, 5000 };
-        [SerializeField] private int[] visibleCountPresets = { 140, 220, 320 };
+        [SerializeField] private int count = 240;
         [SerializeField] private int visualLimit = 360;
         [SerializeField] private float radius = 8f;
         [SerializeField] private float moveSpeed = 1.8f;
@@ -28,10 +25,12 @@ namespace LearningArchitect.Modules.AI
         private void Awake()
         {
             IAiDecisionModel model = new FsmDecisionModel(radius, moveSpeed, idleDuration, targetReachDistance);
+            int spawnCount = ShowcaseStressSpawn.Clamp(count, visualLimit);
+            count = spawnCount;
             simulationHost.Initialize(
                 transform,
-                count,
-                ResolveVisibleCount(count),
+                spawnCount,
+                spawnCount,
                 visualLimit,
                 visualPrefab,
                 visualScale,
@@ -56,47 +55,18 @@ namespace LearningArchitect.Modules.AI
             if (value < 1)
                 throw new ArgumentOutOfRangeException(nameof(value));
 
-            if (count == value)
+            int spawnCount = ShowcaseStressSpawn.Clamp(value, visualLimit);
+            if (count == spawnCount)
                 return;
 
-            count = value;
-            simulationHost.SetVisibleBudget(ResolveVisibleCount(count), visualLimit);
-            simulationHost.SetStressLevel(count);
+            count = spawnCount;
+            simulationHost.SetVisibleBudget(spawnCount, visualLimit);
+            simulationHost.SetStressLevel(spawnCount);
         }
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
             return simulationHost.GetMetricsSnapshot();
-        }
-
-        private int ResolveVisibleCount(int targetCount)
-        {
-            if (visibleCountStressPresets == null || visibleCountPresets == null)
-                return visibleCount;
-
-            int pairCount = Mathf.Min(visibleCountStressPresets.Length, visibleCountPresets.Length);
-            if (pairCount == 0)
-                return visibleCount;
-
-            for (int i = 0; i < pairCount; i++)
-            {
-                if (visibleCountStressPresets[i] == targetCount)
-                    return Mathf.Max(1, visibleCountPresets[i]);
-            }
-
-            int bestIndex = 0;
-            int smallestDistance = Mathf.Abs(visibleCountStressPresets[0] - targetCount);
-            for (int i = 1; i < pairCount; i++)
-            {
-                int distance = Mathf.Abs(visibleCountStressPresets[i] - targetCount);
-                if (distance < smallestDistance)
-                {
-                    smallestDistance = distance;
-                    bestIndex = i;
-                }
-            }
-
-            return Mathf.Max(1, visibleCountPresets[bestIndex]);
         }
 
         private void InitializeWorld(AiWorld world)

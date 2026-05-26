@@ -2,399 +2,377 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace LearningArchitect.UI
 {
+    [DisallowMultipleComponent]
     public sealed class ModuleNavigationControls : MonoBehaviour
     {
+        private const float ButtonFeedbackDuration = 0.12f;
+
+        [Header("References")]
+        [SerializeField, FormerlySerializedAs("panelSprite")] private Sprite _panelSprite;
+        [SerializeField, FormerlySerializedAs("buttonSprite")] private Sprite _buttonSprite;
+
+        [Header("Layout")]
+        [SerializeField, FormerlySerializedAs("panelSize")] private Vector2 _panelSize = new(212f, 212f);
+        [SerializeField, FormerlySerializedAs("panelOffset")] private Vector2 _panelOffset = new(0f, 132f);
+        [SerializeField, FormerlySerializedAs("buttonSize")] private Vector2 _buttonSize = new(60f, 60f);
+
+        [Header("Colors")]
+        [SerializeField, FormerlySerializedAs("panelColor")] private Color _panelColor = default;
+        [SerializeField, FormerlySerializedAs("panelGlowTopColor")] private Color _panelGlowTopColor = default;
+        [SerializeField, FormerlySerializedAs("panelGlowBottomColor")] private Color _panelGlowBottomColor = default;
+        [SerializeField, FormerlySerializedAs("buttonColor")] private Color _buttonColor = default;
+        [SerializeField, FormerlySerializedAs("buttonHoverColor")] private Color _buttonHoverColor = default;
+        [SerializeField, FormerlySerializedAs("buttonPressedColor")] private Color _buttonPressedColor = default;
+        [SerializeField, FormerlySerializedAs("buttonDisabledColor")] private Color _buttonDisabledColor = default;
+        [SerializeField, FormerlySerializedAs("buttonGlowColor")] private Color _buttonGlowColor = default;
+        [SerializeField, FormerlySerializedAs("iconColor")] private Color _iconColor = default;
+        [SerializeField, FormerlySerializedAs("tooltipColor")] private Color _tooltipColor = default;
+        [SerializeField, FormerlySerializedAs("tooltipTextColor")] private Color _tooltipTextColor = default;
+
+        [Header("Feedback")]
+        [SerializeField, FormerlySerializedAs("pressedScale")] private float _pressedScale = 0.95f;
+        [SerializeField, FormerlySerializedAs("buttonFadeDuration")] private float _buttonFadeDuration = 0.08f;
+
+        [Header("Scene References")]
+        [SerializeField] private Button _previousModuleButton;
+        [SerializeField] private TextMeshProUGUI _previousModuleLabel;
+        [SerializeField] private Button _nextModuleButton;
+        [SerializeField] private TextMeshProUGUI _nextModuleLabel;
+        [SerializeField] private Button _previousVariantButton;
+        [SerializeField] private TextMeshProUGUI _previousVariantLabel;
+        [SerializeField] private Button _nextVariantButton;
+        [SerializeField] private TextMeshProUGUI _nextVariantLabel;
+        [SerializeField] private Button _moduleSelectorButton;
+        [SerializeField] private Button _variantSelectorButton;
+
+        private readonly Dictionary<Button, Color> _buttonBaseColors = new();
+        private readonly Dictionary<TextMeshProUGUI, Color> _labelBaseColors = new();
+
+        private bool _canSwitchCategories;
+        private bool _canSwitchModules;
+        private bool _canSwitchVariants;
+        private Button _feedbackButton;
+        private float _feedbackTimer;
+        private bool _isInitialized;
+
         public event Action PreviousModuleRequested;
         public event Action NextModuleRequested;
         public event Action NextCategoryRequested;
         public event Action PreviousVariantRequested;
         public event Action NextVariantRequested;
 
-        [Header("References")]
-        public Sprite panelSprite;
-        public Sprite buttonSprite;
-
-        [Header("Layout")]
-        public Vector2 panelSize = new(212f, 212f);
-        public Vector2 panelOffset = new(0f, 132f);
-        public Vector2 buttonSize = new(60f, 60f);
-        public float buttonSpacing = 46f;
-
-        [Header("Colors")]
-        public Color panelColor = default;
-        public Color panelGlowTopColor = default;
-        public Color panelGlowBottomColor = default;
-        public Color buttonColor = default;
-        public Color buttonHoverColor = default;
-        public Color buttonPressedColor = default;
-        public Color buttonDisabledColor = default;
-        public Color buttonGlowColor = default;
-        public Color iconColor = default;
-        public Color tooltipColor = default;
-        public Color tooltipTextColor = default;
-
-        [Header("Feedback")]
-        public float pressedScale = 0.95f;
-        public float buttonFadeDuration = 0.08f;
-
-        private readonly Dictionary<Button, Color> buttonBaseColors = new();
-        private readonly Dictionary<TextMeshProUGUI, Color> labelBaseColors = new();
-
-        private bool canSwitchCategories;
-        private bool canSwitchModules;
-        private bool canSwitchVariants;
-        private Button feedbackButton;
-        private float feedbackTimer;
-        private bool isInitialized;
-        private Button moduleSelectorButton;
-        private RectTransform panelRoot;
-        private Button nextModuleButton;
-        private TextMeshProUGUI nextModuleLabel;
-        private Button nextVariantButton;
-        private TextMeshProUGUI nextVariantLabel;
-        private Button previousModuleButton;
-        private TextMeshProUGUI previousModuleLabel;
-        private Button previousVariantButton;
-        private TextMeshProUGUI previousVariantLabel;
-        private Button variantSelectorButton;
-
         private void Awake()
         {
-            EnsureInitialized();
+            Initialize();
         }
 
         private void Update()
         {
-            if (feedbackTimer > 0f)
-            {
-                feedbackTimer -= Time.unscaledDeltaTime;
-                if (feedbackTimer <= 0f)
-                {
-                    feedbackButton = null;
-                }
-            }
-
-            Refresh();
+            TickFeedback(Time.unscaledDeltaTime);
+            RefreshView();
         }
 
         private void OnDestroy()
         {
-            RemoveListeners(previousModuleButton);
-            RemoveListeners(nextModuleButton);
-            RemoveListeners(previousVariantButton);
-            RemoveListeners(nextVariantButton);
-            RemoveListeners(moduleSelectorButton);
-            RemoveListeners(variantSelectorButton);
+            UnbindButtons();
         }
 
-        public void PreviousModulePressed()
+        private void Initialize()
         {
-            PreviousModuleRequested?.Invoke();
-            PlayFeedback(previousModuleButton);
-        }
-
-        public void NextModulePressed()
-        {
-            NextModuleRequested?.Invoke();
-            PlayFeedback(nextModuleButton);
-        }
-
-        public void NextCategoryPressed()
-        {
-            NextCategoryRequested?.Invoke();
-            PlayFeedback(moduleSelectorButton);
-        }
-
-        public void PreviousVariantPressed()
-        {
-            PreviousVariantRequested?.Invoke();
-            PlayFeedback(previousVariantButton);
-        }
-
-        public void NextVariantPressed()
-        {
-            NextVariantRequested?.Invoke();
-            PlayFeedback(nextVariantButton);
-        }
-
-        public void ShowNavigationState(bool canSwitchModules, bool canSwitchCategories, bool canSwitchVariants)
-        {
-            EnsureInitialized();
-            this.canSwitchModules = canSwitchModules;
-            this.canSwitchCategories = canSwitchCategories;
-            this.canSwitchVariants = canSwitchVariants;
-            Refresh();
-        }
-
-        private void EnsureInitialized()
-        {
-            if (isInitialized)
+            if (_isInitialized)
             {
                 return;
             }
 
             ApplyRuntimeDefaults();
-            ResolveUi();
+            ValidateReferences();
             CacheBaseStyles();
             BindButtons();
-            isInitialized = true;
-            ShowNavigationState(false, false, false);
+
+            _isInitialized = true;
+            _canSwitchModules = false;
+            _canSwitchCategories = false;
+            _canSwitchVariants = false;
+            RefreshView();
+        }
+
+        private void ValidateReferences()
+        {
+            ValidateButtonReference(_previousModuleButton, nameof(_previousModuleButton));
+            ValidateButtonReference(_nextModuleButton, nameof(_nextModuleButton));
+            ValidateButtonReference(_previousVariantButton, nameof(_previousVariantButton));
+            ValidateButtonReference(_nextVariantButton, nameof(_nextVariantButton));
+            ValidateButtonReference(_moduleSelectorButton, nameof(_moduleSelectorButton));
+            ValidateButtonReference(_variantSelectorButton, nameof(_variantSelectorButton));
+            ValidateLabelReference(_previousVariantLabel, nameof(_previousVariantLabel));
+            ValidateLabelReference(_nextVariantLabel, nameof(_nextVariantLabel));
+
+            if (_pressedScale <= 0f)
+            {
+                throw new ArgumentOutOfRangeException(nameof(_pressedScale));
+            }
+
+            if (_buttonFadeDuration <= 0f)
+            {
+                throw new ArgumentOutOfRangeException(nameof(_buttonFadeDuration));
+            }
         }
 
         private void ApplyRuntimeDefaults()
         {
-            if (pressedScale <= 0f)
+            if (_panelColor == default)
             {
-                pressedScale = 0.95f;
+                _panelColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelMain, 0.84f);
             }
 
-            if (buttonFadeDuration <= 0f)
+            if (_panelGlowTopColor == default)
             {
-                buttonFadeDuration = 0.08f;
+                _panelGlowTopColor = ShowcasePalette.AccentSoft(0.18f);
             }
 
-            if (panelColor == default)
+            if (_panelGlowBottomColor == default)
             {
-                panelColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelMain, 0.84f);
+                _panelGlowBottomColor = ShowcasePalette.AccentSoft(0.12f);
             }
 
-            if (panelGlowTopColor == default)
+            if (_buttonColor == default)
             {
-                panelGlowTopColor = ShowcasePalette.AccentSoft(0.18f);
+                _buttonColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelSoft, 0.98f);
             }
 
-            if (panelGlowBottomColor == default)
+            if (_buttonHoverColor == default)
             {
-                panelGlowBottomColor = ShowcasePalette.AccentSoft(0.12f);
+                _buttonHoverColor = ShowcasePalette.PanelHover;
             }
 
-            if (buttonColor == default)
+            if (_buttonPressedColor == default)
             {
-                buttonColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelSoft, 0.98f);
+                _buttonPressedColor = ShowcasePalette.AccentStrong;
             }
 
-            if (buttonHoverColor == default)
+            if (_buttonDisabledColor == default)
             {
-                buttonHoverColor = ShowcasePalette.PanelHover;
+                _buttonDisabledColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelSoft, 0.42f);
             }
 
-            if (buttonPressedColor == default)
+            if (_buttonGlowColor == default)
             {
-                buttonPressedColor = ShowcasePalette.AccentStrong;
+                _buttonGlowColor = ShowcasePalette.AccentSoft(0.14f);
             }
 
-            if (buttonDisabledColor == default)
+            if (_iconColor == default)
             {
-                buttonDisabledColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelSoft, 0.42f);
+                _iconColor = ShowcasePalette.TextPrimary;
             }
 
-            if (buttonGlowColor == default)
+            if (_tooltipColor == default)
             {
-                buttonGlowColor = ShowcasePalette.AccentSoft(0.14f);
+                _tooltipColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelMain, 0.96f);
             }
 
-            if (iconColor == default)
+            if (_tooltipTextColor == default)
             {
-                iconColor = ShowcasePalette.TextPrimary;
-            }
-
-            if (tooltipColor == default)
-            {
-                tooltipColor = ShowcasePalette.WithAlpha(ShowcasePalette.PanelMain, 0.96f);
-            }
-
-            if (tooltipTextColor == default)
-            {
-                tooltipTextColor = ShowcasePalette.TextPrimary;
+                _tooltipTextColor = ShowcasePalette.TextPrimary;
             }
         }
 
-        private void ResolveUi()
+        private void TickFeedback(float deltaTime)
         {
-            Canvas canvas = FindCanvasByChild(transform, "Container - Root");
-            if (canvas == null)
-            {
-                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires a canvas containing Container - Root.");
-            }
-
-            Transform existing = FindDescendant(canvas.transform, "Container - NavigationControls");
-            if (existing == null)
-            {
-                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires Container - NavigationControls.");
-            }
-
-            panelRoot = existing.GetComponent<RectTransform>();
-            if (panelRoot == null)
-            {
-                throw new InvalidOperationException("Container - NavigationControls requires RectTransform.");
-            }
-
-            previousModuleButton = FindButton(panelRoot, "Button - PrevModule", out previousModuleLabel);
-            nextModuleButton = FindButton(panelRoot, "Button - NextModule", out nextModuleLabel);
-            previousVariantButton = FindButton(canvas.transform, "Button - PrevVariant", out previousVariantLabel);
-            nextVariantButton = FindButton(canvas.transform, "Button - NextVariant", out nextVariantLabel);
-            moduleSelectorButton = FindButton(canvas.transform, "Button - ModuleSelector", out _);
-            variantSelectorButton = FindButton(canvas.transform, "Button - VariantSelector", out _);
-        }
-
-        private void BindButtons()
-        {
-            AddListener(previousModuleButton, PreviousModulePressed);
-            AddListener(nextModuleButton, NextModulePressed);
-            AddListener(previousVariantButton, PreviousVariantPressed);
-            AddListener(nextVariantButton, NextVariantPressed);
-            AddListener(moduleSelectorButton, NextCategoryPressed);
-            AddListener(variantSelectorButton, NextVariantPressed);
-        }
-
-        private void Refresh()
-        {
-            EnsureBaseStylesCached();
-            SetButtonState(previousModuleButton, previousModuleLabel, canSwitchModules);
-            SetButtonState(nextModuleButton, nextModuleLabel, canSwitchModules);
-            SetButtonState(previousVariantButton, previousVariantLabel, canSwitchVariants);
-            SetButtonState(nextVariantButton, nextVariantLabel, canSwitchVariants);
-            SetButtonState(moduleSelectorButton, null, canSwitchCategories);
-            SetButtonState(variantSelectorButton, null, canSwitchVariants);
-        }
-
-        private void CacheBaseStyles()
-        {
-            CacheBaseStyle(previousModuleButton, previousModuleLabel);
-            CacheBaseStyle(nextModuleButton, nextModuleLabel);
-            CacheBaseStyle(previousVariantButton, previousVariantLabel);
-            CacheBaseStyle(nextVariantButton, nextVariantLabel);
-            CacheBaseStyle(moduleSelectorButton, null);
-            CacheBaseStyle(variantSelectorButton, null);
-        }
-
-        private void EnsureBaseStylesCached()
-        {
-            if (buttonBaseColors.Count != 0)
+            if (_feedbackTimer <= 0f)
             {
                 return;
             }
 
-            CacheBaseStyles();
+            _feedbackTimer -= deltaTime;
+            if (_feedbackTimer <= 0f)
+            {
+                _feedbackButton = null;
+            }
+        }
+
+        private void BindButtons()
+        {
+            AddListener(_previousModuleButton, PreviousModulePressed);
+            AddListener(_nextModuleButton, NextModulePressed);
+            AddListener(_previousVariantButton, PreviousVariantPressed);
+            AddListener(_nextVariantButton, NextVariantPressed);
+            AddListener(_moduleSelectorButton, NextCategoryPressed);
+            AddListener(_variantSelectorButton, NextVariantPressed);
+        }
+
+        private void UnbindButtons()
+        {
+            RemoveListener(_previousModuleButton, PreviousModulePressed);
+            RemoveListener(_nextModuleButton, NextModulePressed);
+            RemoveListener(_previousVariantButton, PreviousVariantPressed);
+            RemoveListener(_nextVariantButton, NextVariantPressed);
+            RemoveListener(_moduleSelectorButton, NextCategoryPressed);
+            RemoveListener(_variantSelectorButton, NextVariantPressed);
+        }
+
+        private void CacheBaseStyles()
+        {
+            _buttonBaseColors.Clear();
+            _labelBaseColors.Clear();
+
+            CacheBaseStyle(_previousModuleButton, _previousModuleLabel);
+            CacheBaseStyle(_nextModuleButton, _nextModuleLabel);
+            CacheBaseStyle(_previousVariantButton, _previousVariantLabel);
+            CacheBaseStyle(_nextVariantButton, _nextVariantLabel);
+            CacheBaseStyle(_moduleSelectorButton, null);
+            CacheBaseStyle(_variantSelectorButton, null);
         }
 
         private void CacheBaseStyle(Button button, TextMeshProUGUI label)
         {
             Graphic targetGraphic = button.targetGraphic;
-            buttonBaseColors[button] = targetGraphic != null ? targetGraphic.color : buttonColor;
+            _buttonBaseColors[button] = targetGraphic != null ? targetGraphic.color : _buttonColor;
 
             if (label != null)
             {
-                labelBaseColors[label] = label.color;
+                _labelBaseColors[label] = label.color;
             }
         }
 
-        private void SetButtonState(Button button, TextMeshProUGUI label, bool enabled)
+        private void RefreshView()
         {
-            button.interactable = enabled;
+            EnsureInitialized();
+            EnsureBaseStylesCached();
 
-            Color baseButtonColor = buttonBaseColors[button];
+            SetButtonState(_previousModuleButton, _previousModuleLabel, _canSwitchModules);
+            SetButtonState(_nextModuleButton, _nextModuleLabel, _canSwitchModules);
+            SetButtonState(_previousVariantButton, _previousVariantLabel, _canSwitchVariants);
+            SetButtonState(_nextVariantButton, _nextVariantLabel, _canSwitchVariants);
+            SetButtonState(_moduleSelectorButton, null, _canSwitchCategories);
+            SetButtonState(_variantSelectorButton, null, _canSwitchVariants);
+        }
+
+        private void EnsureInitialized()
+        {
+            if (!_isInitialized)
+            {
+                Initialize();
+            }
+        }
+
+        private void EnsureBaseStylesCached()
+        {
+            if (_buttonBaseColors.Count == 0)
+            {
+                CacheBaseStyles();
+            }
+        }
+
+        private void SetButtonState(Button button, TextMeshProUGUI label, bool isEnabled)
+        {
+            button.interactable = isEnabled;
+
+            Color baseButtonColor = _buttonBaseColors[button];
             ColorBlock colors = button.colors;
-            colors.normalColor = enabled ? baseButtonColor : buttonDisabledColor;
-            colors.highlightedColor = enabled ? buttonHoverColor : buttonDisabledColor;
-            colors.pressedColor = enabled ? buttonPressedColor : buttonDisabledColor;
-            colors.selectedColor = enabled ? baseButtonColor : buttonDisabledColor;
-            colors.disabledColor = buttonDisabledColor;
-            colors.fadeDuration = buttonFadeDuration;
+            colors.normalColor = isEnabled ? baseButtonColor : _buttonDisabledColor;
+            colors.highlightedColor = isEnabled ? _buttonHoverColor : _buttonDisabledColor;
+            colors.pressedColor = isEnabled ? _buttonPressedColor : _buttonDisabledColor;
+            colors.selectedColor = isEnabled ? baseButtonColor : _buttonDisabledColor;
+            colors.disabledColor = _buttonDisabledColor;
+            colors.fadeDuration = _buttonFadeDuration;
             button.colors = colors;
 
-            float scale = 1f;
-            if (button == feedbackButton && feedbackTimer > 0f)
-            {
-                scale = pressedScale;
-            }
-
+            float scale = button == _feedbackButton && _feedbackTimer > 0f ? _pressedScale : 1f;
             button.transform.localScale = Vector3.one * scale;
 
-            if (label != null)
+            if (label == null)
             {
-                Color baseLabelColor = labelBaseColors[label];
-                label.color = enabled ? baseLabelColor : new Color(baseLabelColor.r, baseLabelColor.g, baseLabelColor.b, 0.45f);
+                return;
             }
+
+            Color baseLabelColor = _labelBaseColors[label];
+            label.color = isEnabled
+                ? baseLabelColor
+                : new Color(baseLabelColor.r, baseLabelColor.g, baseLabelColor.b, 0.45f);
         }
 
         private void PlayFeedback(Button button)
         {
-            feedbackButton = button;
-            feedbackTimer = 0.12f;
-            button.transform.localScale = Vector3.one * pressedScale;
+            _feedbackButton = button;
+            _feedbackTimer = ButtonFeedbackDuration;
+            button.transform.localScale = Vector3.one * _pressedScale;
         }
 
-        private static void AddListener(Button button, UnityEngine.Events.UnityAction action)
+        private static void ValidateButtonReference(Button button, string fieldName)
         {
-            button.onClick.RemoveAllListeners();
+            if (button == null)
+            {
+                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires {fieldName}.");
+            }
+        }
+
+        private static void ValidateLabelReference(TextMeshProUGUI label, string fieldName)
+        {
+            if (label == null)
+            {
+                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires {fieldName}.");
+            }
+        }
+
+        private static void AddListener(Button button, UnityAction action)
+        {
+            button.onClick.RemoveListener(action);
             button.onClick.AddListener(action);
         }
 
-        private static void RemoveListeners(Button button)
+        private static void RemoveListener(Button button, UnityAction action)
         {
-            button.onClick.RemoveAllListeners();
-        }
-
-        private static Button FindButton(Transform root, string name, out TextMeshProUGUI label)
-        {
-            Transform buttonTransform = FindDescendant(root, name);
-            if (buttonTransform == null)
-            {
-                throw new InvalidOperationException($"{nameof(ModuleNavigationControls)} requires {name}.");
-            }
-
-            Button button = buttonTransform.GetComponent<Button>();
             if (button == null)
             {
-                throw new InvalidOperationException($"{name} requires {nameof(Button)}.");
+                return;
             }
 
-            Transform labelTransform = buttonTransform.Find("Label");
-            label = labelTransform == null ? null : labelTransform.GetComponent<TextMeshProUGUI>();
-            return button;
+            button.onClick.RemoveListener(action);
         }
 
-        private static Canvas FindCanvasByChild(Transform root, string childName)
+        public void PreviousModulePressed()
         {
-            Canvas[] canvases = root.GetComponentsInChildren<Canvas>(true);
-            for (int i = 0; i < canvases.Length; i++)
-            {
-                if (FindDescendant(canvases[i].transform, childName) != null)
-                {
-                    return canvases[i];
-                }
-            }
-
-            return null;
+            PreviousModuleRequested?.Invoke();
+            PlayFeedback(_previousModuleButton);
         }
 
-        private static Transform FindDescendant(Transform root, string targetName)
+        public void NextModulePressed()
         {
-            if (root == null)
-            {
-                return null;
-            }
+            NextModuleRequested?.Invoke();
+            PlayFeedback(_nextModuleButton);
+        }
 
-            if (root.name == targetName)
-            {
-                return root;
-            }
+        public void NextCategoryPressed()
+        {
+            NextCategoryRequested?.Invoke();
+            PlayFeedback(_moduleSelectorButton);
+        }
 
-            for (int i = 0; i < root.childCount; i++)
-            {
-                Transform match = FindDescendant(root.GetChild(i), targetName);
-                if (match != null)
-                {
-                    return match;
-                }
-            }
+        public void PreviousVariantPressed()
+        {
+            PreviousVariantRequested?.Invoke();
+            PlayFeedback(_previousVariantButton);
+        }
 
-            return null;
+        public void NextVariantPressed()
+        {
+            NextVariantRequested?.Invoke();
+            PlayFeedback(_nextVariantButton);
+        }
+
+        public void ShowNavigationState(bool canSwitchModules, bool canSwitchCategories, bool canSwitchVariants)
+        {
+            EnsureInitialized();
+            _canSwitchModules = canSwitchModules;
+            _canSwitchCategories = canSwitchCategories;
+            _canSwitchVariants = canSwitchVariants;
+            RefreshView();
         }
     }
 }

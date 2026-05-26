@@ -6,22 +6,22 @@ namespace LearningArchitect.UI
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ShowcaseStateHub))]
-    [RequireComponent(typeof(MetricsOverlay))]
+    [RequireComponent(typeof(MetricsOverlayHost))]
     public sealed class MetricsPresenter : MonoBehaviour
     {
         [SerializeField] private ShowcaseStateHub stateHub;
-        [SerializeField] private MetricsOverlay view;
+        [SerializeField] private MetricsOverlayHost view;
 
         private void Awake()
         {
             stateHub = stateHub != null ? stateHub : GetComponent<ShowcaseStateHub>();
-            view = view != null ? view : GetComponent<MetricsOverlay>();
+            view = view != null ? view : GetComponent<MetricsOverlayHost>();
 
             if (stateHub == null)
                 throw new InvalidOperationException($"{nameof(ShowcaseStateHub)} is required.");
 
             if (view == null)
-                throw new InvalidOperationException($"{nameof(MetricsOverlay)} is required.");
+                throw new InvalidOperationException($"{nameof(MetricsOverlayHost)} is required.");
         }
 
         private void OnEnable()
@@ -41,15 +41,12 @@ namespace LearningArchitect.UI
 
         private void HandleSelectionChanged(ModuleDefinitionSO module, VariantDefinitionSO variant)
         {
-            view.ConfigureModule(module);
             view.ShowActiveCount(stateHub.ActiveItemCount);
-            RefreshReferenceProfile();
         }
 
         private void HandleStressStateChanged(int level, int activeCount)
         {
             view.ShowActiveCount(activeCount);
-            RefreshReferenceProfile();
         }
 
         private void HandleMetricsChanged(ShowcaseMetricsSnapshot metrics)
@@ -59,27 +56,8 @@ namespace LearningArchitect.UI
 
         private void Refresh()
         {
-            view.ConfigureModule(stateHub.CurrentModule);
             view.ShowActiveCount(stateHub.ActiveItemCount);
             view.ShowMetrics(stateHub.CurrentMetrics);
-            RefreshReferenceProfile();
-        }
-
-        private void RefreshReferenceProfile()
-        {
-            MetricsOverlay.ReferenceMetricsProfile profile = null;
-            if (ShouldUseReferenceMetrics())
-                MetricsOverlay.TryResolveWebDemoProfile(stateHub.CurrentVariant, stateHub.CurrentStressLevel, out profile);
-
-            view.SetReferenceProfile(profile);
-        }
-
-        private static bool ShouldUseReferenceMetrics()
-        {
-            // Performance should always reflect the live runtime stream.
-            // Static WebGL reference profiles freeze the graph and conflict with the
-            // current "one source of truth" telemetry model.
-            return false;
         }
     }
 }

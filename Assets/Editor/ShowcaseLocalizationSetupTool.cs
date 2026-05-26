@@ -106,6 +106,8 @@ namespace LearningArchitect.EditorTools
             {
                 { "breadcrumb", "ENGINE SYSTEMS / <color=#" + ShowcasePalette.AccentHex + ">VISUALIZER</color>" },
                 { "module", "MODULE" },
+                { "module_category_architecture", "Architecture Pattern Module" },
+                { "module_category_simulation", "Simulation Module" },
                 { "variant", "VARIANT" },
                 { "loaded", "LOADED" },
                 { "orbit", "ORBIT" },
@@ -133,11 +135,6 @@ namespace LearningArchitect.EditorTools
                 { "no_pros", "No pros listed." },
                 { "no_cons", "No cons listed." },
                 { "no_constraints", "No constraints listed." },
-                { "realtime_preview", "Realtime architecture preview" },
-                { "switching_module_prev", "Switching module  ‹" },
-                { "switching_module_next", "Switching module  ›" },
-                { "switching_variant_prev", "Switching variant  ‹" },
-                { "switching_variant_next", "Switching variant  ›" },
                 { "load_selected", "Load selected" },
                 { "stress_load", "Stress load" },
                 { "active", "Active" },
@@ -148,13 +145,19 @@ namespace LearningArchitect.EditorTools
                 { "tooltip_prev_module", "Previous module" },
                 { "tooltip_next_module", "Next module" },
                 { "tooltip_prev_variant", "Previous variant" },
-                { "tooltip_next_variant", "Next variant" }
+                { "tooltip_next_variant", "Next variant" },
+                { "interview_arena_launch", "Interview Arena" },
+                { "interview_arena_title", "Interview Arena" },
+                { "interview_arena_subtitle", "Soldiers: melee, ranged crossbow, respawn. Top-left i-frame bar; blue flash on the hero." },
+                { "interview_arena_back", "Back to architecture demos" }
             };
 
             Dictionary<string, string> russianEntries = new Dictionary<string, string>
             {
                 { "breadcrumb", "СИСТЕМЫ ДВИЖКА / <color=#" + ShowcasePalette.AccentHex + ">ВИЗУАЛИЗАТОР</color>" },
                 { "module", "МОДУЛЬ" },
+                { "module_category_architecture", "Архитектурный паттерн" },
+                { "module_category_simulation", "Симуляционный модуль" },
                 { "variant", "ВАРИАНТ" },
                 { "loaded", "ЗАГРУЖЕНО" },
                 { "orbit", "ОРБИТА" },
@@ -182,11 +185,6 @@ namespace LearningArchitect.EditorTools
                 { "no_pros", "Плюсы не указаны." },
                 { "no_cons", "Минусы не указаны." },
                 { "no_constraints", "Ограничения не указаны." },
-                { "realtime_preview", "Интерактивный просмотр архитектуры" },
-                { "switching_module_prev", "Переключение модуля  ‹" },
-                { "switching_module_next", "Переключение модуля  ›" },
-                { "switching_variant_prev", "Переключение варианта  ‹" },
-                { "switching_variant_next", "Переключение варианта  ›" },
                 { "load_selected", "Нагрузка выбрана" },
                 { "stress_load", "Нагрузка" },
                 { "active", "Активно" },
@@ -197,7 +195,11 @@ namespace LearningArchitect.EditorTools
                 { "tooltip_prev_module", "Предыдущий модуль" },
                 { "tooltip_next_module", "Следующий модуль" },
                 { "tooltip_prev_variant", "Предыдущий вариант" },
-                { "tooltip_next_variant", "Следующий вариант" }
+                { "tooltip_next_variant", "Следующий вариант" },
+                { "interview_arena_launch", "Interview Arena" },
+                { "interview_arena_title", "Interview Arena" },
+                { "interview_arena_subtitle", "Солдаты: melee, арбалет на дистанции, респавн. Слева — индикатор i-frames (голубая вспышка на герое)." },
+                { "interview_arena_back", "Назад к архитектурным демо" }
             };
 
             WriteEntries(englishTable, englishEntries);
@@ -208,56 +210,9 @@ namespace LearningArchitect.EditorTools
 
         private static void PopulateContentCollection(StringTableCollection collection, Locale english, Locale russian)
         {
-            StringTable englishTable = GetStringTableOrThrow(collection, english);
-            StringTable russianTable = GetStringTableOrThrow(collection, russian);
-
-            string[] moduleGuids = AssetDatabase.FindAssets("t:ModuleDefinitionSO", DefinitionSearchFolders);
-            for (int i = 0; i < moduleGuids.Length; i++)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(moduleGuids[i]);
-                ModuleDefinitionSO module = LoadAssetOrThrow<ModuleDefinitionSO>(path);
-
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleNameKey(module), module.ModuleName);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleNameKey(module), module.ModuleNameRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.Description);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleDescriptionKey(module), module.DescriptionRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleThesisKey(module), module.Thesis);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleThesisKey(module), module.ThesisRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleProblemKey(module), module.ProblemStatement);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleProblemKey(module), module.ProblemStatementRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleWebGlPresetKey(module), module.WebGlPresetNote);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleWebGlPresetKey(module), module.WebGlPresetNoteRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabel);
-                SetEntry(russianTable, ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabelRu);
-            }
-
-            string[] variantGuids = AssetDatabase.FindAssets("t:VariantDefinitionSO", DefinitionSearchFolders);
-            for (int i = 0; i < variantGuids.Length; i++)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(variantGuids[i]);
-                VariantDefinitionSO variant = LoadAssetOrThrow<VariantDefinitionSO>(path);
-
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantName);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantNameRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescription);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescriptionRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantDataFlowKey(variant), variant.DataFlow);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantDataFlowKey(variant), variant.DataFlowRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycle);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycleRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproach);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproachRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummary);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummaryRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.Takeaway);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.TakeawayRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.TradeOffs);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.TradeOffsRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.Pros);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantProsKey(variant), variant.ProsRu);
-                SetEntry(englishTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.Cons);
-                SetEntry(russianTable, ShowcaseLocalization.BuildVariantConsKey(variant), variant.ConsRu);
-            }
+            GetStringTableOrThrow(collection, english);
+            GetStringTableOrThrow(collection, russian);
+            // ShowcaseContent rows are authored in the string tables only; module/variant SOs hold keys and wiring.
         }
 
         private static void WriteEntries(StringTable table, Dictionary<string, string> entries)
@@ -274,16 +229,10 @@ namespace LearningArchitect.EditorTools
             SetEntry(russianTable, "module_type", "ТИП МОДУЛЯ");
             SetEntry(englishTable, "variants", "VARIANTS");
             SetEntry(russianTable, "variants", "ВАРИАНТЫ");
-            SetEntry(englishTable, "guided_demo", "GUIDED DEMO");
-            SetEntry(russianTable, "guided_demo", "ГИД-ДЕМО");
             SetEntry(englishTable, "start_demo", "START DEMO");
             SetEntry(russianTable, "start_demo", "ЗАПУСК ДЕМО");
             SetEntry(englishTable, "stop_demo", "STOP DEMO");
             SetEntry(russianTable, "stop_demo", "СТОП ДЕМО");
-            SetEntry(englishTable, "demo_complete", "DEMO COMPLETE");
-            SetEntry(russianTable, "demo_complete", "ДЕМО ЗАВЕРШЕНО");
-            SetEntry(englishTable, "step", "STEP");
-            SetEntry(russianTable, "step", "ШАГ");
             SetEntry(englishTable, "problem", "PROBLEM");
             SetEntry(russianTable, "problem", "ПРОБЛЕМА");
             SetEntry(englishTable, "compare", "COMPARE");
@@ -318,6 +267,10 @@ namespace LearningArchitect.EditorTools
             SetEntry(russianTable, "no_module_type", "Тип модуля не указан.");
             SetEntry(englishTable, "no_webgl_note", "No WebGL note provided.");
             SetEntry(russianTable, "no_webgl_note", "WebGL-пресет не описан.");
+            SetEntry(englishTable, "module_category_architecture", "Architecture Pattern Module");
+            SetEntry(russianTable, "module_category_architecture", "Архитектурный паттерн");
+            SetEntry(englishTable, "module_category_simulation", "Simulation Module");
+            SetEntry(russianTable, "module_category_simulation", "Симуляционный модуль");
         }
 
         private static void SetEntry(StringTable table, string key, string value)

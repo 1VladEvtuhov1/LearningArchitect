@@ -1,0 +1,9 @@
+{
+  "name": "LearningArchitect.Modules.InterviewArena",
+  "references": [
+    "LearningArchitect.Showcase",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ]
+}

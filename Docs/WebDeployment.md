@@ -23,7 +23,7 @@ Do not use `file://` for WebGL checks. Unity loader, manifest fetch, fullscreen,
 1. Open the project in Unity.
 2. Open `Assets/Showcase/Scenes/ArchitectureShowcase.unity`.
 3. Press Play.
-4. Check module switching, variant switching, stress presets, fullscreen-relevant UI, and RU/EN localization.
+4. Check module switching, variant switching, stress presets, fullscreen-relevant UI, and **language toggle** (Unity Localization: `ShowcaseContent` + `ShowcaseUI` tables — hub copy is not edited on `ModuleDefinitionSO` / `VariantDefinitionSO`).
 
 This verifies the runtime before creating a browser build.
 

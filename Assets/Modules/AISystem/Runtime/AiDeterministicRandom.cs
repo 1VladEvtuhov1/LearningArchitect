@@ -1,3 +1,4 @@
+using LearningArchitect.Core;
 using UnityEngine;
 
 namespace LearningArchitect.Modules.AI
@@ -34,7 +35,10 @@ namespace LearningArchitect.Modules.AI
         {
             float angle = NextFloat01(ref state) * Mathf.PI * 2f;
             float distance = Mathf.Sqrt(NextFloat01(ref state)) * radius;
-            return new Vector3(Mathf.Cos(angle) * distance, 0f, Mathf.Sin(angle) * distance);
+            return new Vector3(
+                Mathf.Cos(angle) * distance,
+                ShowcaseSpawnLayout.SurfaceY,
+                Mathf.Sin(angle) * distance);
         }
     }
 }

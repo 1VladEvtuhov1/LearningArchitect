@@ -78,13 +78,13 @@ Primary targets:
 
 - `DescriptionPanel`
 - presenters bound to `ShowcaseStateHub`
-- localization fallback behavior
+- localization: missing `ShowcaseContent` / `ShowcaseUI` keys and explicit missing markers
 
 Examples:
 
 - `DescriptionPanel` hides optional empty sections;
 - tab selection produces the expected rendered section order in the shipped legacy body;
-- localization falls back to ScriptableObject content when table entries are missing.
+- localization surfaces explicit missing markers when required table entries are missing (no duplicate copy on `ModuleDefinitionSO` / `VariantDefinitionSO`).
 
 These tests are useful, but should stay narrower than core/module tests.
 
@@ -187,8 +187,8 @@ Current automated coverage is no longer just a tiny seed:
 That is a meaningful baseline for shell behavior and module contract safety, but the remaining risk areas are still real:
 
 - PlayMode coverage is intentionally thin and focused on orchestration smoke, not presenter-heavy UI behavior;
-- localization coverage now proves real `ShowcaseContent` lookup and fallback for a narrow slice, but not every visible content surface;
-- validator and `ShowcaseLayoutTool` preserve-normalizer coverage now guard the hub `DescriptionPanel` hierarchy and key authoring contracts, but broader asset-graph drift can still happen outside those checks;
+- localization coverage now proves real `ShowcaseContent` / `ShowcaseUI` lookup and explicit missing-marker behavior for a narrow slice, but not every visible content surface;
+- validator coverage now guards the hub `DescriptionPanel` hierarchy and key authoring contracts, while `ShowcaseLayoutToolTests` only assert that the deprecated editor tool stays in safe mode;
 - deeper asset-level validation around broader authoring contracts is still lighter than the runtime shell coverage.
 
 ## Recommended Next Steps

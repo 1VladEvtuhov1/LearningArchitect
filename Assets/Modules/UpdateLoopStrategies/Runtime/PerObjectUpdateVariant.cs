@@ -7,7 +7,6 @@ namespace LearningArchitect.Modules.Performance
     public sealed class PerObjectUpdateVariant : MonoBehaviour, IShowcaseStressTarget, IShowcaseMetricsSource
     {
         [SerializeField] private int count = 5000;
-        [SerializeField] private int visibleCount = 260;
         [SerializeField] private int visualLimit = 420;
         [SerializeField] private float radius = 7f;
         [SerializeField] private float speed = 0.85f;
@@ -49,10 +48,11 @@ namespace LearningArchitect.Modules.Performance
             ClearVisuals();
             PerObjectUpdateMover.ResetMetrics();
 
-            int visible = Mathf.Min(targetCount, Mathf.Min(visibleCount, visualLimit));
-            visuals = new Transform[visible];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            visuals = new Transform[spawnCount];
 
-            for (int i = 0; i < visible; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
                     transform,

@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dfb2fe43eb341c886ab5fdb1a3de927, type: 3}
+  m_Name: UnityToolboxTestCenter
+  m_EditorClassIdentifier: UnityToolbox.TestCenter.Editor::UnityToolbox.TestCenter.ReusableTestCenterConfigurationAsset
+  _windowTitle: LearningArchitect Test Center
+  _toolbarTitle: LearningArchitect Test Center
+  _sessionStatePrefix: LearningArchitect.TestCenter.
+  _resultsDirectoryRelativePath: Temp/TestResults
+  _minWidth: 780
+  _minHeight: 540
+  _sections:
+  - _title: EditMode Regression
+    _suites:
+    - _displayName: Core Shell & Validation
+      _categoryName: LearningArchitect.Core.Edit
+      _mode: 2
+      _resultFileName: LearningArchitect.Core.Edit.xml
+      _description: Shared runtime orchestration, shell state, and showcase validator coverage.
+    - _displayName: UI & Localization
+      _categoryName: LearningArchitect.UI.Edit
+      _mode: 2
+      _resultFileName: LearningArchitect.UI.Edit.xml
+      _description: Hub UI, localization tables, panel formatting, and presenter behaviour.
+    - _displayName: Module Contract Coverage
+      _categoryName: LearningArchitect.Modules.Edit
+      _mode: 2
+      _resultFileName: LearningArchitect.Modules.Edit.xml
+      _description: Module authoring rules, prefab wiring, and showcase-facing contract checks.
+  - _title: Focused Logic
+    _suites:
+    - _displayName: AI Simulation Rules
+      _categoryName: LearningArchitect.AI.Edit
+      _mode: 2
+      _resultFileName: LearningArchitect.AI.Edit.xml
+      _description: Deterministic AI decision and simulation coverage.
+  - _title: PlayMode Smoke
+    _suites:
+    - _displayName: Runtime Integration Smoke
+      _categoryName: LearningArchitect.Showcase.PlayMode
+      _mode: 0
+      _resultFileName: LearningArchitect.Showcase.PlayMode.xml
+      _description: End-to-end module activation and stress propagation in the real runtime shell.

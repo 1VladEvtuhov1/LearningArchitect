@@ -50,7 +50,7 @@ Recurring themes across the modules:
 For public browser delivery the project now also prefers:
 
 - one readable presentation page before the runtime is launched;
-- stable, representative WebGL metrics over noisy browser benchmarking;
+- live runtime metrics with conservative browser-safe presets instead of treating WebGL as a benchmark harness;
 - a guided review flow that works for recruiters and interviewers who will not inspect the Unity scene directly.
 
 ## Repository Structure
@@ -72,14 +72,19 @@ For public browser delivery the project now also prefers:
 
 ## Content Authoring
 
-Module and variant information is authored in two layers:
+Module and variant **wiring** (`ModuleDefinitionSO` / `VariantDefinitionSO`) lives under `Assets/Modules/*/Data` and holds `localizationKey`, taxonomy, prefab references, and stress counts. **All visible prose** is authored in Unity Localization:
 
-- `ModuleDefinitionSO` / `VariantDefinitionSO` assets keep fallback content and prefab wiring under `Assets/Modules/*/Data`
-- `ShowcaseContent` localization tables override visible hub copy when a localized entry exists
+- `ShowcaseContent` — per-module and per-variant strings (EN/RU tables);
+- `ShowcaseUI` — shared hub chrome and fixed labels (including module **category** line keys derived from `ShowcaseModuleCategory`).
 
-If project text appears out of sync, check `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset` and `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset` before assuming the ScriptableObject asset is unused.
+Localization identity is explicit:
 
-The full content source-of-truth rules live in `Docs/Architecture.md`.
+- `ModuleDefinitionSO.localizationKey` and `VariantDefinitionSO.localizationKey` define the stable lookup id used by the runtime;
+- asset names are authoring concerns and should not be treated as localization ids.
+
+If UI text is wrong or missing markers appear, edit the string tables and keys first. The menu `Learning Architect/Localization/Setup Showcase Localization` can seed or repair table scaffolding but does not replace hand-authored `ShowcaseContent` rows.
+
+The full content rules live in `Docs/Architecture.md`.
 
 ## How To Open The Showcase
 
@@ -112,3 +117,9 @@ The embedded demo is meant to support interview review, not to act like a produc
 - Active decisions: `Docs/Decisions.md`
 - Open threads: `Docs/OpenThreads.md`
 - Working memory: `Docs/WorkingMemory.md`
+
+## Tooling Notes
+
+- `Assets/Showcase/Prefabs/ArchitectureShowcaseHub.prefab` is the runtime UI source of truth. `Assembly-CSharp.csproj` is Unity-generated and should not be read as an architecture document.
+- `MSB3277` warnings involving `System.Net.Http` or `System.IO.Compression` currently come from Unity-generated project references and external editor assemblies, not from showcase runtime logic.
+- occasional disposed `NetworkStream` logs from `MCPForUnity` should be treated as external tooling noise unless they map to a reproducible project defect.

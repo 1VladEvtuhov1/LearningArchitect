@@ -1,0 +1,202 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7bca88ede9100e44a913f84791356e2, type: 3}
+  m_Name: RecruiterDemoScenario
+  m_EditorClassIdentifier: LearningArchitect.Showcase::LearningArchitect.Core.RecruiterDemoScenarioSO
+  defaultStepDuration: 6.5
+  introOverlayDuration: 1.8
+  outroOverlayDuration: 2.2
+  steps:
+  - module: {fileID: 11400000, guid: 76f250a6b9e8d3b469578c5a4ca245d6, type: 2}
+    variant: {fileID: 11400000, guid: 3abb53d6c32715c4cbf3a52ad6d113ae, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_01.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -8
+      pitchOffset: 2
+      distanceOffset: 0.8
+  - module: {fileID: 11400000, guid: 76f250a6b9e8d3b469578c5a4ca245d6, type: 2}
+    variant: {fileID: 11400000, guid: 159c825882c26aa4191b124a98c6519a, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 7
+    noteLocalizationKey: recruiter_demo.step_02.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 10
+      pitchOffset: -1
+      distanceOffset: -0.6
+  - module: {fileID: 11400000, guid: 4ee1378dd83fbbf478d6f4681602fe25, type: 2}
+    variant: {fileID: 11400000, guid: b95fd78c66c870e46b682949bf83611f, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_03.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -14
+      pitchOffset: 1
+      distanceOffset: 0.4
+  - module: {fileID: 11400000, guid: 4ee1378dd83fbbf478d6f4681602fe25, type: 2}
+    variant: {fileID: 11400000, guid: b3c4aefa0b886f449b6b54556a79c42b, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 7
+    noteLocalizationKey: recruiter_demo.step_04.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 14
+      pitchOffset: -2
+      distanceOffset: -0.8
+  - module: {fileID: 11400000, guid: 4a82e0899e11beb44b1b49dbc84c9963, type: 2}
+    variant: {fileID: 11400000, guid: 0fd2f2bb543caca4eab2579ba2a4d85a, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_05.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -18
+      pitchOffset: 4
+      distanceOffset: 0.6
+  - module: {fileID: 11400000, guid: 4a82e0899e11beb44b1b49dbc84c9963, type: 2}
+    variant: {fileID: 11400000, guid: c5221fc9f88ddde4893f563fcc994d3d, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 7
+    noteLocalizationKey: recruiter_demo.step_06.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 18
+      pitchOffset: -3
+      distanceOffset: -1.2
+  - module: {fileID: 11400000, guid: a63297c5a348a764d85005ddcd20e9fc, type: 2}
+    variant: {fileID: 11400000, guid: 8c5baa3d3ea5ecc4b97a29600cc51b33, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_07.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -10
+      pitchOffset: 3
+      distanceOffset: 0.5
+  - module: {fileID: 11400000, guid: a63297c5a348a764d85005ddcd20e9fc, type: 2}
+    variant: {fileID: 11400000, guid: b119176c4d258954ca07fbfbd1ece63c, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 6
+    noteLocalizationKey: recruiter_demo.step_08.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 8
+      pitchOffset: 0
+      distanceOffset: -0.4
+  - module: {fileID: 11400000, guid: a63297c5a348a764d85005ddcd20e9fc, type: 2}
+    variant: {fileID: 11400000, guid: 037e149306af7a3468300d2b5b57c855, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 6
+    noteLocalizationKey: recruiter_demo.step_09.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 0
+      pitchOffset: -2
+      distanceOffset: 0
+  - module: {fileID: 11400000, guid: 3cb04b453040fc8408416e1e0a69446d, type: 2}
+    variant: {fileID: 11400000, guid: 2181563459e58dc479bd63d35279eecf, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_10.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -12
+      pitchOffset: 2
+      distanceOffset: 0.3
+  - module: {fileID: 11400000, guid: 3cb04b453040fc8408416e1e0a69446d, type: 2}
+    variant: {fileID: 11400000, guid: 8d3a718effbdcae4683feeadbc1b53e8, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 6.5
+    noteLocalizationKey: recruiter_demo.step_11.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 14
+      pitchOffset: -1
+      distanceOffset: -0.6
+  - module: {fileID: 11400000, guid: db5b2dbdfed13af4ea87869ea947c739, type: 2}
+    variant: {fileID: 11400000, guid: 70445c96e5d868c468b276ddfb5ca9f8, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_12.note
+    cameraCue:
+      enabled: 1
+      yawOffset: 180
+      pitchOffset: -7
+      distanceOffset: -4.5
+  - module: {fileID: 11400000, guid: db5b2dbdfed13af4ea87869ea947c739, type: 2}
+    variant: {fileID: 11400000, guid: 85b0df0001002e244a8955dfd761d739, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 6.2
+    noteLocalizationKey: recruiter_demo.step_13.note
+    cameraCue:
+      enabled: 1
+      yawOffset: 180
+      pitchOffset: -7
+      distanceOffset: -4.5
+  - module: {fileID: 11400000, guid: a9e840ab760450d478aa25eebc67221d, type: 2}
+    variant: {fileID: 11400000, guid: 5301665bff97a2a448d2fdc09a83dd3d, type: 2}
+    stressMode: 1
+    explicitStressLevel: 0
+    duration: 5.5
+    noteLocalizationKey: recruiter_demo.step_14.note
+    cameraCue:
+      enabled: 0
+      yawOffset: -16
+      pitchOffset: 2
+      distanceOffset: 0.7
+  - module: {fileID: 11400000, guid: a9e840ab760450d478aa25eebc67221d, type: 2}
+    variant: {fileID: 11400000, guid: cac7007f5ce29a24abbb5b437228dea6, type: 2}
+    stressMode: 2
+    explicitStressLevel: 0
+    duration: 6.4
+    noteLocalizationKey: recruiter_demo.step_15.note
+    cameraCue:
+      enabled: 0
+      yawOffset: 16
+      pitchOffset: -2
+      distanceOffset: -0.8
+  selectionCues:
+  - variant: {fileID: 11400000, guid: 70445c96e5d868c468b276ddfb5ca9f8, type: 2}
+    cameraCue:
+      enabled: 1
+      yawOffset: 180
+      pitchOffset: -7
+      distanceOffset: -4.5
+  - variant: {fileID: 11400000, guid: 7d411a6be7e2bdc42bd3bee277e3b26a, type: 2}
+    cameraCue:
+      enabled: 1
+      yawOffset: 180
+      pitchOffset: -7
+      distanceOffset: -4.5
+  - variant: {fileID: 11400000, guid: 85b0df0001002e244a8955dfd761d739, type: 2}
+    cameraCue:
+      enabled: 1
+      yawOffset: 180
+      pitchOffset: -7
+      distanceOffset: -4.5

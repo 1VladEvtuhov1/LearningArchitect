@@ -112,88 +112,80 @@ In practice this is now part of the real contract even if a module can fall back
 
 ## Data Layer
 
-The showcase is data-driven through two ScriptableObject types.
+The showcase is data-driven through two ScriptableObject types that **wire** modules and variants; **all user-visible copy** is stored in Unity Localization string tables.
 
 ### `ModuleDefinitionSO`
 
 Contains:
 
-- module category;
-- display name;
-- thesis;
-- description;
-- problem statement;
-- WebGL note;
-- active item label;
-- list of variants.
+- `localizationKey` — stable id for `ShowcaseContent` / `ShowcaseUI` rows (not the asset file name);
+- `category` — taxonomy used for navigation and for **generic** module-type labels in `ShowcaseUI` (`module_category_simulation` / `module_category_architecture`);
+- references to `VariantDefinitionSO` instances.
 
 Role:
 
-- defines what a module is in the showcase.
+- defines which variants belong to a module and how the hub classifies it.
 
 ### `VariantDefinitionSO`
 
 Contains:
 
-- variant name;
+- `localizationKey` — stable id for `ShowcaseContent` rows;
 - prefab reference;
-- stress presets;
-- architecture description;
-- comparison summary;
-- takeaway;
-- trade-offs;
-- pros;
-- cons.
+- numeric stress presets (counts).
 
 Role:
 
-- defines how a specific implementation is loaded and explained.
+- defines how a specific implementation is spawned and stress-tested. Long-form explanations, names, and comparison copy live only in `ShowcaseContent`.
 
-This means UI text, stress presets, and prefab wiring are attached to data instead of hardcoded scene logic.
+Stress preset **button labels** are not duplicated per locale on the asset: the shared UI formats counts unless you later add dedicated table keys.
+
+This means prefab wiring and stress counts are attached to data instead of hardcoded scene logic, while copy stays in one localization place.
 
 ## Content Source Of Truth
 
-The project has two authoring layers for descriptive content.
+Visible text is authored **only** in Unity Localization tables.
 
-### 1. ScriptableObject Fallback Data
+### `ShowcaseContent` (module and variant copy)
 
-`ModuleDefinitionSO` and `VariantDefinitionSO` contain the authorable fallback fields used by the hub:
+At runtime, the hub resolves module and variant strings through `ShowcaseLocalization` / `ShowcaseLocalizationContent`.
 
-- module name
-- module thesis
-- module description
-- module problem statement
-- module WebGL note
-- variant architecture description
-- variant comparison summary
-- variant takeaway
-- variant trade-offs
-- variant pros
-- variant cons
+The lookup path is:
 
-These assets are stored in feature-owned data folders under `Assets/Modules/*/Data`.
+1. build the table entry id from `ModuleDefinitionSO.localizationKey` or `VariantDefinitionSO.localizationKey` (for example `effectsmodule.description`, `effects_chunkvariant.architecture`);
+2. read the matching `ShowcaseContent` entry for the active locale;
+3. if a required entry is missing, the UI shows an explicit `[MISSING: ShowcaseContent.<key>]` marker — there is **no** silent fallback to fields on the ScriptableObject.
 
-### 2. Localization Table Overrides
-
-At runtime, the hub resolves text through `ShowcaseLocalization`.
-
-The content lookup path is:
-
-1. try `ShowcaseContent` localization entries;
-2. if no valid localized entry exists, fall back to the values stored in the ScriptableObject.
-
-In practice this means the localization tables are the first source of truth for what appears in the UI:
+Authoritative tables:
 
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset`
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`
 
-The ScriptableObject fields are still important because they:
+### `ShowcaseUI` (chrome and taxonomy labels)
 
-- provide fallback content when localization keys are missing;
-- make module assets self-describing;
-- keep content close to prefab wiring.
+Short hub chrome and fixed labels (tabs, headers, **module category line** derived from `ShowcaseModuleCategory`) live in `ShowcaseUI` tables:
 
-When editing module copy, always verify whether the relevant key already exists in `ShowcaseContent`. Changing only the ScriptableObject may not change the visible UI if the localized override is present.
+- `Assets/Showcase/Localization/Tables/ShowcaseUI_en.asset`
+- `Assets/Showcase/Localization/Tables/ShowcaseUI_ru.asset`
+
+Module and variant **assets** under `Assets/Modules/*/Data` remain the place for **references** (prefabs, variant lists, keys, category). They are not a second copy of localized prose.
+
+Important constraint:
+
+- real showcase assets must assign an explicit `localizationKey`;
+- asset renames are authoring changes only and must not be used as a content-management tool;
+- `localizationKey` is the runtime identity for localized module and variant copy;
+- if you intentionally rename a localization id, you must update the relevant table entries as part of the same change.
+
+Current validation rule:
+
+- `ShowcaseValidator` treats missing `localizationKey` on real `ModuleDefinitionSO` and `VariantDefinitionSO` assets as an error;
+- missing required `ShowcaseContent` entries are validator errors (or warnings for optional fields such as WebGL notes);
+- required visible content resolves only through tables or explicit `[MISSING: ...]` markers.
+
+When copy changes, edit the string tables (and run `Tools/LearningArchitect/Validate Showcase Configuration`). Editing a `ModuleDefinitionSO` / `VariantDefinitionSO` asset alone does not change visible text.
+
+**Editor scaffolding:** `Learning Architect/Localization/Setup Showcase Localization` ensures locale and table assets exist and can merge keys for `ShowcaseUI`. It does **not** populate `ShowcaseContent` from module/variant assets — those rows stay hand-authored in the string tables.
 
 ## Layering
 
@@ -227,7 +219,7 @@ Contains:
 - hub widgets;
 - presenters;
 - localization bridge;
-- metrics overlay;
+- metrics and status hosts, presenters, runtime samplers, formatters, and views;
 - navigation;
 - guided demo flow.
 
@@ -383,20 +375,20 @@ This is not a generic website around Unity. It is part of the productized presen
 
 ## WebGL Metrics Strategy
 
-Browser delivery introduced a presentation tradeoff around performance communication.
+Browser delivery still has a presentation constraint:
 
-The current metrics strategy is split:
+- WebGL should communicate architectural differences without pretending to be a lab-grade benchmark.
 
-- in editor and native development flow, live runtime metrics still matter;
-- in the WebGL delivery flow, selected showcase variants can use representative reference values and pre-authored chart samples.
+The current strategy is:
 
-This is currently used for the `Update Loop Strategies` module so that:
+- keep live runtime metrics in the shared shell;
+- use conservative stress presets that remain readable in a browser;
+- rely on the page copy and guided flow to frame what the viewer should compare.
 
-- `Per-Object` and `Centralized` differ clearly at a glance;
-- browser noise does not erase the intended architectural lesson;
-- the graph communicates a stable pattern instead of random loader- and machine-dependent spikes.
+In other words:
 
-The reference metrics are resolved in UI presentation code, not by rewriting the module simulation itself.
+- the showcase does not ship a hidden runtime reference-metrics catalog anymore;
+- the browser story is carried by the same runtime metrics path plus tighter preset discipline and better surrounding context.
 
 ## New Modules Added In This Iteration
 
@@ -481,6 +473,22 @@ Project continuity notes live in:
 - `Docs/OpenThreads.md`
 - `Docs/WorkingMemory.md`
 
+## Planned Module: Interview Arena
+
+A large planned module (**Interview Arena**) is documented under `Docs/Modules/InterviewArena/`.
+
+Intent:
+
+- compact WebGL multiplayer arena (physics movement, lobby, personal server);
+- interview-oriented depth (client/server, pooling, FSM AI, vector math);
+- integrated through the same hub contracts (`IModule`, stress, localization keys), not as a second entry scene.
+
+Integration assessment and phased rollout:
+
+- `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+
+Runtime code lives under `Assets/Modules/InterviewArena/`. The playable shell is a **separate scene** (`Assets/Modules/InterviewArena/Scenes/InterviewArena.unity`), opened from the hub via `InterviewArenaLaunchDock` and `ShowcaseSceneLoader` — not via the module/variant extension workflow below.
+
 ## Extension Workflow
 
 To add a new module correctly:
@@ -491,6 +499,7 @@ To add a new module correctly:
 4. Create `VariantDefinitionSO` assets for those prefabs.
 5. Create a `ModuleDefinitionSO` that references the variants.
 6. Register the module in `ShowcaseCompositionRoot.Modules`.
-7. Add or adjust guided demo steps if the new module should appear in curated navigation.
+7. Assign explicit `localizationKey` values and add matching rows to `ShowcaseContent_en` / `ShowcaseContent_ru` (and any new `ShowcaseUI` keys if you introduce them).
+8. Add or adjust `Assets/Showcase/Data/RecruiterDemoScenario.asset` if the new module should appear in the guided walkthrough.
 
 That workflow is the main architectural contract of the repository.

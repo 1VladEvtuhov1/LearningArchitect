@@ -131,26 +131,6 @@ MonoBehaviour:
     m_Key: no_constraints
     m_Metadata:
       m_Items: []
-  - m_Id: 1957503003
-    m_Key: realtime_preview
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503004
-    m_Key: switching_module_prev
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503005
-    m_Key: switching_module_next
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503006
-    m_Key: switching_variant_prev
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503007
-    m_Key: switching_variant_next
-    m_Metadata:
-      m_Items: []
   - m_Id: 1957503008
     m_Key: load_selected
     m_Metadata:
@@ -207,24 +187,12 @@ MonoBehaviour:
     m_Key: variants
     m_Metadata:
       m_Items: []
-  - m_Id: 2257050888118274
-    m_Key: guided_demo
-    m_Metadata:
-      m_Items: []
   - m_Id: 2257050888118275
     m_Key: start_demo
     m_Metadata:
       m_Items: []
   - m_Id: 2257050888118276
     m_Key: stop_demo
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2257050888118277
-    m_Key: demo_complete
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2257050888118278
-    m_Key: step
     m_Metadata:
       m_Items: []
   - m_Id: 2257050888118279
@@ -293,6 +261,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2257050888118295
     m_Key: no_webgl_note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118296
+    m_Key: module_category_architecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118297
+    m_Key: module_category_simulation
     m_Metadata:
       m_Items: []
   m_Metadata:

@@ -1,0 +1,12 @@
+{
+  "name": "LearningArchitect.Modules.InterviewArena.Tests.Editor",
+  "references": [
+    "LearningArchitect.Modules.InterviewArena"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

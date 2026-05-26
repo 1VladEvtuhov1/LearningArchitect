@@ -21,18 +21,16 @@ Recommended target:
 
 The main scene build itself is small in scope:
 
-- only `Assets/Showcase/Scenes/ArchitectureShowcase.unity` is in build settings
+- build settings include `ArchitectureShowcase` (entry) and `InterviewArena` (separate game scene); run **Learning Architect → Interview Arena → Setup Interview Arena Scenes** after clone
 
 The most suspicious size contributors in the repository are:
 
-- `Assets/TextMesh Pro` total: about `11.15 MB`
-- `Assets/TextMesh Pro/Examples & Extras` total: about `5.87 MB`
-- `Assets/TextMesh Pro/Resources` total: about `3.55 MB`
+- `Assets/TextMesh Pro` total: about `4.03 MB`
 - `Assets/Shared/UI/main_UI.png`: about `1.61 MB` at `1672x941`
 
 Things that are large in the repository but are not automatically a WebGL build problem:
 
-- `Assets/Screenshots` total: about `13.68 MB`
+- `Assets/Screenshots` total: about `1.9 MB`
   Move these out of `Assets/` for project cleanliness, but they are only a build problem if referenced.
 
 Things that are not currently a meaningful size problem:
@@ -42,20 +40,17 @@ Things that are not currently a meaningful size problem:
 
 ## Quick Wins
 
-1. Remove `Assets/TextMesh Pro/Examples & Extras` if the showcase does not use any of those demo assets.
-   This is the highest-confidence cleanup in the project.
-
-2. Audit `main_UI.png`.
+1. Audit `main_UI.png`.
    If it is a decorative panel/background, try:
    - lower max size
    - texture compression
    - disabling read/write
    - replacing it with a smaller sliced texture if possible
 
-3. Move `Assets/Screenshots` outside `Assets/`.
+2. Move `Assets/Screenshots` outside `Assets/`.
    This reduces editor/import noise and prevents accidental references.
 
-4. Keep WebGL stress presets conservative.
+3. Keep WebGL stress presets conservative.
    Browser demo quality matters more than aggressive headline numbers.
 
 ## Package Audit
@@ -81,7 +76,7 @@ Do not remove them blindly. Verify the active scene and prefabs do not rely on t
 
 Use this as the default shipping profile for the current showcase:
 
-- `Compression Format`: `Brotli`
+- `Compression Format`: `Brotli` (**set in repo**: `ProjectSettings` → `webGLCompressionFormat: 2`)
 - `Decompression Fallback`: `Off` if hosting serves compressed files correctly
 - `Development Build`: `Off`
 - `Autoconnect Profiler`: `Off`
@@ -98,12 +93,11 @@ Memory policy:
 
 ## Practical Sequence
 
-1. Remove TMP demo content if unused.
-2. Compress or downscale `main_UI.png`.
-3. Move screenshots out of `Assets/`.
-4. Build with `Brotli`.
-5. Generate a build report and check the real top contributors.
-6. Only then consider deeper changes like Addressables or asset streaming.
+1. Compress or downscale `main_UI.png`.
+2. Move screenshots out of `Assets/`.
+3. Build with `Brotli`.
+4. Generate a build report and check the real top contributors.
+5. Only then consider deeper changes like Addressables or asset streaming.
 
 ## Current Shipping Model
 
@@ -118,27 +112,21 @@ Important behavior:
 
 This format is intentionally optimized for portfolio review rather than for raw benchmark fidelity.
 
-## Reference Metrics Policy
+## Metrics Policy
 
-The browser demo no longer treats live browser FPS as the primary storytelling layer for every comparison.
+The browser demo still avoids positioning itself as a benchmark harness.
 
-For the `Update Loop` module in WebGL:
+Current policy:
 
-- representative values are injected for the current preset;
-- the chart uses pre-authored samples instead of relying only on noisy live frame history;
-- the purpose is to make architectural differences legible during interviews;
-- the demo is showing a stable teaching surface, not claiming exact cross-machine benchmark truth.
+- keep the shared live metrics path visible in the runtime;
+- use conservative presets so the same metrics remain readable in a browser;
+- let the page copy and guided review flow explain what to compare.
 
-This is a deliberate tradeoff for browser delivery.
+The goal is:
 
-Current curated examples:
-
-- `Per-Object / 25`: `148 FPS`, `6.7 ms`
-- `Per-Object / 100`: `86 FPS`, `11.6 ms`
-- `Per-Object / 250`: `43 FPS`, `23.3 ms`
-- `Centralized / 100`: `166 FPS`, `6.1 ms`
-- `Centralized / 1 000`: `124 FPS`, `8.0 ms`
-- `Centralized / 5 000`: `72 FPS`, `13.9 ms`
+- clear architectural comparison;
+- stable interview review;
+- no hidden browser-only reference metrics layer drifting away from the real runtime.
 
 ## Build Output Integration
 

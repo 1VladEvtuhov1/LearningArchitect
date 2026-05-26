@@ -1,3 +1,4 @@
+using LearningArchitect.Core;
 using LearningArchitect.Modules.AI;
 using NUnit.Framework;
 using UnityEngine;
@@ -67,6 +68,46 @@ namespace LearningArchitect.Tests.AI
             Assert.AreEqual(0, world.Task[0]);
             Assert.Greater(world.Energy[0], 0.1f);
             Assert.AreEqual(world.HomePositions[0], world.Targets[0]);
+        }
+
+        [Test]
+        public void BehaviorTreeDecisionModel_MovesTowardsTarget_WithoutTeleportSnap()
+        {
+            AiWorld world = new(1);
+            world.Positions[0] = new Vector3(2f, ShowcaseSpawnLayout.SurfaceY, 0f);
+            world.HomePositions[0] = new Vector3(0f, ShowcaseSpawnLayout.SurfaceY, 0f);
+            world.Targets[0] = world.HomePositions[0];
+            world.Energy[0] = 0.1f;
+            world.RandomStates[0] = 5u;
+
+            BehaviorTreeDecisionModel model = new(8f, 1.9f, 1.3f, 0.55f, 0.22f, 1.2f, 0.18f, 0.4f, 0.95f, 0.28f);
+            model.Tick(world, 0.016f);
+
+            Assert.Less(world.Positions[0].x, 2f);
+            Assert.Greater(world.Positions[0].x, 1.9f);
+        }
+
+        [Test]
+        public void BehaviorTreeDecisionModel_KeepsPatrolTargetStable_WhenAgentHasNotMoved()
+        {
+            Vector3 home = new Vector3(1f, ShowcaseSpawnLayout.SurfaceY, 2f);
+            AiWorld world = new(1);
+            world.Positions[0] = home;
+            world.HomePositions[0] = home;
+            world.Targets[0] = home;
+            world.Energy[0] = 0.9f;
+            world.Timers[0] = 0f;
+            world.Task[0] = 2;
+            world.RandomStates[0] = 7u;
+
+            BehaviorTreeDecisionModel model = new(8f, 1.9f, 1.3f, 0.55f, 0.22f, 1.2f, 0.18f, 0.4f, 0.95f, 0.28f);
+            model.Tick(world, 0.016f);
+
+            Vector3 patrolTarget = world.Targets[0];
+            Assert.Greater((patrolTarget - home).sqrMagnitude, 0.16f);
+
+            model.Tick(world, 0.016f);
+            Assert.AreEqual(patrolTarget, world.Targets[0]);
         }
 
         [Test]

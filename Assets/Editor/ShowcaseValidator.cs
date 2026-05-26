@@ -112,14 +112,13 @@ namespace LearningArchitect.EditorTools
             "cons",
             "core_idea",
             "data_flow",
-            "demo_complete",
             "fps",
             "frame_time",
-            "guided_demo",
             "key_features",
-            "load_selected",
             "loaded",
             "module",
+            "module_category_architecture",
+            "module_category_simulation",
             "module_group",
             "module_type",
             "na",
@@ -146,20 +145,13 @@ namespace LearningArchitect.EditorTools
             "performance",
             "problem",
             "pros",
-            "realtime_preview",
             "runtime_lifecycle",
             "select_module",
             "select_variant",
             "start_demo",
-            "step",
             "stop_demo",
             "strengths",
-            "stress_load",
             "stress_test",
-            "switching_module_next",
-            "switching_module_prev",
-            "switching_variant_next",
-            "switching_variant_prev",
             "system_status",
             "takeaway",
             "tooltip_next_module",
@@ -180,12 +172,108 @@ namespace LearningArchitect.EditorTools
         {
             ModuleDefinitionSO[] modules = LoadAssets<ModuleDefinitionSO>();
             VariantDefinitionSO[] variants = LoadAssets<VariantDefinitionSO>();
+            RecruiterDemoScenarioSO[] recruiterScenarios = LoadAssets<RecruiterDemoScenarioSO>();
+            ShowcaseValidationReport report = ValidateShowcaseConfigurationInternal(modules, variants, recruiterScenarios);
+            LogReport(report, modules.Length, variants.Length);
+        }
+
+        internal static ShowcaseValidationReport ValidateShowcaseConfigurationInternal(
+            IReadOnlyList<ModuleDefinitionSO> modules,
+            IReadOnlyList<VariantDefinitionSO> variants,
+            IReadOnlyList<RecruiterDemoScenarioSO> recruiterScenarios)
+        {
             ShowcaseLocalizationSnapshot localization = CaptureLocalizationSnapshot();
             ShowcaseValidationReport report = ValidateDefinitions(modules, variants, localization);
+            ValidateRecruiterDemoScenarios(recruiterScenarios, modules, localization, report);
             ValidateHubPrefabLayout(AssetDatabase.LoadAssetAtPath<GameObject>(HubPrefabPath), report);
             ValidateHubSceneLayout(report);
+            ValidateInterviewArenaBuildScenes(report);
+            ValidateInterviewArenaScenePlayer(report);
+            return report;
+        }
 
-            LogReport(report, modules.Length, variants.Length);
+        private static MonoBehaviour FindInterviewArenaBootstrapInScene()
+        {
+            MonoBehaviour[] behaviours = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour != null && behaviour.GetType().Name == "InterviewArenaRuntimeContext")
+                    return behaviour;
+            }
+
+            return null;
+        }
+
+        internal static void ValidateInterviewArenaBuildScenes(ShowcaseValidationReport report)
+        {
+            const string architectureScenePath = "Assets/Showcase/Scenes/ArchitectureShowcase.unity";
+            const string interviewArenaScenePath = "Assets/Modules/InterviewArena/Scenes/InterviewArena.unity";
+
+            bool hasShowcase = false;
+            bool hasArena = false;
+
+            foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+            {
+                if (!scene.enabled)
+                    continue;
+
+                if (scene.path == architectureScenePath)
+                    hasShowcase = true;
+
+                if (scene.path == interviewArenaScenePath)
+                    hasArena = true;
+            }
+
+            if (!hasShowcase)
+            {
+                report.AddError(
+                    $"Build settings must include enabled scene '{architectureScenePath}'.",
+                    null);
+            }
+
+            if (!hasArena)
+            {
+                report.AddWarning(
+                    $"Build settings do not include '{interviewArenaScenePath}'. " +
+                    "Run Learning Architect/Interview Arena/Setup Interview Arena Scenes.",
+                    null);
+            }
+        }
+
+        internal static void ValidateInterviewArenaScenePlayer(ShowcaseValidationReport report)
+        {
+            const string arenaScenePath = "Assets/Modules/InterviewArena/Scenes/InterviewArena.unity";
+            if (!System.IO.File.Exists(arenaScenePath))
+                return;
+
+            Scene existingScene = SceneManager.GetSceneByPath(arenaScenePath);
+            Scene scene = existingScene.IsValid() && existingScene.isLoaded
+                ? existingScene
+                : EditorSceneManager.OpenScene(arenaScenePath, OpenSceneMode.Additive);
+
+            bool openedForValidation = !existingScene.IsValid() || !existingScene.isLoaded;
+            try
+            {
+                MonoBehaviour bootstrap = FindInterviewArenaBootstrapInScene();
+                if (bootstrap == null)
+                    return;
+
+                SerializedObject serialized = new SerializedObject(bootstrap);
+                if (serialized.FindProperty("player").objectReferenceValue == null)
+                {
+                    report.AddWarning(
+                        "InterviewArenaRuntimeContext has no scene player assigned. Place a prefab instance and wire the Player field (no runtime spawn).",
+                        bootstrap);
+                }
+            }
+            finally
+            {
+                if (openedForValidation)
+                    EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         internal static ShowcaseValidationReport ValidateDefinitions(
@@ -255,12 +343,16 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            ValidateLocalizedContent(report, module, "Module name", ShowcaseLocalization.BuildModuleNameKey(module), module.ModuleName, module.ModuleNameRu, localization, true);
-            ValidateLocalizedContent(report, module, "Module thesis", ShowcaseLocalization.BuildModuleThesisKey(module), module.Thesis, module.ThesisRu, localization, true);
-            ValidateLocalizedContent(report, module, "Module description", ShowcaseLocalization.BuildModuleDescriptionKey(module), module.Description, module.DescriptionRu, localization, true);
-            ValidateLocalizedContent(report, module, "Module problem statement", ShowcaseLocalization.BuildModuleProblemKey(module), module.ProblemStatement, module.ProblemStatementRu, localization, true);
-            ValidateLocalizedContent(report, module, "Module active item label", ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), module.ActiveItemLabel, module.ActiveItemLabelRu, localization, false);
-            ValidateLocalizedContent(report, module, "Module WebGL preset note", ShowcaseLocalization.BuildModuleWebGlPresetKey(module), module.WebGlPresetNote, module.WebGlPresetNoteRu, localization, false);
+            bool hasLocalizationKey = ValidateLocalizationKey(module, module.LocalizationKey, report);
+            if (hasLocalizationKey)
+            {
+                ValidateLocalizedContent(report, module, "Module name", ShowcaseLocalization.BuildModuleNameKey(module), localization, true);
+                ValidateLocalizedContent(report, module, "Module thesis", ShowcaseLocalization.BuildModuleThesisKey(module), localization, true);
+                ValidateLocalizedContent(report, module, "Module description", ShowcaseLocalization.BuildModuleDescriptionKey(module), localization, true);
+                ValidateLocalizedContent(report, module, "Module problem statement", ShowcaseLocalization.BuildModuleProblemKey(module), localization, true);
+                ValidateLocalizedContent(report, module, "Module active item label", ShowcaseLocalization.BuildModuleActiveItemLabelKey(module), localization, false);
+                ValidateLocalizedContent(report, module, "Module WebGL preset note", ShowcaseLocalization.BuildModuleWebGlPresetKey(module), localization, false);
+            }
 
             VariantDefinitionSO[] variants = module.Variants;
             if (variants == null || variants.Length == 0)
@@ -308,21 +400,144 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            ValidateLocalizedContent(report, variant, "Variant name", ShowcaseLocalization.BuildVariantNameKey(variant), variant.VariantName, variant.VariantNameRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant architecture description", ShowcaseLocalization.BuildVariantArchitectureKey(variant), variant.ArchitectureDescription, variant.ArchitectureDescriptionRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant compare summary", ShowcaseLocalization.BuildVariantCompareKey(variant), variant.CompareSummary, variant.CompareSummaryRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant data flow", ShowcaseLocalization.BuildVariantDataFlowKey(variant), variant.DataFlow, variant.DataFlowRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant runtime lifecycle", ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), variant.RuntimeLifecycle, variant.RuntimeLifecycleRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant why this approach", ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), variant.WhyThisApproach, variant.WhyThisApproachRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant takeaway", ShowcaseLocalization.BuildVariantTakeawayKey(variant), variant.Takeaway, variant.TakeawayRu, localization, false);
-            ValidateLocalizedContent(report, variant, "Variant trade-offs", ShowcaseLocalization.BuildVariantTradeOffsKey(variant), variant.TradeOffs, variant.TradeOffsRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant pros", ShowcaseLocalization.BuildVariantProsKey(variant), variant.Pros, variant.ProsRu, localization, true);
-            ValidateLocalizedContent(report, variant, "Variant cons", ShowcaseLocalization.BuildVariantConsKey(variant), variant.Cons, variant.ConsRu, localization, true);
+            bool hasLocalizationKey = ValidateLocalizationKey(variant, variant.LocalizationKey, report);
+            if (hasLocalizationKey)
+            {
+                ValidateLocalizedContent(report, variant, "Variant name", ShowcaseLocalization.BuildVariantNameKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant architecture description", ShowcaseLocalization.BuildVariantArchitectureKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant compare summary", ShowcaseLocalization.BuildVariantCompareKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant data flow", ShowcaseLocalization.BuildVariantDataFlowKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant runtime lifecycle", ShowcaseLocalization.BuildVariantRuntimeLifecycleKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant why this approach", ShowcaseLocalization.BuildVariantWhyThisApproachKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant takeaway", ShowcaseLocalization.BuildVariantTakeawayKey(variant), localization, false);
+                ValidateLocalizedContent(report, variant, "Variant trade-offs", ShowcaseLocalization.BuildVariantTradeOffsKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant pros", ShowcaseLocalization.BuildVariantProsKey(variant), localization, true);
+                ValidateLocalizedContent(report, variant, "Variant cons", ShowcaseLocalization.BuildVariantConsKey(variant), localization, true);
+            }
 
             ValidateStressPresets(variant, report);
-            ValidateStressPresetLabels(variant, report, ShowcaseLanguage.English);
-            ValidateStressPresetLabels(variant, report, ShowcaseLanguage.Russian);
             ValidatePrefabContracts(variant, report);
+        }
+
+        private static void ValidateRecruiterDemoScenarios(
+            IReadOnlyList<RecruiterDemoScenarioSO> scenarios,
+            IReadOnlyList<ModuleDefinitionSO> modules,
+            ShowcaseLocalizationSnapshot localization,
+            ShowcaseValidationReport report)
+        {
+            if (scenarios == null || scenarios.Count == 0)
+            {
+                report.AddWarning("No recruiter demo scenario assets were found.", null);
+                return;
+            }
+
+            for (int i = 0; i < scenarios.Count; i++)
+                ValidateRecruiterDemoScenario(scenarios[i], modules, localization, report);
+        }
+
+        private static void ValidateRecruiterDemoScenario(
+            RecruiterDemoScenarioSO scenario,
+            IReadOnlyList<ModuleDefinitionSO> modules,
+            ShowcaseLocalizationSnapshot localization,
+            ShowcaseValidationReport report)
+        {
+            if (scenario == null)
+            {
+                report.AddError("Encountered a null recruiter demo scenario asset.", null);
+                return;
+            }
+
+            RecruiterDemoScenarioSO.StepDefinition[] steps = scenario.Steps;
+            if (steps == null || steps.Length == 0)
+            {
+                report.AddError("Recruiter demo scenario does not define any steps.", scenario);
+                return;
+            }
+
+            HashSet<VariantDefinitionSO> selectionCueVariants = new();
+            RecruiterDemoScenarioSO.SelectionCueDefinition[] selectionCues = scenario.SelectionCues;
+            for (int i = 0; i < selectionCues.Length; i++)
+            {
+                VariantDefinitionSO variant = selectionCues[i].Variant;
+                if (variant == null)
+                {
+                    report.AddError($"Recruiter demo selection cue {i} is missing a variant reference.", scenario);
+                    continue;
+                }
+
+                if (!selectionCueVariants.Add(variant))
+                    report.AddError($"Recruiter demo selection cue {i} duplicates variant '{variant.name}'.", scenario);
+            }
+
+            for (int i = 0; i < steps.Length; i++)
+                ValidateRecruiterDemoStep(scenario, steps[i], i, modules, localization, report);
+        }
+
+        private static void ValidateRecruiterDemoStep(
+            RecruiterDemoScenarioSO scenario,
+            RecruiterDemoScenarioSO.StepDefinition step,
+            int index,
+            IReadOnlyList<ModuleDefinitionSO> modules,
+            ShowcaseLocalizationSnapshot localization,
+            ShowcaseValidationReport report)
+        {
+            if (step.Module == null)
+            {
+                report.AddError($"Recruiter demo step {index} is missing a module reference.", scenario);
+                return;
+            }
+
+            if (step.Variant == null)
+            {
+                report.AddError($"Recruiter demo step {index} is missing a variant reference.", scenario);
+                return;
+            }
+
+            if (!ContainsReference(modules, step.Module))
+            {
+                report.AddError(
+                    $"Recruiter demo step {index} references module '{step.Module.name}', which is not part of the showcase module list.",
+                    scenario);
+            }
+
+            if (!ContainsReference(step.Module.Variants, step.Variant))
+            {
+                report.AddError(
+                    $"Recruiter demo step {index} references variant '{step.Variant.name}', which is not part of module '{step.Module.name}'.",
+                    scenario);
+            }
+
+            if (!step.HasNoteLocalizationKey)
+            {
+                report.AddError($"Recruiter demo step {index} requires an explicit note localization key.", scenario);
+            }
+            else
+            {
+                ValidateLocalizedContent(
+                    report,
+                    scenario,
+                    $"Recruiter demo step {index} note",
+                    step.NoteLocalizationKey,
+                    localization,
+                    true);
+            }
+
+            if (step.StressMode == RecruiterDemoStressMode.ExplicitValue && step.ExplicitStressLevel <= 0)
+            {
+                report.AddError($"Recruiter demo step {index} requires a positive explicit stress level.", scenario);
+            }
+        }
+
+        private static bool ValidateLocalizationKey(
+            UnityEngine.Object target,
+            string localizationKey,
+            ShowcaseValidationReport report)
+        {
+            if (!string.IsNullOrWhiteSpace(localizationKey))
+                return true;
+
+            report.AddError($"{target.GetType().Name} requires an explicit localizationKey.", target);
+            return false;
         }
 
         private static void ValidateUiLocalization(ShowcaseLocalizationSnapshot localization, ShowcaseValidationReport report)
@@ -346,10 +561,10 @@ namespace LearningArchitect.EditorTools
             {
                 string key = RequiredUiKeys[i];
                 if (!HasLocalizedValue(localization.EnglishUiTable, key))
-                    report.AddWarning($"UI key '{key}' is missing an English table entry.", localization.EnglishUiTable);
+                    report.AddError($"UI key '{key}' is missing an English table entry.", localization.EnglishUiTable);
 
                 if (!HasLocalizedValue(localization.RussianUiTable, key))
-                    report.AddWarning($"UI key '{key}' is missing a Russian table entry.", localization.RussianUiTable);
+                    report.AddError($"UI key '{key}' is missing a Russian table entry.", localization.RussianUiTable);
             }
         }
 
@@ -373,44 +588,48 @@ namespace LearningArchitect.EditorTools
             UnityEngine.Object context,
             string fieldLabel,
             string key,
-            string englishFallback,
-            string russianFallback,
             ShowcaseLocalizationSnapshot localization,
             bool required)
         {
-            bool hasEnglishFallback = !string.IsNullOrWhiteSpace(englishFallback);
-            bool hasRussianFallback = !string.IsNullOrWhiteSpace(russianFallback);
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                report.AddError($"{fieldLabel}: localization key is empty.", context);
+                return;
+            }
+
             bool hasEnglishTableValue = HasLocalizedValue(localization.EnglishContentTable, key);
             bool hasRussianTableValue = HasLocalizedValue(localization.RussianContentTable, key);
 
-            ValidateLocaleContent(report, context, fieldLabel, "English", key, hasEnglishFallback, hasEnglishTableValue, localization.HasEnglishContentTable, required);
-            ValidateLocaleContent(report, context, fieldLabel, "Russian", key, hasRussianFallback, hasRussianTableValue, localization.HasRussianContentTable, required);
+            ValidateLocaleTableOnly(report, context, fieldLabel, "English", key, hasEnglishTableValue, localization.HasEnglishContentTable, required);
+            ValidateLocaleTableOnly(report, context, fieldLabel, "Russian", key, hasRussianTableValue, localization.HasRussianContentTable, required);
         }
 
-        private static void ValidateLocaleContent(
+        private static void ValidateLocaleTableOnly(
             ShowcaseValidationReport report,
             UnityEngine.Object context,
             string fieldLabel,
             string localeName,
             string key,
-            bool hasFallback,
             bool hasTableValue,
             bool tableExists,
             bool required)
         {
-            if (!hasFallback && !hasTableValue)
+            if (!tableExists)
             {
-                string message = $"{fieldLabel} is missing {localeName} content.";
                 if (required)
-                    report.AddError(message, context);
-                else
-                    report.AddWarning(message, context);
+                    report.AddError($"{fieldLabel}: missing {localeName} string table for '{ShowcaseLocalization.ContentTableName}'.", context);
 
                 return;
             }
 
-            if (tableExists && !hasTableValue && hasFallback)
-                report.AddWarning($"{fieldLabel} is missing a {localeName} localization table entry for key '{key}'.", context);
+            if (!hasTableValue)
+            {
+                string message = $"{fieldLabel} is missing {localeName} ShowcaseContent entry for key '{key}'.";
+                if (required)
+                    report.AddError(message, context);
+                else
+                    report.AddWarning(message, context);
+            }
         }
 
         private static void ValidateStressPresets(VariantDefinitionSO variant, ShowcaseValidationReport report)
@@ -437,26 +656,6 @@ namespace LearningArchitect.EditorTools
                     report.AddWarning("Stress presets are not ordered from low to high.", variant);
 
                 previous = value;
-            }
-        }
-
-        private static void ValidateStressPresetLabels(VariantDefinitionSO variant, ShowcaseValidationReport report, ShowcaseLanguage language)
-        {
-            string localeName = language == ShowcaseLanguage.Russian ? "Russian" : "English";
-            string[] labels = variant.GetStressPresetLabels(language);
-
-            if (labels == null)
-            {
-                if (HasSerializedPresetLabels(variant, language))
-                    report.AddError($"{localeName} stress preset labels do not match the preset count.", variant);
-
-                return;
-            }
-
-            for (int i = 0; i < labels.Length; i++)
-            {
-                if (string.IsNullOrWhiteSpace(labels[i]))
-                    report.AddWarning($"{localeName} stress preset label at index {i} is blank.", variant);
             }
         }
 
@@ -591,19 +790,69 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            if (FindDeep(descriptionPanel.transform, "Layout - DescriptionTabs") == null &&
-                FindDeep(descriptionPanel.transform, "Container - DescriptionCharacters") == null)
+            ValidateRequiredReference(descriptionPanel, "tabsBar", "DescriptionPanel requires tabsBar.", report);
+            ValidateRequiredReference(descriptionPanel, "activeTabUnderline", "DescriptionPanel requires activeTabUnderline.", report);
+            ValidateRequiredReference(descriptionPanel, "legacyDescriptionText", "DescriptionPanel requires legacyDescriptionText.", report);
+            ValidateRequiredReference(descriptionPanel, "overviewTabLabel", "DescriptionPanel requires overviewTabLabel.", report);
+            ValidateRequiredReference(descriptionPanel, "architectureTabLabel", "DescriptionPanel requires architectureTabLabel.", report);
+            ValidateRequiredReference(descriptionPanel, "tradeOffsTabLabel", "DescriptionPanel requires tradeOffsTabLabel.", report);
+
+            HubUI hubUi = hubPrefab.GetComponent<HubUI>();
+            if (hubUi == null)
             {
-                report.AddError("DescriptionPanel is missing 'Layout - DescriptionTabs'.", descriptionPanel);
+                report.AddError("Showcase hub prefab is missing HubUI on the root object.", hubPrefab);
+            }
+            else
+            {
+                ValidateRequiredReference(hubUi, "moduleName", "HubUI requires moduleName.", report);
+                ValidateRequiredReference(hubUi, "variantName", "HubUI requires variantName.", report);
+                ValidateRequiredReference(hubUi, "moduleSelectorName", "HubUI requires moduleSelectorName.", report);
+                ValidateRequiredReference(hubUi, "variantSelectorName", "HubUI requires variantSelectorName.", report);
+                ValidateArrayPropertyHasElements(hubUi, "moduleStats", "HubUI requires moduleStats bindings.", report);
+                ValidateStructArrayObjectReference(hubUi, "moduleStats", "root", report);
+                ValidateStructArrayObjectReference(hubUi, "moduleStats", "label", report);
+                ValidateStructArrayObjectReference(hubUi, "moduleStats", "value", report);
             }
 
-            if (FindDeep(descriptionPanel.transform, "Image - ActiveTabUnderline") == null &&
-                FindDeep(descriptionPanel.transform, "ActiveTabUnderline") == null)
-                report.AddError("DescriptionPanel is missing Image - ActiveTabUnderline.", descriptionPanel);
+            ModuleNavigationControls navigationControls = hubPrefab.GetComponent<ModuleNavigationControls>();
+            if (navigationControls != null)
+            {
+                ValidateRequiredReference(navigationControls, "_previousModuleButton", "ModuleNavigationControls requires _previousModuleButton.", report);
+                ValidateRequiredReference(navigationControls, "_nextModuleButton", "ModuleNavigationControls requires _nextModuleButton.", report);
+                ValidateRequiredReference(navigationControls, "_previousVariantButton", "ModuleNavigationControls requires _previousVariantButton.", report);
+                ValidateRequiredReference(navigationControls, "_previousVariantLabel", "ModuleNavigationControls requires _previousVariantLabel.", report);
+                ValidateRequiredReference(navigationControls, "_nextVariantButton", "ModuleNavigationControls requires _nextVariantButton.", report);
+                ValidateRequiredReference(navigationControls, "_nextVariantLabel", "ModuleNavigationControls requires _nextVariantLabel.", report);
+                ValidateRequiredReference(navigationControls, "_moduleSelectorButton", "ModuleNavigationControls requires _moduleSelectorButton.", report);
+                ValidateRequiredReference(navigationControls, "_variantSelectorButton", "ModuleNavigationControls requires _variantSelectorButton.", report);
+            }
 
-            if (FindDeep(viewport, "Text - Description") == null &&
-                FindDeep(viewport, "DescriptionText") == null)
-                report.AddError("DescriptionPanel viewport must provide 'Text - Description'.", viewport);
+            StressTestControls stressControls = hubPrefab.GetComponent<StressTestControls>();
+            if (stressControls != null)
+                ValidateRequiredReference(stressControls, "_view", "StressTestControls requires _view.", report);
+
+            StressTestControlsView stressView = hubPrefab.GetComponent<StressTestControlsView>();
+            if (stressView != null)
+            {
+                ValidateArrayPropertyHasElements(stressView, "_presetButtons", "StressTestControlsView requires preset button bindings.", report);
+                ValidateStructArrayObjectReference(stressView, "_presetButtons", "_button", report);
+                ValidateStructArrayObjectReference(stressView, "_presetButtons", "_label", report);
+            }
+
+            ShowcaseLocalization localization = hubPrefab.GetComponent<ShowcaseLocalization>();
+            if (localization != null)
+            {
+                ValidateRequiredReference(localization, "languageToggleButton", "ShowcaseLocalization requires languageToggleButton.", report);
+                ValidateRequiredReference(localization, "languageToggleLabel", "ShowcaseLocalization requires languageToggleLabel.", report);
+                ValidateRequiredReference(localization, "breadcrumbText", "ShowcaseLocalization requires breadcrumbText.", report);
+                ValidateRequiredReference(localization, "moduleHeaderText", "ShowcaseLocalization requires moduleHeaderText.", report);
+                ValidateRequiredReference(localization, "variantHeaderText", "ShowcaseLocalization requires variantHeaderText.", report);
+                ValidateRequiredReference(localization, "stressHeaderText", "ShowcaseLocalization requires stressHeaderText.", report);
+                ValidateRequiredReference(localization, "statusTitleText", "ShowcaseLocalization requires statusTitleText.", report);
+                ValidateRequiredReference(localization, "overviewTabText", "ShowcaseLocalization requires overviewTabText.", report);
+                ValidateRequiredReference(localization, "architectureTabText", "ShowcaseLocalization requires architectureTabText.", report);
+                ValidateRequiredReference(localization, "tradeOffsTabText", "ShowcaseLocalization requires tradeOffsTabText.", report);
+            }
         }
 
         internal static void ValidateHubSceneLayout(ShowcaseValidationReport report)
@@ -639,7 +888,7 @@ namespace LearningArchitect.EditorTools
                 $"Scene hub '{HubRootName}' must stay at the world origin",
                 report);
 
-            Transform moduleRoot = FindDeep(hubInstance.transform, "ModuleRoot");
+            Transform moduleRoot = hubInstance.transform.Find("ModuleRoot");
             if (moduleRoot == null)
             {
                 report.AddError("Scene hub instance is missing ModuleRoot.", hubInstance);
@@ -650,14 +899,6 @@ namespace LearningArchitect.EditorTools
                 moduleRoot,
                 "Scene ModuleRoot must stay aligned with the hub origin",
                 report);
-        }
-
-        private static bool HasSerializedPresetLabels(VariantDefinitionSO variant, ShowcaseLanguage language)
-        {
-            SerializedObject serializedObject = new(variant);
-            string propertyName = language == ShowcaseLanguage.Russian ? "stressPresetLabelsRu" : "stressPresetLabels";
-            SerializedProperty property = serializedObject.FindProperty(propertyName);
-            return property != null && property.arraySize > 0;
         }
 
         private static bool HasLocalizedValue(StringTable table, string key)
@@ -682,24 +923,6 @@ namespace LearningArchitect.EditorTools
 
                 if (table.LocaleIdentifier.Code.StartsWith(localeCode, StringComparison.OrdinalIgnoreCase))
                     return table;
-            }
-
-            return null;
-        }
-
-        private static Transform FindDeep(Transform root, string name)
-        {
-            if (root == null)
-                return null;
-
-            if (root.name == name)
-                return root;
-
-            for (int i = 0; i < root.childCount; i++)
-            {
-                Transform match = FindDeep(root.GetChild(i), name);
-                if (match != null)
-                    return match;
             }
 
             return null;
@@ -755,6 +978,81 @@ namespace LearningArchitect.EditorTools
                    Mathf.Abs(left.z - right.z) <= TransformTolerance;
         }
 
+        private static bool ContainsReference<T>(IReadOnlyList<T> values, T candidate)
+            where T : UnityEngine.Object
+        {
+            if (values == null || candidate == null)
+                return false;
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (values[i] == candidate)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool ContainsReference<T>(T[] values, T candidate)
+            where T : UnityEngine.Object
+        {
+            if (values == null || candidate == null)
+                return false;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] == candidate)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static void ValidateRequiredReference(
+            UnityEngine.Object target,
+            string propertyName,
+            string message,
+            ShowcaseValidationReport report)
+        {
+            SerializedProperty property = new SerializedObject(target).FindProperty(propertyName);
+            if (property == null || property.propertyType != SerializedPropertyType.ObjectReference || property.objectReferenceValue == null)
+                report.AddError(message, target);
+        }
+
+        private static void ValidateArrayPropertyHasElements(
+            UnityEngine.Object target,
+            string propertyName,
+            string message,
+            ShowcaseValidationReport report)
+        {
+            SerializedProperty property = new SerializedObject(target).FindProperty(propertyName);
+            if (property == null || !property.isArray || property.arraySize == 0)
+                report.AddError(message, target);
+        }
+
+        private static void ValidateStructArrayObjectReference(
+            UnityEngine.Object target,
+            string arrayPropertyName,
+            string childPropertyName,
+            ShowcaseValidationReport report)
+        {
+            SerializedProperty property = new SerializedObject(target).FindProperty(arrayPropertyName);
+            if (property == null || !property.isArray)
+                return;
+
+            for (int i = 0; i < property.arraySize; i++)
+            {
+                SerializedProperty element = property.GetArrayElementAtIndex(i);
+                SerializedProperty child = element.FindPropertyRelative(childPropertyName);
+                if (child == null || child.propertyType != SerializedPropertyType.ObjectReference || child.objectReferenceValue == null)
+                {
+                    report.AddError(
+                        $"{target.GetType().Name} requires '{arrayPropertyName}[{i}].{childPropertyName}'.",
+                        target);
+                }
+            }
+        }
+
         private static T[] LoadAssets<T>()
             where T : UnityEngine.Object
         {
@@ -771,7 +1069,7 @@ namespace LearningArchitect.EditorTools
             return assets.ToArray();
         }
 
-        private static void LogReport(ShowcaseValidationReport report, int moduleCount, int variantCount)
+        internal static void LogReport(ShowcaseValidationReport report, int moduleCount, int variantCount)
         {
             foreach (ShowcaseValidationIssue issue in report.Issues)
             {

@@ -17,41 +17,41 @@ namespace LearningArchitect.Tests.Modules
     public sealed class ModuleContractTests
     {
         [Test]
-        public void InstantiationVariant_SeparatesSimulationAndVisibleCounts()
+        public void InstantiationVariant_SpawnsRequestedProjectileCount()
         {
             using ModuleFixture<InstantiationVariant> fixture = CreateFixture<InstantiationVariant>();
 
             fixture.InvokeLifecycle("Awake");
-            fixture.Component.SetStressLevel(4000);
+            fixture.Component.SetStressLevel(120);
             fixture.InvokeLifecycle("Update");
 
             ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(4000, metrics.SimulationCount);
-            Assert.AreEqual(200, metrics.VisibleCount);
+            Assert.AreEqual(120, metrics.SimulationCount);
+            Assert.AreEqual(120, metrics.VisibleCount);
             Assert.AreEqual(fixture.Component.ActiveCount, metrics.VisibleCount);
-            Assert.AreEqual(200, fixture.Root.transform.childCount);
+            Assert.GreaterOrEqual(fixture.Component.ActiveCount, 1);
         }
 
         [Test]
-        public void PooledVariant_UsesStressLevelForSimulationCountAndPoolBudgetForVisibleCount()
+        public void PooledVariant_SpawnsRequestedActiveProjectileCount()
         {
             using ModuleFixture<PooledVariant> fixture = CreateFixture<PooledVariant>();
 
             fixture.InvokeLifecycle("Awake");
-            fixture.Component.SetStressLevel(4000);
+            fixture.Component.SetStressLevel(120);
             fixture.InvokeLifecycle("Update");
 
             ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(4000, metrics.SimulationCount);
-            Assert.AreEqual(200, metrics.VisibleCount);
+            Assert.AreEqual(120, metrics.SimulationCount);
+            Assert.AreEqual(120, metrics.VisibleCount);
             Assert.AreEqual(fixture.Component.ActiveCount, metrics.VisibleCount);
             Assert.AreEqual(240, fixture.Root.transform.childCount);
         }
 
         [Test]
-        public void InventoryVariants_ReportLogicalSlotCountAndMappedVisibleCounts()
+        public void InventoryVariants_SpawnRequestedSlotMarkers()
         {
             using ModuleFixture<InventoryPackedVariant> packed = CreateFixture<InventoryPackedVariant>();
             using ModuleFixture<InventoryObjectsVariant> objects = CreateFixture<InventoryObjectsVariant>();
@@ -59,53 +59,57 @@ namespace LearningArchitect.Tests.Modules
             packed.InvokeLifecycle("Awake");
             objects.InvokeLifecycle("Awake");
 
+            packed.Component.SetStressLevel(180);
+            objects.Component.SetStressLevel(220);
+
             ShowcaseMetricsSnapshot packedMetrics = packed.Component.GetMetricsSnapshot();
             ShowcaseMetricsSnapshot objectMetrics = objects.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(4096, packedMetrics.SimulationCount);
-            Assert.AreEqual(240, packedMetrics.VisibleCount);
+            Assert.AreEqual(180, packedMetrics.SimulationCount);
+            Assert.AreEqual(180, packedMetrics.VisibleCount);
             Assert.AreEqual(packed.Component.ActiveCount, packedMetrics.VisibleCount);
 
-            Assert.AreEqual(1024, objectMetrics.SimulationCount);
+            Assert.AreEqual(220, objectMetrics.SimulationCount);
             Assert.AreEqual(220, objectMetrics.VisibleCount);
             Assert.AreEqual(objects.Component.ActiveCount, objectMetrics.VisibleCount);
         }
 
         [Test]
-        public void PerformanceVariants_CapVisibleActorsButKeepRequestedSimulationCount()
+        public void PerformanceVariants_SpawnRequestedActorCount()
         {
             using ModuleFixture<CentralizedUpdateVariant> centralized = CreateFixture<CentralizedUpdateVariant>();
             using ModuleFixture<PerObjectUpdateVariant> perObject = CreateFixture<PerObjectUpdateVariant>();
 
             centralized.InvokeLifecycle("Awake");
             perObject.InvokeLifecycle("Awake");
-            centralized.Component.SetStressLevel(5000);
-            perObject.Component.SetStressLevel(5000);
+            centralized.Component.SetStressLevel(180);
+            perObject.Component.SetStressLevel(180);
 
             ShowcaseMetricsSnapshot centralizedMetrics = centralized.Component.GetMetricsSnapshot();
             ShowcaseMetricsSnapshot perObjectMetrics = perObject.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(5000, centralizedMetrics.SimulationCount);
-            Assert.AreEqual(260, centralizedMetrics.VisibleCount);
+            Assert.AreEqual(180, centralizedMetrics.SimulationCount);
+            Assert.AreEqual(180, centralizedMetrics.VisibleCount);
             Assert.AreEqual(centralized.Component.ActiveCount, centralizedMetrics.VisibleCount);
 
-            Assert.AreEqual(5000, perObjectMetrics.SimulationCount);
-            Assert.AreEqual(260, perObjectMetrics.VisibleCount);
+            Assert.AreEqual(180, perObjectMetrics.SimulationCount);
+            Assert.AreEqual(180, perObjectMetrics.VisibleCount);
             Assert.AreEqual(perObject.Component.ActiveCount, perObjectMetrics.VisibleCount);
-            Assert.AreEqual(260, perObject.Root.transform.childCount);
+            Assert.AreEqual(180, perObject.Root.transform.childCount);
         }
 
         [Test]
-        public void ChunkEffectsVariant_ScalesVisualBudgetWithinConfiguredBounds()
+        public void ChunkEffectsVariant_SpawnsRequestedMarkerCount()
         {
             using ModuleFixture<ChunkEffectsVariant> fixture = CreateFixture<ChunkEffectsVariant>();
 
             fixture.InvokeLifecycle("Awake");
-            fixture.Component.SetStressLevel(5000);
+            fixture.Component.SetStressLevel(240);
 
-            ShowcaseMetricsSnapshot defaultMetrics = fixture.Component.GetMetricsSnapshot();
-            Assert.AreEqual(5000, defaultMetrics.SimulationCount);
-            Assert.AreEqual(420, defaultMetrics.VisibleCount);
+            ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
+            Assert.AreEqual(240, metrics.SimulationCount);
+            Assert.AreEqual(240, metrics.VisibleCount);
+            Assert.AreEqual(240, fixture.Component.ActiveCount);
 
             fixture.Component.SetStressLevel(100);
             ShowcaseMetricsSnapshot reducedMetrics = fixture.Component.GetMetricsSnapshot();
@@ -116,7 +120,7 @@ namespace LearningArchitect.Tests.Modules
         }
 
         [Test]
-        public void VfxVariants_ReportMappedOrDirectVisibleCounts()
+        public void VfxVariants_SpawnRequestedVisibleCounts()
         {
             using ModuleFixture<BatchedPulseVfxVariant> batched = CreateFixture<BatchedPulseVfxVariant>();
             using ModuleFixture<IndieEffectsVariant> indie = CreateFixture<IndieEffectsVariant>();
@@ -124,31 +128,31 @@ namespace LearningArchitect.Tests.Modules
             batched.InvokeLifecycle("Awake");
             indie.InvokeLifecycle("Awake");
 
-            batched.Component.SetStressLevel(4800);
-            indie.Component.SetStressLevel(500);
+            batched.Component.SetStressLevel(180);
+            indie.Component.SetStressLevel(160);
             ShowcaseMetricsSnapshot batchedMetrics = batched.Component.GetMetricsSnapshot();
             ShowcaseMetricsSnapshot indieMetrics = indie.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(4800, batchedMetrics.SimulationCount);
-            Assert.AreEqual(240, batchedMetrics.VisibleCount);
+            Assert.AreEqual(180, batchedMetrics.SimulationCount);
+            Assert.AreEqual(180, batchedMetrics.VisibleCount);
             Assert.AreEqual(batched.Component.ActiveCount, batchedMetrics.VisibleCount);
 
-            Assert.AreEqual(500, indieMetrics.SimulationCount);
-            Assert.AreEqual(500, indieMetrics.VisibleCount);
+            Assert.AreEqual(160, indieMetrics.SimulationCount);
+            Assert.AreEqual(160, indieMetrics.VisibleCount);
             Assert.AreEqual(indie.Component.ActiveCount, indieMetrics.VisibleCount);
         }
 
         [Test]
-        public void HumanoidAnimationVariant_ActorPrefabReportsSimulationAndVisibleCounts()
+        public void HumanoidAnimationVariant_SpawnsRequestedActorCount()
         {
             using ModuleFixture<HumanoidAnimationVariant> fixture = CreateFixture<HumanoidAnimationVariant>();
 
             fixture.InvokeLifecycle("Awake");
-            fixture.Component.SetStressLevel(24);
+            fixture.Component.SetStressLevel(8);
 
             ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(24, metrics.SimulationCount);
+            Assert.AreEqual(8, metrics.SimulationCount);
             Assert.AreEqual(8, metrics.VisibleCount);
             Assert.AreEqual(fixture.Component.ActiveCount, metrics.VisibleCount);
             Assert.AreEqual(8, fixture.Root.transform.childCount);
@@ -190,15 +194,16 @@ namespace LearningArchitect.Tests.Modules
         }
 
         [Test]
-        public void CreatureAnimationVariant_UsesVisibleCapForRigCount()
+        public void CreatureAnimationVariant_SpawnsRequestedRigCount()
         {
             using ModuleFixture<CreatureAnimationVariant> fixture = CreateFixture<CreatureAnimationVariant>();
 
             fixture.InvokeLifecycle("Awake");
+            fixture.Component.SetStressLevel(32);
 
             ShowcaseMetricsSnapshot metrics = fixture.Component.GetMetricsSnapshot();
 
-            Assert.AreEqual(64, metrics.SimulationCount);
+            Assert.AreEqual(32, metrics.SimulationCount);
             Assert.AreEqual(32, metrics.VisibleCount);
             Assert.AreEqual(fixture.Component.ActiveCount, metrics.VisibleCount);
             Assert.AreEqual(32, fixture.Root.transform.childCount);

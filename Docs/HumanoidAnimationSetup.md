@@ -42,13 +42,7 @@ The module asset `Assets/Modules/LayeredCharacterAnimation/Data/Animation3DModul
 
 The actor root is intentionally not translated in these variants. The running clip is shown in-place, while the showcase still feeds movement-like `Speed` data into the Animator. This keeps the interview focus on animation composition instead of pathing.
 
-The stress presets are intentionally conservative:
-
-- `Solo` = 1 actor
-- `Squad` = 4 actors
-- `Crowd` = 8 actors
-
-This module is about readable animation composition, not thousands of skinned meshes.
+The stress presets are intentionally conservative **counts** (currently `1`, `4`, and `8` actors in the regenerated assets). The hub formats preset **button labels** from those numbers; localized long-form copy for the module and variants still lives only in **`ShowcaseContent`**.
 
 ## Animator Contract
 
@@ -83,7 +77,7 @@ The utility lives at:
 Assets/Editor/PaladinCombatAnimationSetup.cs
 ```
 
-It configures FBX import settings, rebuilds the AnimatorController, creates the AvatarMask, assigns URP/Lit materials, creates the actor prefab, and updates the module/variant assets.
+It configures FBX import settings, rebuilds the AnimatorController, creates the AvatarMask, assigns URP/Lit materials, creates the actor prefab, and updates **`ModuleDefinitionSO` / `VariantDefinitionSO` wiring** (keys, prefabs, stress counts). It does **not** replace authoring of visible strings in **`ShowcaseContent`** / **`ShowcaseUI`** — after changing marketing or explanatory copy, edit the localization tables (see `Architecture.md`).
 
 ## Manual Tuning Points
 

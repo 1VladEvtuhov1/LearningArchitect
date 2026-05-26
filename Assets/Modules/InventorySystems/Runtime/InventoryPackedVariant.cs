@@ -11,9 +11,6 @@ namespace LearningArchitect.Modules.Inventory
         private const int TypeCount = 5;
 
         [SerializeField] private int slotCount = 4096;
-        [SerializeField] private int visibleCount = 220;
-        [SerializeField] private int[] visibleCountStressPresets = { 1024, 4096, 8192 };
-        [SerializeField] private int[] visibleCountPresets = { 180, 240, 320 };
         [SerializeField] private int visualLimit = 320;
         [SerializeField] private float slotSpacing = 0.46f;
         [SerializeField] private float visualRefreshInterval = 0.06f;
@@ -71,18 +68,21 @@ namespace LearningArchitect.Modules.Inventory
         {
             ClearVisuals();
 
-            itemTypes = new int[targetSlotCount];
-            amounts = new int[targetSlotCount];
-            restockCooldowns = new float[targetSlotCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetSlotCount, visualLimit);
+            slotCount = spawnCount;
 
-            for (int i = 0; i < targetSlotCount; i++)
+            itemTypes = new int[spawnCount];
+            amounts = new int[spawnCount];
+            restockCooldowns = new float[spawnCount];
+
+            for (int i = 0; i < spawnCount; i++)
             {
                 itemTypes[i] = i % TypeCount;
                 amounts[i] = 2 + (i % (MaxStack - 1));
                 restockCooldowns[i] = 0.08f * (i % 6);
             }
 
-            int visibleSlots = Mathf.Min(targetSlotCount, Mathf.Min(ResolveVisibleCount(targetSlotCount), visualLimit));
+            int visibleSlots = spawnCount;
             visuals = new Transform[visibleSlots];
             renderers = new Renderer[visibleSlots];
             for (int i = 0; i < visibleSlots; i++)
@@ -99,36 +99,6 @@ namespace LearningArchitect.Modules.Inventory
             operationsCursor = 0;
             nextVisualRefreshTime = 0f;
             RefreshVisuals(true);
-        }
-
-        private int ResolveVisibleCount(int targetSlotCount)
-        {
-            if (visibleCountStressPresets == null || visibleCountPresets == null)
-                return visibleCount;
-
-            int pairCount = Mathf.Min(visibleCountStressPresets.Length, visibleCountPresets.Length);
-            if (pairCount == 0)
-                return visibleCount;
-
-            for (int i = 0; i < pairCount; i++)
-            {
-                if (visibleCountStressPresets[i] == targetSlotCount)
-                    return Mathf.Max(1, visibleCountPresets[i]);
-            }
-
-            int bestIndex = 0;
-            int smallestDistance = Mathf.Abs(visibleCountStressPresets[0] - targetSlotCount);
-            for (int i = 1; i < pairCount; i++)
-            {
-                int distance = Mathf.Abs(visibleCountStressPresets[i] - targetSlotCount);
-                if (distance < smallestDistance)
-                {
-                    smallestDistance = distance;
-                    bestIndex = i;
-                }
-            }
-
-            return Mathf.Max(1, visibleCountPresets[bestIndex]);
         }
 
         private void SimulateInventory(float deltaTime)

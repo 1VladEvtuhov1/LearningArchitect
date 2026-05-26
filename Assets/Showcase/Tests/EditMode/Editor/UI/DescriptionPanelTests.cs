@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Reflection;
 using LearningArchitect.Core;
 using LearningArchitect.UI;
 using NUnit.Framework;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,17 +35,12 @@ namespace LearningArchitect.Tests.UI
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("module_type")));
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("problem")));
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("compare")));
-                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("takeaway")));
-                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("webgl_preset")));
-                Assert.That(body, Does.Contain("WebGL note"));
                 AssertSectionOrder(
                     body,
                     ShowcaseLocalization.GetText("about"),
                     ShowcaseLocalization.GetText("module_type"),
                     ShowcaseLocalization.GetText("problem"),
-                    ShowcaseLocalization.GetText("compare"),
-                    ShowcaseLocalization.GetText("takeaway"),
-                    ShowcaseLocalization.GetText("webgl_preset"));
+                    ShowcaseLocalization.GetText("compare"));
             }
             finally
             {
@@ -55,7 +51,7 @@ namespace LearningArchitect.Tests.UI
         }
 
         [Test]
-        public void ArchitectureTab_HidesOptionalSections_WhenVariantDoesNotProvideThem()
+        public void ArchitectureTab_ShowsMissingMarkers_WhenVariantDoesNotProvideOptionalContent()
         {
             ModuleDefinitionSO module = null;
             VariantDefinitionSO variant = null;
@@ -74,13 +70,16 @@ namespace LearningArchitect.Tests.UI
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("module_type")));
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("problem")));
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("core_idea")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("data_flow")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("runtime_lifecycle")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("why_this_approach")));
+                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("strengths")));
                 Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("watch_out")));
-                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("no_constraints")));
-                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("strengths")));
-                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("data_flow")));
-                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("runtime_lifecycle")));
-                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("why_this_approach")));
-                Assert.That(body, Does.Not.Contain(ShowcaseLocalization.GetText("takeaway")));
+                Assert.That(body, Does.Contain("[MISSING: ShowcaseContent.variantbeta.data_flow]"));
+                Assert.That(body, Does.Contain("[MISSING: ShowcaseContent.variantbeta.runtime_lifecycle]"));
+                Assert.That(body, Does.Contain("[MISSING: ShowcaseContent.variantbeta.why_this_approach]"));
+                Assert.That(body, Does.Contain("[MISSING: ShowcaseContent.variantbeta.pros]"));
+                Assert.That(body, Does.Contain("[MISSING: ShowcaseContent.variantbeta.cons]"));
             }
             finally
             {
@@ -91,7 +90,7 @@ namespace LearningArchitect.Tests.UI
         }
 
         [Test]
-        public void ArchitectureTab_RendersStructuredSections_WhenVariantProvidesThem()
+        public void ArchitectureTab_RendersRequiredSections_ForArchitectureContract()
         {
             ModuleDefinitionSO module = null;
             VariantDefinitionSO variant = null;
@@ -124,8 +123,7 @@ namespace LearningArchitect.Tests.UI
                     ShowcaseLocalization.GetText("runtime_lifecycle"),
                     ShowcaseLocalization.GetText("why_this_approach"),
                     ShowcaseLocalization.GetText("strengths"),
-                    ShowcaseLocalization.GetText("watch_out"),
-                    ShowcaseLocalization.GetText("takeaway"));
+                    ShowcaseLocalization.GetText("watch_out"));
             }
             finally
             {
@@ -134,35 +132,14 @@ namespace LearningArchitect.Tests.UI
                 DestroyImmediateSafe(variant);
             }
         }
-
         [Test]
-        public void TradeOffsTab_FormatsProsAndConsAsBulletLists()
+        public void FormatListBody_FormatsProsAndConsAsBulletLists()
         {
-            ModuleDefinitionSO module = null;
-            VariantDefinitionSO variant = null;
-            DescriptionPanelHarness harness = null;
+            string formattedPros = DescriptionPanel.FormatListBodyForEditModeTests("- Fast\n- Stable", "Fallback", new Color(0x22 / 255f, 0xC5 / 255f, 0x5E / 255f, 1f));
+            string formattedCons = DescriptionPanel.FormatListBodyForEditModeTests("* Complex", "Fallback", new Color(0xEF / 255f, 0x44 / 255f, 0x44 / 255f, 1f));
 
-            try
-            {
-                module = CreateModule("ModuleGamma", "Module description", "Problem statement", string.Empty);
-                variant = CreateVariant("VariantGamma", compare: "Compare summary", tradeOffs: "Trade-off summary", pros: "- Fast\n- Stable", cons: "* Complex");
-                harness = DescriptionPanelHarness.Create();
-
-                harness.Panel.SetContent(module, variant);
-                harness.Panel.SetTab(2);
-                string body = harness.GetRenderedBody();
-
-                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("compare")));
-                Assert.That(body, Does.Contain(ShowcaseLocalization.GetText("trade_offs")));
-                Assert.That(body, Does.Contain("<color=#22C55E>•</color> Fast\n<color=#22C55E>•</color> Stable"));
-                Assert.That(body, Does.Contain("<color=#EF4444>•</color> Complex"));
-            }
-            finally
-            {
-                harness?.Dispose();
-                DestroyImmediateSafe(module);
-                DestroyImmediateSafe(variant);
-            }
+            Assert.AreEqual("<color=#22C55E>•</color> Fast\n<color=#22C55E>•</color> Stable", formattedPros);
+            Assert.AreEqual("<color=#EF4444>•</color> Complex", formattedCons);
         }
 
         [Test]
@@ -199,14 +176,22 @@ namespace LearningArchitect.Tests.UI
 
         private static ModuleDefinitionSO CreateModule(string assetName, string description, string problem, string webGlPreset)
         {
+            _ = description;
+            _ = problem;
+            _ = webGlPreset;
+
             ModuleDefinitionSO module = ScriptableObject.CreateInstance<ModuleDefinitionSO>();
             module.name = assetName;
-            SetField(module, "moduleName", assetName);
-            SetField(module, "description", description);
-            SetField(module, "problemStatement", problem);
-            SetField(module, "webGlPresetNote", webGlPreset);
-            SetField(module, "categoryLabel", "Architecture Pattern Module");
+            SetField(module, "localizationKey", assetName.ToLowerInvariant());
+            SetCategory(module, ShowcaseModuleCategory.ArchitecturePatternModule);
             return module;
+        }
+
+        private static void SetCategory(ModuleDefinitionSO module, ShowcaseModuleCategory category)
+        {
+            SerializedObject so = new(module);
+            so.FindProperty("category").enumValueIndex = (int)category;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static VariantDefinitionSO CreateVariant(
@@ -221,18 +206,19 @@ namespace LearningArchitect.Tests.UI
             string pros = "",
             string cons = "")
         {
+            _ = architecture;
+            _ = dataFlow;
+            _ = runtimeLifecycle;
+            _ = whyThisApproach;
+            _ = compare;
+            _ = takeaway;
+            _ = tradeOffs;
+            _ = pros;
+            _ = cons;
+
             VariantDefinitionSO variant = ScriptableObject.CreateInstance<VariantDefinitionSO>();
             variant.name = assetName;
-            SetField(variant, "variantName", assetName);
-            SetField(variant, "architectureDescription", architecture);
-            SetField(variant, "dataFlow", dataFlow);
-            SetField(variant, "runtimeLifecycle", runtimeLifecycle);
-            SetField(variant, "whyThisApproach", whyThisApproach);
-            SetField(variant, "compareSummary", compare);
-            SetField(variant, "takeaway", takeaway);
-            SetField(variant, "tradeOffs", tradeOffs);
-            SetField(variant, "pros", pros);
-            SetField(variant, "cons", cons);
+            SetField(variant, "localizationKey", assetName.ToLowerInvariant());
             return variant;
         }
 
@@ -314,6 +300,12 @@ namespace LearningArchitect.Tests.UI
                 scrollRect.viewport = viewport;
                 scrollRect.content = descriptionText.rectTransform;
                 panel.ScrollRect = scrollRect;
+                SetField(panel, "tabsBar", tabsBar);
+                SetField(panel, "activeTabUnderline", underline);
+                SetField(panel, "legacyDescriptionText", descriptionText);
+                SetField(panel, "overviewTabLabel", tabsBar.Find("Text - OverviewTab").GetComponent<TextMeshProUGUI>());
+                SetField(panel, "architectureTabLabel", tabsBar.Find("Text - ArchitectureTab").GetComponent<TextMeshProUGUI>());
+                SetField(panel, "tradeOffsTabLabel", tabsBar.Find("Text - TradeOffsTab").GetComponent<TextMeshProUGUI>());
 
                 canvasRoot.SetActive(true);
                 Canvas.ForceUpdateCanvases();
@@ -362,3 +354,4 @@ namespace LearningArchitect.Tests.UI
         }
     }
 }
+

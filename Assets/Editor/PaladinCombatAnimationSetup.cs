@@ -493,6 +493,10 @@ namespace LearningArchitect.EditorTools
             HumanoidAnimationProfileSO profile,
             VariantCopy copy)
         {
+            _ = nameEn;
+            _ = nameRu;
+            _ = copy;
+
             GameObject root = new GameObject(prefabName);
             root.AddComponent<Animation3DModule>();
             HumanoidAnimationVariant variantComponent = root.AddComponent<HumanoidAnimationVariant>();
@@ -522,27 +526,16 @@ namespace LearningArchitect.EditorTools
             }
 
             SerializedObject variantSo = new SerializedObject(variant);
-            SetString(variantSo, "localizationKey", string.Empty);
-            SetString(variantSo, "variantName", nameEn);
-            SetString(variantSo, "variantNameRu", nameRu);
+            SetString(variantSo, "localizationKey", BuildLocalizationKey(assetPath));
             SetObject(variantSo, "prefab", AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath));
             SetIntArray(variantSo, "stressPresets", new[] { 1, 4, 8 });
-            SetStringArray(variantSo, "stressPresetLabels", new[] { "Solo", "Squad", "Crowd" });
-            SetStringArray(variantSo, "stressPresetLabelsRu", new[] { "Соло", "Группа", "Толпа" });
-            SetString(variantSo, "architectureDescription", copy.ArchitectureEn);
-            SetString(variantSo, "architectureDescriptionRu", copy.ArchitectureRu);
-            SetString(variantSo, "compareSummary", copy.CompareEn);
-            SetString(variantSo, "compareSummaryRu", copy.CompareRu);
-            SetString(variantSo, "takeaway", copy.TakeawayEn);
-            SetString(variantSo, "takeawayRu", copy.TakeawayRu);
-            SetString(variantSo, "tradeOffs", copy.TradeOffsEn);
-            SetString(variantSo, "tradeOffsRu", copy.TradeOffsRu);
-            SetString(variantSo, "pros", copy.ProsEn);
-            SetString(variantSo, "prosRu", copy.ProsRu);
-            SetString(variantSo, "cons", copy.ConsEn);
-            SetString(variantSo, "consRu", copy.ConsRu);
             variantSo.ApplyModifiedPropertiesWithoutUndo();
             return variant;
+        }
+
+        private static string BuildLocalizationKey(string assetPath)
+        {
+            return Path.GetFileNameWithoutExtension(assetPath).ToLowerInvariant();
         }
 
         private static void UpdateModule(params VariantDefinitionSO[] variants)
@@ -552,18 +545,7 @@ namespace LearningArchitect.EditorTools
                 throw new System.InvalidOperationException("Animation3DModule asset was not found.");
 
             SerializedObject moduleSo = new SerializedObject(module);
-            SetString(moduleSo, "moduleName", "Layered Character Animation");
-            SetString(moduleSo, "moduleNameRu", "Слоистая анимация персонажа");
-            SetString(moduleSo, "thesis", "Show how one humanoid model can run, shoot, or combine both through Animator layers and an upper-body AvatarMask.");
-            SetString(moduleSo, "thesisRu", "Показать, как одна humanoid-модель может бежать, стрелять или совмещать оба действия через Animator layers и upper-body AvatarMask.");
-            SetString(moduleSo, "description", "Interactive character-animation module focused on a common game-dev mechanic: keeping locomotion active while a combat action plays on the upper body.");
-            SetString(moduleSo, "descriptionRu", "Интерактивный модуль анимации персонажа про частую game-dev механику: locomotion остаётся активной, пока combat action играет на верхней части тела.");
-            SetString(moduleSo, "problemStatement", "Full-body clips are easy to preview, but action games need composition. The interesting architecture is separating locomotion ownership from upper-body actions.");
-            SetString(moduleSo, "problemStatementRu", "Full-body клипы легко смотреть отдельно, но action-играм нужна композиция. Важная архитектура — разделить владение locomotion и upper-body actions.");
-            SetString(moduleSo, "webGlPresetNote", "Use Solo/Squad/Crowd presets for browser-safe previews. The goal is readability of layer mixing, not pushing thousands of skinned meshes.");
-            SetString(moduleSo, "webGlPresetNoteRu", "Используйте пресеты Соло/Группа/Толпа для browser-safe preview. Цель — читаемость layer mixing, а не тысячи skinned meshes.");
-            SetString(moduleSo, "activeItemLabel", "animated actors");
-            SetString(moduleSo, "activeItemLabelRu", "анимируемых актёров");
+            SetString(moduleSo, "localizationKey", "animation3dmodule");
 
             SerializedProperty variantsProperty = moduleSo.FindProperty("variants");
             variantsProperty.arraySize = variants.Length;

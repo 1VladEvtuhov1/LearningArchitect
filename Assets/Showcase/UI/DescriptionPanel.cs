@@ -32,6 +32,12 @@ namespace LearningArchitect.UI
         }
 
         [SerializeField] private ScrollRect scrollRect;
+        [SerializeField] private RectTransform tabsBar;
+        [SerializeField] private RectTransform activeTabUnderline;
+        [SerializeField] private TextMeshProUGUI legacyDescriptionText;
+        [SerializeField] private TextMeshProUGUI overviewTabLabel;
+        [SerializeField] private TextMeshProUGUI architectureTabLabel;
+        [SerializeField] private TextMeshProUGUI tradeOffsTabLabel;
         [SerializeField] private Color activeTabColor = default;
         [SerializeField] private Color inactiveTabColor = default;
         [SerializeField] private Color sectionTitleColor = default;
@@ -42,12 +48,9 @@ namespace LearningArchitect.UI
         private readonly List<SectionDefinition> sectionDefinitions = new(6);
         private readonly Vector3[] tabWorldCorners = new Vector3[4];
 
-        private RectTransform activeTabUnderline;
         private int currentTabIndex;
         private ModuleDefinitionSO currentModule;
         private bool isInitialized;
-        private TextMeshProUGUI legacyDescriptionText;
-        private RectTransform tabsBar;
         private VariantDefinitionSO currentVariant;
 
         public ScrollRect ScrollRect
@@ -155,8 +158,8 @@ namespace LearningArchitect.UI
                 return true;
 
             ApplyPaletteDefaults();
-            if (!TryResolveUi())
-                return false;
+            ValidateReferences();
+            ConfigureUi();
 
             isInitialized = true;
             return true;
@@ -180,78 +183,42 @@ namespace LearningArchitect.UI
                 negativeTextColor = ShowcasePalette.Error;
         }
 
-        private bool TryResolveUi()
+        private void ValidateReferences()
         {
             if (scrollRect == null || scrollRect.viewport == null)
-                return false;
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(scrollRect)} with a viewport.");
 
-            RectTransform panelRoot = scrollRect.transform as RectTransform;
-            if (panelRoot == null)
-                return false;
-
-            tabsBar = panelRoot.Find("Layout - DescriptionTabs") as RectTransform
-                ?? panelRoot.Find("Container - DescriptionCharacters") as RectTransform;
             if (tabsBar == null)
-                return false;
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(tabsBar)}.");
 
-            activeTabUnderline = FindDeep(tabsBar, "Image - ActiveTabUnderline") as RectTransform
-                ?? FindDeep(tabsBar, "ActiveTabUnderline") as RectTransform;
             if (activeTabUnderline == null)
-                return false;
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(activeTabUnderline)}.");
 
-            legacyDescriptionText = FindDeep(scrollRect.viewport, "Text - Description")?.GetComponent<TextMeshProUGUI>()
-                ?? FindDeep(scrollRect.viewport, "DescriptionText")?.GetComponent<TextMeshProUGUI>();
             if (legacyDescriptionText == null)
-                return false;
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(legacyDescriptionText)}.");
 
+            if (overviewTabLabel == null)
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(overviewTabLabel)}.");
+
+            if (architectureTabLabel == null)
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(architectureTabLabel)}.");
+
+            if (tradeOffsTabLabel == null)
+                throw new InvalidOperationException($"{nameof(DescriptionPanel)} requires {nameof(tradeOffsTabLabel)}.");
+        }
+
+        private void ConfigureUi()
+        {
             legacyDescriptionText.richText = true;
-
-            if (!TryResolveTabLabels())
-                return false;
-
+            BindTabLabel(0, overviewTabLabel);
+            BindTabLabel(1, architectureTabLabel);
+            BindTabLabel(2, tradeOffsTabLabel);
             EnsureTabLayout();
             RefreshTabVisuals();
-            return true;
         }
 
-        private bool TryResolveTabLabels()
+        private void BindTabLabel(int tabIndex, TextMeshProUGUI label)
         {
-            for (int i = 0; i < tabLabels.Length; i++)
-                tabLabels[i] = null;
-
-            List<TextMeshProUGUI> labels = new(tabLabels.Length);
-            for (int i = 0; i < tabsBar.childCount; i++)
-            {
-                Transform child = tabsBar.GetChild(i);
-                if (child == activeTabUnderline)
-                    continue;
-
-                TextMeshProUGUI label = child.GetComponent<TextMeshProUGUI>() ?? child.GetComponentInChildren<TextMeshProUGUI>(true);
-                if (label != null)
-                    labels.Add(label);
-            }
-
-            if (labels.Count < tabLabels.Length)
-                return false;
-
-            for (int i = 0; i < tabLabels.Length; i++)
-            {
-                if (!TryBindTabLabel(i, labels[i].transform))
-                    return false;
-            }
-
-            return true;
-        }
-
-        private bool TryBindTabLabel(int tabIndex, Transform tabTransform)
-        {
-            if (tabTransform == null)
-                return false;
-
-            TextMeshProUGUI label = tabTransform.GetComponent<TextMeshProUGUI>() ?? tabTransform.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (label == null)
-                return false;
-
             label.text = GetTabTitle(tabIndex);
             label.raycastTarget = true;
             label.alignment = TextAlignmentOptions.Center;
@@ -262,7 +229,6 @@ namespace LearningArchitect.UI
                 clickTarget = label.gameObject.AddComponent<DescriptionPanelTabClickTarget>();
 
             clickTarget.Initialize(this, tabIndex);
-            return true;
         }
 
         private void RebuildContent()
@@ -299,7 +265,7 @@ namespace LearningArchitect.UI
             switch (currentTabIndex)
             {
                 case 0:
-                    AddRequiredTextSection(ShowcaseLocalization.GetText("about"), moduleDescription, ShowcaseLocalization.GetText("realtime_preview"));
+                    AddRequiredTextSection(ShowcaseLocalization.GetText("about"), moduleDescription, ShowcaseLocalization.GetText("na"));
                     AddRequiredTextSection(ShowcaseLocalization.GetText("module_type"), moduleCategory, ShowcaseLocalization.GetText("no_module_type"));
                     AddRequiredTextSection(ShowcaseLocalization.GetText("problem"), moduleProblem, ShowcaseLocalization.GetText("no_problem_statement"));
                     AddRequiredTextSection(ShowcaseLocalization.GetText("compare"), compareSummary, ShowcaseLocalization.GetText("no_compare_summary"));
@@ -521,6 +487,11 @@ namespace LearningArchitect.UI
             return list.Length == 0 ? fallback : list.ToString();
         }
 
+        internal static string FormatListBodyForEditModeTests(string source, string fallback, Color bulletColor)
+        {
+            return FormatListBody(source, fallback, bulletColor);
+        }
+
         private static string GetTabTitle(int index)
         {
             return index switch
@@ -534,24 +505,6 @@ namespace LearningArchitect.UI
         private static string ToHex(Color color)
         {
             return "#" + ColorUtility.ToHtmlStringRGB(color);
-        }
-
-        private static Transform FindDeep(Transform root, string name)
-        {
-            if (root == null)
-                return null;
-
-            if (root.name == name)
-                return root;
-
-            for (int i = 0; i < root.childCount; i++)
-            {
-                Transform match = FindDeep(root.GetChild(i), name);
-                if (match != null)
-                    return match;
-            }
-
-            return null;
         }
     }
 }

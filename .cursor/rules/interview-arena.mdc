@@ -1,0 +1,46 @@
+---
+description: Interview Arena module (LearningArchitect) — WebGL multiplayer arena planning and implementation
+globs:
+  - "Assets/Modules/InterviewArena/**/*.cs"
+  - "Docs/Modules/InterviewArena/**/*.md"
+alwaysApply: false
+---
+
+# Interview Arena (LearningArchitect)
+
+Planned showcase module: compact WebGL multiplayer arena for interview preparation.
+
+**Canonical docs:** `Docs/Modules/InterviewArena/` (not `Assets/Content/`).
+
+**Integration:** separate scene (`InterviewArena`) opened from the hub dock — **not** an 8th `ModuleDefinitionSO`. See `Docs/Decisions.md` D-008. Keep `ArchitectureShowcase` as the default build entry (D-001).
+
+## Main intent
+
+- WebGL-first playable slice inside the shared showcase hub
+- personal-server lobby flow (mock services in Editor until backend exists)
+- physics-based movement, pooling, AI FSM
+- clean asmdef split under `Assets/Modules/InterviewArena/`
+
+## Namespaces
+
+Use `LearningArchitect.Modules.InterviewArena.*` (or `InterviewArena.*` only if asmdef root name requires it — keep one convention per folder).
+
+Preferred areas (see `Docs/Modules/InterviewArena/docs/03_UNITY_MODULES.md`):
+
+- Core, Auth, Lobby, Player, Physics, Combat, AI, Multiplayer, UI, Infrastructure
+
+Dependency direction:
+
+```text
+UI -> Controllers -> Services -> Infrastructure
+Gameplay -> Core/Data
+```
+
+## When editing
+
+1. Read `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md` for phased scope.
+2. Match existing showcase patterns in `Assets/Modules/*` and `Assets/Showcase/Runtime`.
+3. User-visible strings go to `ShowcaseContent` / `ShowcaseUI`, not variant SO fields.
+4. **Do not** runtime-spawn the player with `CreatePrimitive` / `AddComponent` chains. Use prefab + scene references; empty serialized fields are fine until authored.
+5. Read `Docs/Modules/InterviewArena/CODE_ARCHITECTURE.md` before adding systems. Prefer NonAlloc physics, input buffering, and `PlayerConfig` tuning.
+6. Read `Docs/Modules/InterviewArena/SCENE_COMPOSITION.md` before changing scenes, prefab hierarchy, or UI object names. Runtime pools belong under scene services (`ArenaCombatServices`), not inside actor prefabs. UI widgets use Showcase naming: `Container -`, `Image -`, `Text -`.

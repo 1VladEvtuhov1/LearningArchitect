@@ -88,10 +88,11 @@ namespace LearningArchitect.Modules.VFX
         {
             ClearEmitters();
 
-            int visible = Mathf.Min(targetCount, visualLimit);
-            emitters = new EmitterRig[visible];
-            for (int i = 0; i < visible; i++)
-                emitters[i] = CreateEmitter(i, visible);
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            emitters = new EmitterRig[spawnCount];
+            for (int i = 0; i < spawnCount; i++)
+                emitters[i] = CreateEmitter(i, spawnCount);
         }
 
         private EmitterRig CreateEmitter(int index, int visibleCount)

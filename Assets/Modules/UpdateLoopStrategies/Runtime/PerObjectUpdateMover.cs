@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using LearningArchitect.Core;
 using UnityEngine;
 
 namespace LearningArchitect.Modules.Performance
@@ -18,8 +19,7 @@ namespace LearningArchitect.Modules.Performance
         {
             this.radius = radius;
             this.speed = speed;
-            velocity = Random.onUnitSphere * speed;
-            velocity.y *= 0.2f;
+            velocity = ShowcaseSpawnLayout.RandomVelocity(speed);
         }
 
         private void Update()
@@ -28,14 +28,15 @@ namespace LearningArchitect.Modules.Performance
             long startedAt = Stopwatch.GetTimestamp();
             float radiusSquared = radius * radius;
             Vector3 position = transform.localPosition + velocity * Time.deltaTime;
+            Vector2 planar = new Vector2(position.x, position.z);
 
-            if (position.sqrMagnitude > radiusSquared)
+            if (planar.sqrMagnitude > radiusSquared)
             {
                 velocity = -velocity;
                 position = transform.localPosition + velocity * Time.deltaTime;
             }
 
-            transform.localPosition = position;
+            transform.localPosition = ShowcaseSpawnLayout.ClampToSurface(position);
             currentFrameTicks += Stopwatch.GetTimestamp() - startedAt;
         }
 

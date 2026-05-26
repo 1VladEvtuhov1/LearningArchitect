@@ -160,18 +160,7 @@ namespace LearningArchitect.Tests.PlayMode
         {
             ModuleDefinitionSO module = Track(ScriptableObject.CreateInstance<ModuleDefinitionSO>());
             module.name = name;
-            SetField(module, "moduleName", name);
-            SetField(module, "moduleNameRu", name + " RU");
-            SetField(module, "thesis", "Module thesis");
-            SetField(module, "thesisRu", "Module thesis RU");
-            SetField(module, "description", "Module description");
-            SetField(module, "descriptionRu", "Module description RU");
-            SetField(module, "problemStatement", "Module problem");
-            SetField(module, "problemStatementRu", "Module problem RU");
-            SetField(module, "activeItemLabel", "Active items");
-            SetField(module, "activeItemLabelRu", "Active items RU");
-            SetField(module, "webGlPresetNote", "WebGL note");
-            SetField(module, "webGlPresetNoteRu", "WebGL note RU");
+            SetField(module, "localizationKey", name.ToLowerInvariant());
             SetField(module, "variants", variants);
             return module;
         }
@@ -180,31 +169,9 @@ namespace LearningArchitect.Tests.PlayMode
         {
             VariantDefinitionSO variant = Track(ScriptableObject.CreateInstance<VariantDefinitionSO>());
             variant.name = name;
-            SetField(variant, "variantName", name);
-            SetField(variant, "variantNameRu", name + " RU");
+            SetField(variant, "localizationKey", name.ToLowerInvariant());
             SetField(variant, "prefab", null);
             SetField(variant, "stressPresets", stressPresets);
-            SetField(variant, "stressPresetLabels", CreateLabels(stressPresets, "EN"));
-            SetField(variant, "stressPresetLabelsRu", CreateLabels(stressPresets, "RU"));
-            SetField(variant, "architectureDescription", "Architecture");
-            SetField(variant, "architectureDescriptionRu", "Architecture RU");
-            SetField(variant, "dataFlow", "Input -> Simulation -> View");
-            SetField(variant, "dataFlowRu", "Input -> Simulation -> View RU");
-            SetField(variant, "runtimeLifecycle", "Bootstrap -> Simulate -> Release");
-            SetField(variant, "runtimeLifecycleRu", "Bootstrap -> Simulate -> Release RU");
-            SetField(variant, "whyThisApproach", "Clear ownership");
-            SetField(variant, "whyThisApproachRu", "Clear ownership RU");
-            SetField(variant, "compareSummary", "Stable comparison");
-            SetField(variant, "compareSummaryRu", "Stable comparison RU");
-            SetField(variant, "takeaway", "Useful takeaway");
-            SetField(variant, "takeawayRu", "Useful takeaway RU");
-            SetField(variant, "tradeOffs", "Known trade-offs");
-            SetField(variant, "tradeOffsRu", "Known trade-offs RU");
-            SetField(variant, "pros", "- Predictable");
-            SetField(variant, "prosRu", "- Predictable RU");
-            SetField(variant, "cons", "- Synthetic runtime");
-            SetField(variant, "consRu", "- Synthetic runtime RU");
-            SetField(variant, "localizationKey", name.ToLowerInvariant());
             variantVisibleCounts[variant] = visibleCount;
             return variant;
         }
@@ -213,15 +180,6 @@ namespace LearningArchitect.Tests.PlayMode
         {
             yield return null;
             yield return null;
-        }
-
-        private static string[] CreateLabels(int[] stressPresets, string prefix)
-        {
-            string[] labels = new string[stressPresets.Length];
-            for (int i = 0; i < stressPresets.Length; i++)
-                labels[i] = prefix + " " + stressPresets[i];
-
-            return labels;
         }
 
         private int GetVisibleCount(VariantDefinitionSO variant)

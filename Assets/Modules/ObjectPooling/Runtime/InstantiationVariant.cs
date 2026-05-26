@@ -62,7 +62,7 @@ namespace LearningArchitect.Modules.Pooling
 
         public ShowcaseMetricsSnapshot GetMetricsSnapshot()
         {
-            return new ShowcaseMetricsSnapshot(count, ActiveCount, moduleCpuMs);
+            return new ShowcaseMetricsSnapshot(targetVisualCount, ActiveCount, moduleCpuMs);
         }
 
         public void SetStressLevel(int value)
@@ -76,7 +76,8 @@ namespace LearningArchitect.Modules.Pooling
 
         private void ApplyStressLevel(int value)
         {
-            targetVisualCount = Mathf.Clamp(value / 20, 24, visualLimit);
+            targetVisualCount = ShowcaseStressSpawn.Clamp(value, visualLimit);
+            count = targetVisualCount;
             nextSpawnIndex = 0;
 
             while (activeProjectiles.Count > targetVisualCount)

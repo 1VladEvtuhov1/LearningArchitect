@@ -14,6 +14,9 @@ namespace LearningArchitect.Core
         [Header("Modules")]
         [SerializeField] private ModuleDefinitionSO[] modules;
         [SerializeField] private Transform moduleRoot;
+        [SerializeField]
+        [Tooltip("Scene anchor for spawned module content (e.g. ModuleSpawnRoot under PreviewStage).")]
+        private Transform moduleSpawnAnchor;
 
         [Header("Runtime")]
         [SerializeField] private ShowcaseRuntimeController runtimeController;
@@ -60,6 +63,7 @@ namespace LearningArchitect.Core
         private void Awake()
         {
             ResolveDependencies();
+            AttachModuleRootToSceneSpawnAnchor();
             stateHub.SetModuleCount(modules.Length);
             runtimeController.Configure(transitionController, stateHub);
             commandRouter.Configure(runtimeController);
@@ -73,6 +77,20 @@ namespace LearningArchitect.Core
             var spawner = new VariantSpawner(moduleRoot);
             var runtimeHost = new ModuleRuntimeHost();
             return new ShowcaseCoordinator(modules, selectionState, stressState, spawner, runtimeHost);
+        }
+
+        private void AttachModuleRootToSceneSpawnAnchor()
+        {
+            Transform spawnAnchor = moduleSpawnAnchor != null
+                ? moduleSpawnAnchor
+                : GameObject.Find("ModuleSpawnRoot")?.transform;
+
+            if (spawnAnchor == null)
+                return;
+
+            moduleRoot.SetParent(spawnAnchor, false);
+            moduleRoot.localPosition = Vector3.zero;
+            moduleRoot.localRotation = Quaternion.identity;
         }
 
         private void ResolveDependencies()

@@ -94,7 +94,7 @@ namespace LearningArchitect.Tests.UI
         }
 
         [Test]
-        public void MissingContentKey_FallsBackToScriptableObjectContent_WithRealTablesConfigured()
+        public void MissingContentKey_ReturnsMissingMarker_WithRealTablesConfigured()
         {
             ModuleDefinitionSO module = null;
             VariantDefinitionSO variant = null;
@@ -103,23 +103,51 @@ namespace LearningArchitect.Tests.UI
             {
                 module = ScriptableObject.CreateInstance<ModuleDefinitionSO>();
                 module.name = "SyntheticMissingLocalizationModule";
-                SetField(module, "description", "English module fallback");
-                SetField(module, "descriptionRu", "Russian module fallback");
+                SetField(module, "localizationKey", "synthetic_missing_localization_module");
 
                 variant = ScriptableObject.CreateInstance<VariantDefinitionSO>();
                 variant.name = "SyntheticMissingLocalizationVariant";
-                SetField(variant, "architectureDescription", "English architecture fallback");
-                SetField(variant, "architectureDescriptionRu", "Russian architecture fallback");
+                SetField(variant, "localizationKey", "synthetic_missing_localization_variant");
 
                 ConfigureLocalizationInstance(ShowcaseLanguage.Russian);
                 SetLocale("ru");
-                Assert.AreEqual("Russian module fallback", ShowcaseLocalization.GetModuleDescription(module));
-                Assert.AreEqual("Russian architecture fallback", ShowcaseLocalization.GetVariantArchitectureDescription(variant));
+                Assert.AreEqual("[MISSING: ShowcaseContent.synthetic_missing_localization_module.description]", ShowcaseLocalization.GetModuleDescription(module));
+                Assert.AreEqual("[MISSING: ShowcaseContent.synthetic_missing_localization_variant.architecture]", ShowcaseLocalization.GetVariantArchitectureDescription(variant));
 
                 ConfigureLocalizationInstance(ShowcaseLanguage.English);
                 SetLocale("en");
-                Assert.AreEqual("English module fallback", ShowcaseLocalization.GetModuleDescription(module));
-                Assert.AreEqual("English architecture fallback", ShowcaseLocalization.GetVariantArchitectureDescription(variant));
+                Assert.AreEqual("[MISSING: ShowcaseContent.synthetic_missing_localization_module.description]", ShowcaseLocalization.GetModuleDescription(module));
+                Assert.AreEqual("[MISSING: ShowcaseContent.synthetic_missing_localization_variant.architecture]", ShowcaseLocalization.GetVariantArchitectureDescription(variant));
+            }
+            finally
+            {
+                if (module != null)
+                    UnityEngine.Object.DestroyImmediate(module);
+
+                if (variant != null)
+                    UnityEngine.Object.DestroyImmediate(variant);
+            }
+        }
+
+        [Test]
+        public void BuildContentKeys_UseExplicitLocalizationKey_WhenAssigned()
+        {
+            ModuleDefinitionSO module = null;
+            VariantDefinitionSO variant = null;
+
+            try
+            {
+                module = ScriptableObject.CreateInstance<ModuleDefinitionSO>();
+                variant = ScriptableObject.CreateInstance<VariantDefinitionSO>();
+
+                module.name = "ModuleNameShouldNotMatter";
+                variant.name = "VariantNameShouldNotMatter";
+
+                SetField(module, "localizationKey", "module.explicit_id");
+                SetField(variant, "localizationKey", "variant.explicit_id");
+
+                Assert.AreEqual("module.explicit_id.description", ShowcaseLocalization.BuildModuleDescriptionKey(module));
+                Assert.AreEqual("variant.explicit_id.architecture", ShowcaseLocalization.BuildVariantArchitectureKey(variant));
             }
             finally
             {

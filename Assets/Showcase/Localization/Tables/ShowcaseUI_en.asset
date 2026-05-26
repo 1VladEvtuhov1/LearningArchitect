@@ -134,26 +134,6 @@ MonoBehaviour:
     m_Localized: No constraints listed.
     m_Metadata:
       m_Items: []
-  - m_Id: 1957503003
-    m_Localized: Realtime architecture preview
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503004
-    m_Localized: "Switching module  \u2039"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503005
-    m_Localized: "Switching module  \u203A"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503006
-    m_Localized: "Switching variant  \u2039"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1957503007
-    m_Localized: "Switching variant  \u203A"
-    m_Metadata:
-      m_Items: []
   - m_Id: 1957503008
     m_Localized: Load selected
     m_Metadata:
@@ -210,24 +190,12 @@ MonoBehaviour:
     m_Localized: VARIANTS
     m_Metadata:
       m_Items: []
-  - m_Id: 2257050888118274
-    m_Localized: GUIDED DEMO
-    m_Metadata:
-      m_Items: []
   - m_Id: 2257050888118275
     m_Localized: START DEMO
     m_Metadata:
       m_Items: []
   - m_Id: 2257050888118276
     m_Localized: STOP DEMO
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2257050888118277
-    m_Localized: DEMO COMPLETE
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2257050888118278
-    m_Localized: STEP
     m_Metadata:
       m_Items: []
   - m_Id: 2257050888118279
@@ -296,6 +264,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2257050888118295
     m_Localized: No WebGL note provided.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118296
+    m_Localized: Architecture Pattern Module
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2257050888118297
+    m_Localized: Simulation Module
     m_Metadata:
       m_Items: []
   references:

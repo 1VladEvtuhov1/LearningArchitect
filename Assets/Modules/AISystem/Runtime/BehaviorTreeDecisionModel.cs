@@ -8,6 +8,8 @@ namespace LearningArchitect.Modules.AI
         private const int RecoverTask = 0;
         private const int InspectTask = 1;
         private const int PatrolTask = 2;
+        private const float RecoverEnterEnergy = 0.25f;
+        private const float RecoverExitEnergy = 0.38f;
 
         private readonly float radius;
         private readonly float moveSpeed;
@@ -19,6 +21,7 @@ namespace LearningArchitect.Modules.AI
         private readonly float targetReachDistance;
         private readonly float patrolRadiusScale;
         private readonly float inspectRadiusScale;
+        private readonly float minPatrolSeparationSquared;
 
         public BehaviorTreeDecisionModel(
             float radius,
@@ -63,6 +66,7 @@ namespace LearningArchitect.Modules.AI
             this.targetReachDistance = targetReachDistance;
             this.patrolRadiusScale = patrolRadiusScale;
             this.inspectRadiusScale = inspectRadiusScale;
+            minPatrolSeparationSquared = targetReachDistance * targetReachDistance * 4f;
         }
 
         public void Tick(AiWorld world, float deltaTime)
@@ -86,7 +90,7 @@ namespace LearningArchitect.Modules.AI
                     case RecoverTask:
                         world.Targets[i] = world.HomePositions[i];
                         MoveTowards(world, i, deltaTime, targetReachDistanceSquared);
-                        if ((world.Positions[i] - world.HomePositions[i]).sqrMagnitude <= recoverDistanceSquared)
+                        if (IsNearHome(world, i, recoverDistanceSquared))
                             world.Energy[i] = Mathf.Min(1f, world.Energy[i] + recoverRate * deltaTime);
                         break;
 
@@ -96,10 +100,10 @@ namespace LearningArchitect.Modules.AI
                         break;
 
                     case PatrolTask:
-                        if ((world.Targets[i] - world.Positions[i]).sqrMagnitude <= targetReachDistanceSquared)
+                        if (ShouldPickPatrolTarget(world, i, targetReachDistanceSquared))
                         {
                             uint patrolRandomState = world.RandomStates[i];
-                            world.Targets[i] = SelectTargetAroundHome(world, i, radius * patrolRadiusScale, ref patrolRandomState);
+                            world.Targets[i] = PickPatrolTarget(world, i, ref patrolRandomState);
                             world.RandomStates[i] = patrolRandomState;
                         }
 
@@ -112,11 +116,12 @@ namespace LearningArchitect.Modules.AI
                             if (AiDeterministicRandom.NextFloat01(ref inspectRandomState) <= inspectChance * deltaTime)
                             {
                                 world.Timers[i] = inspectDuration;
-                                world.Targets[i] = SelectTargetAroundHome(world, i, radius * inspectRadiusScale, ref inspectRandomState);
+                                world.Targets[i] = PickInspectTarget(world, i, ref inspectRandomState);
                             }
 
                             world.RandomStates[i] = inspectRandomState;
                         }
+
                         break;
 
                     default:
@@ -127,31 +132,88 @@ namespace LearningArchitect.Modules.AI
 
         private int SelectTask(AiWorld world, int index, float recoverDistanceSquared)
         {
-            if (world.Energy[index] <= 0.25f)
+            if (world.Task[index] == RecoverTask)
+            {
+                if (world.Energy[index] < RecoverExitEnergy)
+                    return RecoverTask;
+            }
+            else if (world.Energy[index] <= RecoverEnterEnergy)
+            {
                 return RecoverTask;
+            }
 
             if (world.Timers[index] > 0f)
                 return InspectTask;
 
             Vector3 offsetFromHome = world.Positions[index] - world.HomePositions[index];
+            offsetFromHome.y = 0f;
             if (offsetFromHome.sqrMagnitude > recoverDistanceSquared * 6f && world.Energy[index] <= 0.4f)
                 return RecoverTask;
 
             return PatrolTask;
         }
 
-        private static Vector3 SelectTargetAroundHome(AiWorld world, int index, float targetRadius, ref uint randomState)
+        private static bool ShouldPickPatrolTarget(AiWorld world, int index, float targetReachDistanceSquared)
         {
-            return world.HomePositions[index] + AiDeterministicRandom.NextPointOnDisc(ref randomState, targetRadius);
+            Vector3 offset = world.Targets[index] - world.Positions[index];
+            offset.y = 0f;
+            return offset.sqrMagnitude <= targetReachDistanceSquared;
+        }
+
+        private Vector3 PickPatrolTarget(AiWorld world, int index, ref uint randomState)
+        {
+            float patrolRadius = radius * patrolRadiusScale;
+            Vector3 home = world.HomePositions[index];
+
+            for (int attempt = 0; attempt < 8; attempt++)
+            {
+                Vector3 candidate = home + AiDeterministicRandom.NextPointOnDisc(ref randomState, patrolRadius);
+                Vector3 offset = candidate - world.Positions[index];
+                offset.y = 0f;
+                if (offset.sqrMagnitude >= minPatrolSeparationSquared)
+                    return candidate;
+            }
+
+            return home + AiDeterministicRandom.NextPointOnDisc(ref randomState, patrolRadius);
+        }
+
+        private Vector3 PickInspectTarget(AiWorld world, int index, ref uint randomState)
+        {
+            float inspectRadius = radius * inspectRadiusScale;
+            Vector3 home = world.HomePositions[index];
+
+            for (int attempt = 0; attempt < 8; attempt++)
+            {
+                Vector3 candidate = home + AiDeterministicRandom.NextPointOnDisc(ref randomState, inspectRadius);
+                Vector3 offset = candidate - world.Positions[index];
+                offset.y = 0f;
+                if (offset.sqrMagnitude >= minPatrolSeparationSquared)
+                    return candidate;
+            }
+
+            return home + AiDeterministicRandom.NextPointOnDisc(ref randomState, inspectRadius);
+        }
+
+        private static bool IsNearHome(AiWorld world, int index, float recoverDistanceSquared)
+        {
+            Vector3 offset = world.Positions[index] - world.HomePositions[index];
+            offset.y = 0f;
+            return offset.sqrMagnitude <= recoverDistanceSquared;
         }
 
         private void MoveTowards(AiWorld world, int index, float deltaTime, float targetReachDistanceSquared)
         {
             Vector3 direction = world.Targets[index] - world.Positions[index];
+            direction.y = 0f;
+
             if (direction.sqrMagnitude <= targetReachDistanceSquared)
                 return;
 
-            world.Positions[index] += direction.normalized * moveSpeed * deltaTime;
+            Vector3 step = direction.normalized * (moveSpeed * deltaTime);
+            if (step.sqrMagnitude >= direction.sqrMagnitude)
+                world.Positions[index] += direction;
+            else
+                world.Positions[index] += step;
         }
     }
 }

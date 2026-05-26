@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3316a2c70045509498f9a2c72c9f8bd1, type: 3}
+  m_Name: InterviewArena_EnemyConfig
+  m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.EnemyConfig
+  maxHealth: 90
+  invulnerabilityDuration: 0.35
+  respawnDelay: 4.5
+  detectRange: 9
+  loseDetectRange: 12
+  visibilityDotThreshold: -0.15
+  patrolSpeed: 2.2
+  chaseSpeed: 4.6
+  patrolRadius: 3.5
+  patrolIdleDuration: 0.8
+  rotationSpeed: 10
+  attackRange: 1.65
+  attackCooldown: 1.05
+  attackWindup: 0.22
+  attackDamage: 16
+  attackKnockback: 5.5
+  strikeForwardOffset: 0.75
+  strikeRadius: 0.9
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 128
+  crossbowConfig: {fileID: 11400000, guid: 46ab6cd10506d374a825ca1ecd3761a4, type: 2}
+  crossbowMinRange: 2.2
+  crossbowMaxRange: 11
+  crossbowPoolSize: 12

@@ -70,7 +70,7 @@ namespace LearningArchitect.Modules.AI
             long startedAt = Stopwatch.GetTimestamp();
             runner.Tick(deltaTime);
             moduleCpuMs = (float)((Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency);
-            presenter.Sync(runner.World);
+            presenter.Sync(runner.World, deltaTime);
         }
 
         public void SetStressLevel(int count)

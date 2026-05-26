@@ -8,7 +8,6 @@ namespace LearningArchitect.Modules.Performance
     public sealed class CentralizedUpdateVariant : MonoBehaviour, IShowcaseStressTarget, IShowcaseMetricsSource
     {
         [SerializeField] private int count = 5000;
-        [SerializeField] private int visibleCount = 260;
         [SerializeField] private int visualLimit = 420;
         [SerializeField] private float radius = 7f;
         [SerializeField] private float speed = 0.85f;
@@ -39,13 +38,14 @@ namespace LearningArchitect.Modules.Performance
             for (int i = 0; i < count; i++)
             {
                 Vector3 position = positions[i] + velocities[i] * deltaTime;
-                if (position.sqrMagnitude > radiusSquared)
+                Vector2 planar = new Vector2(position.x, position.z);
+                if (planar.sqrMagnitude > radiusSquared)
                 {
                     velocities[i] = -velocities[i];
                     position = positions[i] + velocities[i] * deltaTime;
                 }
 
-                positions[i] = position;
+                positions[i] = ShowcaseSpawnLayout.ClampToSurface(position);
             }
 
             for (int i = 0; i < visuals.Length; i++)
@@ -75,19 +75,19 @@ namespace LearningArchitect.Modules.Performance
         {
             ClearVisuals();
 
-            positions = new Vector3[targetCount];
-            velocities = new Vector3[targetCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            positions = new Vector3[spawnCount];
+            velocities = new Vector3[spawnCount];
+            visuals = new Transform[spawnCount];
 
-            int visible = Mathf.Min(targetCount, Mathf.Min(visibleCount, visualLimit));
-            visuals = new Transform[visible];
-
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 positions[i] = ShowcaseSpawnLayout.RandomPointOnPlatform(radius);
                 velocities[i] = ShowcaseSpawnLayout.RandomVelocity(speed);
             }
 
-            for (int i = 0; i < visible; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
                     transform,

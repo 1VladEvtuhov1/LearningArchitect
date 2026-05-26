@@ -12,68 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1de7887b445c3947ad2504ac5d2fb14, type: 3}
   m_Name: Animation_RunVariant
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Core.VariantDefinitionSO
-  localizationKey: 
-  variantName: Run
-  variantNameRu: "\u0411\u0435\u0433"
+  localizationKey: animation_runvariant
   prefab: {fileID: 5816978165570920196, guid: 196ea95fc68bf2e479d4459d2bf3791d, type: 3}
   stressPresets: 010000000400000008000000
-  stressPresetLabels:
-  - Solo
-  - Squad
-  - Crowd
-  stressPresetLabelsRu:
-  - "\u0421\u043E\u043B\u043E"
-  - "\u0413\u0440\u0443\u043F\u043F\u0430"
-  - "\u0422\u043E\u043B\u043F\u0430"
-  architectureDescription: The same Paladin model plays a humanoid locomotion clip
-    through a reusable AnimatorController. Movement drives Speed and Turn parameters,
-    while the upper-body shooting layer stays disabled.
-  architectureDescriptionRu: "\u0422\u0430 \u0436\u0435 \u043C\u043E\u0434\u0435\u043B\u044C
-    Paladin \u0432\u043E\u0441\u043F\u0440\u043E\u0438\u0437\u0432\u043E\u0434\u0438\u0442
-    humanoid locomotion clip \u0447\u0435\u0440\u0435\u0437 \u043F\u0435\u0440\u0435\u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C\u044B\u0439
-    AnimatorController. \u0414\u0432\u0438\u0436\u0435\u043D\u0438\u0435 \u0443\u043F\u0440\u0430\u0432\u043B\u044F\u0435\u0442
-    Speed \u0438 Turn, \u0430 \u0432\u0435\u0440\u0445\u043D\u0438\u0439 \u0441\u043B\u043E\u0439
-    \u0441\u0442\u0440\u0435\u043B\u044C\u0431\u044B \u043E\u0442\u043A\u043B\u044E\u0447\u0451\u043D."
-  dataFlow: A single locomotion parameter path drives the base Animator state, and the pose is authored as one clean full-body clip.
-  dataFlowRu: "\u041E\u0434\u0438\u043D \u043F\u0443\u0442\u044C locomotion-\u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u043E\u0432 \u0434\u0432\u0438\u0433\u0430\u0435\u0442 \u0431\u0430\u0437\u043E\u0432\u043E\u0435 Animator-\u0441\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435, \u0430 pose \u043E\u0441\u0442\u0430\u0451\u0442\u0441\u044F \u0447\u0438\u0441\u0442\u044B\u043C authored full-body clip'\u043E\u043C."
-  runtimeLifecycle: Variant activation loads the controller and avatar, Update only maintains simple locomotion state, and shutdown releases the rig.
-  runtimeLifecycleRu: "\u0410\u043A\u0442\u0438\u0432\u0430\u0446\u0438\u044F \u0432\u0430\u0440\u0438\u0430\u043D\u0442\u0430 \u0433\u0440\u0443\u0437\u0438\u0442 controller \u0438 avatar, Update \u0434\u0435\u0440\u0436\u0438\u0442 \u0442\u043E\u043B\u044C\u043A\u043E \u043F\u0440\u043E\u0441\u0442\u043E\u0435 locomotion-\u0441\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435, \u0430 shutdown \u043E\u0441\u0432\u043E\u0431\u043E\u0436\u0434\u0430\u0435\u0442 rig."
-  whyThisApproach: Useful as the simplest baseline for validating retargeted movement before layering extra mechanics.
-  whyThisApproachRu: "\u042D\u0442\u043E \u043F\u043E\u043B\u0435\u0437\u043D\u044B\u0439 \u0431\u0430\u0437\u043E\u0432\u044B\u0439 \u0441\u043B\u0443\u0447\u0430\u0439 \u0434\u043B\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 retargeted-\u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044F \u0434\u043E \u0442\u043E\u0433\u043E, \u043A\u0430\u043A \u0441\u0432\u0435\u0440\u0445\u0443 \u0434\u043E\u0431\u0430\u0432\u043B\u044F\u0442\u044C \u043D\u043E\u0432\u044B\u0435 \u043C\u0435\u0445\u0430\u043D\u0438\u043A\u0438."
-  compareSummary: Clean baseline for checking retargeted locomotion, root locking
-    and readable movement direction.
-  compareSummaryRu: "\u0427\u0438\u0441\u0442\u044B\u0439 baseline \u0434\u043B\u044F
-    \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 retargeted locomotion, root
-    locking \u0438 \u0447\u0438\u0442\u0430\u0435\u043C\u043E\u0433\u043E \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u044F
-    \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u044F."
-  takeaway: Best when the character only needs full-body movement and simple parameter
-    driving.
-  takeawayRu: "\u041F\u043E\u0434\u0445\u043E\u0434\u0438\u0442, \u043A\u043E\u0433\u0434\u0430
-    \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0443 \u043D\u0443\u0436\u0435\u043D
-    \u0442\u043E\u043B\u044C\u043A\u043E full-body movement \u0438 \u043F\u0440\u043E\u0441\u0442\u043E\u0435
-    \u0443\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u0430\u043C\u0438."
-  tradeOffs: Readable and cheap, but it does not cover concurrent combat actions.
-  tradeOffsRu: "\u0427\u0438\u0442\u0430\u0435\u043C\u043E \u0438 \u0434\u0451\u0448\u0435\u0432\u043E,
-    \u043D\u043E \u043D\u0435 \u043F\u043E\u043A\u0440\u044B\u0432\u0430\u0435\u0442
-    \u043F\u0430\u0440\u0430\u043B\u043B\u0435\u043B\u044C\u043D\u044B\u0435 \u0431\u043E\u0435\u0432\u044B\u0435
-    \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F."
-  pros: 'Simple controller path
-
-    Clear locomotion baseline
-
-    Good for validating
-    imported clips'
-  prosRu: "\u041F\u0440\u043E\u0441\u0442\u043E\u0439 controller path\n\u0427\u0438\u0441\u0442\u044B\u0439
-    locomotion baseline\n\u0423\u0434\u043E\u0431\u043D\u043E \u0434\u043B\u044F
-    \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 \u0438\u043C\u043F\u043E\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0445
-    \u043A\u043B\u0438\u043F\u043E\u0432"
-  cons: 'No concurrent action layer
-
-    Combat interrupts movement
-
-    Less representative
-    for action games'
-  consRu: "\u041D\u0435\u0442 \u043F\u0430\u0440\u0430\u043B\u043B\u0435\u043B\u044C\u043D\u043E\u0433\u043E
-    action layer\n\u0411\u043E\u0439 \u043F\u0440\u0435\u0440\u044B\u0432\u0430\u0435\u0442
-    \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435\n\u0421\u043B\u0430\u0431\u0435\u0435
-    \u043E\u0442\u0440\u0430\u0436\u0430\u0435\u0442 action-game \u043C\u0435\u0445\u0430\u043D\u0438\u043A\u0443"

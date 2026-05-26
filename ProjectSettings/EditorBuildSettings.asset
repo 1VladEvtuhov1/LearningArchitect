@@ -8,8 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Showcase/Scenes/ArchitectureShowcase.unity
     guid: 2d7abb1b952d9354b91c62d7008710fb
+  - enabled: 1
+    path: Assets/Modules/InterviewArena/Scenes/InterviewArena.unity
+    guid: 593754436728ad545a29557d102ae885
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 38ff5f3c63e4851449838761bc3df4df, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.localization.settings: {fileID: 11400000, guid: 9ee33bf56691e4f4e876571337bcff74, type: 2}
-  m_UseUCBPForAssetBundles: 0

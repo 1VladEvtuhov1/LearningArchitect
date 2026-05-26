@@ -20,7 +20,6 @@ namespace LearningArchitect.Modules.Animation3D
         }
 
         [SerializeField] private int count = 64;
-        [SerializeField] private int visibleCount = 32;
         [SerializeField] private int visualLimit = 44;
         [SerializeField] private float radius = 6.5f;
         [SerializeField] private float moveSpeed = 1.45f;
@@ -54,15 +53,15 @@ namespace LearningArchitect.Modules.Animation3D
             for (int i = 0; i < count; i++)
             {
                 Vector3 position = positions[i] + (velocities[i] * deltaTime);
-                if (position.sqrMagnitude > radiusSquared)
+                Vector2 planar = new Vector2(position.x, position.z);
+                if (planar.sqrMagnitude > radiusSquared)
                 {
                     velocities[i] = -velocities[i];
                     position = positions[i] + (velocities[i] * deltaTime);
                 }
 
-                position.y = 0f;
                 velocities[i].y = 0f;
-                positions[i] = position;
+                positions[i] = ShowcaseSpawnLayout.ClampToSurface(position);
                 phases[i] += deltaTime * gaitSpeed * (0.9f + ((i % 4) * 0.08f));
             }
 
@@ -95,22 +94,22 @@ namespace LearningArchitect.Modules.Animation3D
         {
             ClearRigs();
 
-            positions = new Vector3[targetCount];
-            velocities = new Vector3[targetCount];
-            phases = new float[targetCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            positions = new Vector3[spawnCount];
+            velocities = new Vector3[spawnCount];
+            phases = new float[spawnCount];
 
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 positions[i] = ShowcaseSpawnLayout.RandomPointOnPlatform(radius, 0.12f);
-                positions[i].y = 0f;
                 velocities[i] = ShowcaseSpawnLayout.RandomVelocity(moveSpeed, 0.04f);
                 velocities[i].y = 0f;
                 phases[i] = (i * 0.52f) + 0.7f;
             }
 
-            int visible = Mathf.Min(targetCount, Mathf.Min(visibleCount, visualLimit));
-            rigs = new CreatureRig[visible];
-            for (int i = 0; i < visible; i++)
+            rigs = new CreatureRig[spawnCount];
+            for (int i = 0; i < spawnCount; i++)
                 rigs[i] = CreateRig(i);
         }
 

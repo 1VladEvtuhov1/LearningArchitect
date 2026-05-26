@@ -9,7 +9,8 @@ namespace LearningArchitect.Modules.Effects
     {
         [SerializeField] private GameObject effectPrefab;
         [SerializeField] private GameObject visualPrefab;
-        [SerializeField] private int count = 500;
+        [SerializeField] private int count = 160;
+        [SerializeField] private int visualLimit = 420;
         [SerializeField] private float radius = 6f;
         [SerializeField] private float rotateSpeed = 40f;
         [SerializeField] private Vector3 visualScale = Vector3.one * 0.14f;
@@ -51,21 +52,25 @@ namespace LearningArchitect.Modules.Effects
             if (value < 1)
                 throw new System.ArgumentOutOfRangeException(nameof(value));
 
-            if (count == value && effects.Count == value)
+            int spawnCount = ShowcaseStressSpawn.Clamp(value, visualLimit);
+            if (count == spawnCount && effects.Count == spawnCount)
                 return;
 
-            count = value;
-            Rebuild(count);
+            count = spawnCount;
+            Rebuild(spawnCount);
         }
 
         private void Rebuild(int targetCount)
         {
             ClearEffects();
 
-            if (effects.Capacity < targetCount)
-                effects.Capacity = targetCount;
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
 
-            for (int i = 0; i < targetCount; i++)
+            if (effects.Capacity < spawnCount)
+                effects.Capacity = spawnCount;
+
+            for (int i = 0; i < spawnCount; i++)
             {
                 Vector3 position = ShowcaseSpawnLayout.RandomPointOnPlatform(radius, 0.3f);
 

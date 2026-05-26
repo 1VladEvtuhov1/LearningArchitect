@@ -7,9 +7,7 @@ namespace LearningArchitect.Modules.Effects
     public sealed class ChunkEffectsVariant : MonoBehaviour, IShowcaseStressTarget, IShowcaseMetricsSource
     {
         [SerializeField] private int count = 5000;
-        [SerializeField] private int visualCount = 240;
         [SerializeField] private int visualLimit = 420;
-        [SerializeField] [Range(0.01f, 1f)] private float visibleFraction = 0.12f;
         [SerializeField] private float radius = 7f;
         [SerializeField] private float speed = 0.8f;
         [SerializeField] private GameObject visualPrefab;
@@ -39,14 +37,15 @@ namespace LearningArchitect.Modules.Effects
             for (int i = 0; i < count; i++)
             {
                 Vector3 position = positions[i] + velocities[i] * dt;
+                Vector2 planar = new Vector2(position.x, position.z);
 
-                if (position.sqrMagnitude > radiusSquared)
+                if (planar.sqrMagnitude > radiusSquared)
                 {
                     velocities[i] = -velocities[i];
                     position = positions[i] + velocities[i] * dt;
                 }
 
-                positions[i] = position;
+                positions[i] = ShowcaseSpawnLayout.ClampToSurface(position);
             }
 
             for (int i = 0; i < visuals.Length; i++)
@@ -78,29 +77,19 @@ namespace LearningArchitect.Modules.Effects
         {
             ClearVisuals();
 
-            positions = new Vector3[targetCount];
-            velocities = new Vector3[targetCount];
+            int spawnCount = ShowcaseStressSpawn.Clamp(targetCount, visualLimit);
+            count = spawnCount;
+            positions = new Vector3[spawnCount];
+            velocities = new Vector3[spawnCount];
+            visuals = new Transform[spawnCount];
 
-            int visible;
-            if (targetCount <= visualLimit)
-            {
-                visible = targetCount;
-            }
-            else
-            {
-                int scaledVisible = Mathf.CeilToInt(targetCount * visibleFraction);
-                visible = Mathf.Clamp(scaledVisible, visualCount, visualLimit);
-            }
-
-            visuals = new Transform[visible];
-
-            for (int i = 0; i < targetCount; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 positions[i] = ShowcaseSpawnLayout.RandomPointOnPlatform(radius);
                 velocities[i] = ShowcaseSpawnLayout.RandomVelocity(speed);
             }
 
-            for (int i = 0; i < visible; i++)
+            for (int i = 0; i < spawnCount; i++)
             {
                 GameObject marker = ShowcaseVisualInstanceFactory.CreateMarker(
                     transform,

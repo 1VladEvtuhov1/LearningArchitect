@@ -13,8 +13,8 @@ namespace LearningArchitect.Tests.Core
         {
             ModuleDefinitionSO module = ScriptableObject.CreateInstance<ModuleDefinitionSO>();
             module.name = assetName;
+            SetField(module, "localizationKey", assetName.ToLowerInvariant());
             SetField(module, "category", category);
-            SetField(module, "moduleName", assetName);
             SetField(module, "variants", variants);
             return module;
         }
@@ -23,7 +23,7 @@ namespace LearningArchitect.Tests.Core
         {
             VariantDefinitionSO variant = ScriptableObject.CreateInstance<VariantDefinitionSO>();
             variant.name = assetName;
-            SetField(variant, "variantName", assetName);
+            SetField(variant, "localizationKey", assetName.ToLowerInvariant());
             SetField(variant, "prefab", prefab);
             SetField(variant, "stressPresets", stressPresets);
             return variant;

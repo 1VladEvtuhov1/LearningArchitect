@@ -60,7 +60,7 @@ Touches:
 - `Assets/Showcase/Runtime/VariantDefinitionSO.cs`
 - `Assets/Modules/*/Data`
 
-### D-003: Localization Tables Override ScriptableObject Copy
+### D-003: Localization Tables Are The Only Copy For Visible Text
 
 Status:
 
@@ -68,19 +68,51 @@ Status:
 
 Decision:
 
-- runtime UI resolves module and variant copy through `ShowcaseContent` localization tables first, and only falls back to ScriptableObject fields when no localized entry is available.
+- runtime UI resolves module and variant prose **only** through `ShowcaseContent` (and shared chrome through `ShowcaseUI`); missing required keys surface explicit `[MISSING: ...]` markers in the UI and validator findings in the editor.
+- localization lookup identity comes from explicit `localizationKey` fields on `ModuleDefinitionSO` and `VariantDefinitionSO`, not from asset names.
+- `ModuleDefinitionSO` / `VariantDefinitionSO` do not duplicate EN/RU strings; they carry keys, taxonomy, prefab wiring, and stress counts.
 
 Why:
 
 - visible UI copy must be language-aware;
-- module assets should remain self-describing even when localization entries are missing;
+- a single authoring surface avoids drift between duplicate SerializedObject text fields and shipped localization tables;
+- asset renames should not silently break visible content;
 - this avoids hardcoding language selection rules inside every presenter or panel.
 
 Touches:
 
 - `Assets/Showcase/UI/ShowcaseLocalization.cs`
+- `Assets/Showcase/UI/ShowcaseLocalizationContent.cs`
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_en.asset`
 - `Assets/Showcase/Localization/Tables/ShowcaseContent_ru.asset`
+- `Assets/Showcase/Localization/Tables/ShowcaseUI_en.asset`
+- `Assets/Showcase/Localization/Tables/ShowcaseUI_ru.asset`
+- `Assets/Showcase/Runtime/ModuleDefinitionSO.cs`
+- `Assets/Showcase/Runtime/VariantDefinitionSO.cs`
+
+### D-008: Browser Delivery Uses Live Metrics, Not A Hidden Reference Catalog
+
+Status:
+
+- active
+
+Decision:
+
+- browser delivery keeps the shared live metrics path and uses conservative presets instead of a separate runtime reference-metrics catalog.
+
+Why:
+
+- one metrics path is easier to reason about and document than parallel live-vs-reference runtime branches;
+- hidden browser-only metrics layers create doc drift and confuse learning value;
+- browser clarity should come from framing and preset discipline, not from a second silent data source.
+
+Touches:
+
+- `Assets/Showcase/UI/MetricsOverlayHost.cs`
+- `Assets/Showcase/UI/MetricsOverlayRuntime.cs`
+- `Assets/Showcase/UI/MetricsOverlayPresenter.cs`
+- `Docs/Architecture.md`
+- `WEBGL.md`
 
 ### D-004: Hub Prefab Visual Baseline Takes Priority Over UI Normalization
 
@@ -148,6 +180,30 @@ Touches:
 - `Docs/Decisions.md`
 - `Docs/OpenThreads.md`
 - `Docs/WorkingMemory.md`
+
+### D-008: Interview Arena Uses A Separate Scene
+
+Status:
+
+- active
+
+Decision:
+
+- Interview Arena is not an eighth `ModuleDefinitionSO` entry in the architecture showcase hub.
+- gameplay lives in `Assets/Modules/InterviewArena/Scenes/InterviewArena.unity` and is opened from the hub through `ShowcaseSceneLoader` / `InterviewArenaLaunchDock`.
+- the architecture showcase scene remains the default build entry point.
+
+Why:
+
+- the game loop (movement, lobby, networking) does not fit the showcase stress/metrics/module-variant contract;
+- a separate scene keeps the seven teaching modules focused while still shipping one WebGL build with two experiences;
+- the local player must be a **scene/prefab-authored** object, not runtime-spawned geometry (production and interview signal).
+
+Touches:
+
+- `Assets/Showcase/Runtime/ShowcaseSceneLoader.cs`
+- `Assets/Showcase/UI/InterviewArenaLaunchDock.cs`
+- `Assets/Modules/InterviewArena/`
 
 ### D-007: Runtime Visuals Use Assigned Carrier Prefabs
 
