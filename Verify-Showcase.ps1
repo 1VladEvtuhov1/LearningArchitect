@@ -4,8 +4,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "==> dotnet build"
-dotnet build .\LearningArchitect.sln
+Write-Host "==> dotnet build (Unity client solution)"
+$unitySln = Join-Path $PSScriptRoot "UnityClient\LearningArchitect.sln"
+if (-not (Test-Path $unitySln)) {
+    Write-Warning "Unity solution not found at $unitySln. Open UnityClient/ in Unity Hub once to regenerate .sln/.csproj."
+}
+else {
+    dotnet build $unitySln
+}
 
 if (-not $SkipSite) {
     $siteCopyTool = Join-Path $PSScriptRoot "Site\scripts\site-copy-tool.mjs"

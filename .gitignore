@@ -1,7 +1,18 @@
-# Unity project
+# Unity client (UnityClient/)
 # Keep Assets/, Packages/, ProjectSettings/ and all .meta files in version control.
 
-# Unity generated folders
+# Unity generated folders — client project
+UnityClient/[Ll]ibrary/
+UnityClient/[Tt]emp/
+UnityClient/[Oo]bj/
+UnityClient/[Ll]ogs/
+UnityClient/[Bb]uild/
+UnityClient/[Bb]uilds/
+UnityClient/[Mm]emoryCaptures/
+UnityClient/[Rr]ecordings/
+UnityClient/[Uu]ser[Ss]ettings/
+
+# Legacy root Unity artifacts (local folders from pre-migration editor sessions)
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -56,10 +67,14 @@ CodeCoverage/
 *.coveragexml
 
 # Working documentation captures
+UnityClient/Docs/Screenshots/
+UnityClient/Assets/Content/Screenshots/
 Docs/Screenshots/
 
 # Addressables / build cache artifacts
 ServerData/
+UnityClient/Assets/AddressableAssetsData/WebGL.meta
+UnityClient/Assets/AddressableAssetsData/WebGL/
 Assets/AddressableAssetsData/WebGL.meta
 Assets/AddressableAssetsData/WebGL/
 

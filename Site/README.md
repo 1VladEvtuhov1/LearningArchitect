@@ -2,9 +2,9 @@
 
 This folder is a standalone static presentation shell for the project.
 
-It is intentionally separate from `Assets/` so it can be hosted as a normal portfolio page while the Unity project keeps its own build and authoring structure.
+It is intentionally separate from `UnityClient/Assets/` so it can be hosted as a normal portfolio page while the Unity project keeps its own build and authoring structure.
 
-For the full run, build, and server deployment checklist, see `../Docs/WebDeployment.md`.
+For the full run, build, and server deployment checklist, see `../UnityClient/Docs/WebDeployment.md`.
 
 ## What It Contains
 

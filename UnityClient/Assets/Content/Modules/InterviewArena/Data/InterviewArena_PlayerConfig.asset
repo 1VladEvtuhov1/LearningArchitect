@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a20281474f570b4cb501d86e580acd5, type: 3}
+  m_Name: InterviewArena_PlayerConfig
+  m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.PlayerConfig
+  moveSpeed: 8
+  groundAcceleration: 58
+  groundDeceleration: 68
+  airAcceleration: 22
+  rotationSpeed: 14
+  airControl: 0.35
+  maxGroundAngle: 48
+  jumpImpulse: 6.5
+  coyoteTime: 0.15
+  jumpCutMultiplier: 0.45
+  fallGravityMultiplier: 1.65
+  maxFallSpeed: 22
+  dashImpulse: 11
+  dashCooldown: 1.1
+  dashDuration: 0.14
+  airborneWallSlide: 0.35
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckRadius: 0.32
+  groundCheckDistance: 0.2
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
