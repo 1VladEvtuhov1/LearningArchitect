@@ -148,8 +148,7 @@ namespace LearningArchitect.Modules.InterviewArena
 
             _startButton = CreateButton(_roomPanel.transform, "Button - StartMatch", new Vector2(120f, -120f), () => _ = StartMatchAsync());
             CreateButton(_roomPanel.transform, "Button - RefreshRoom", new Vector2(0f, -170f), () => _ = RefreshRoomAsync());
-            CreateButton(_roomPanel.transform, "Button - LeaveRoom", new Vector2(-120f, -220f), OnLeaveRoomClicked);
-            CreateButton(_roomPanel.transform, "Button - EnterArena", new Vector2(120f, -220f), () => _stateMachine.Enter(GameState.LocalArena));
+            CreateButton(_roomPanel.transform, "Button - LeaveRoom", new Vector2(0f, -220f), OnLeaveRoomClicked);
         }
 
         private async void OnLoginClicked()
@@ -273,7 +272,7 @@ namespace LearningArchitect.Modules.InterviewArena
                 return;
             }
 
-            SetStatus("Match " + result.Value.matchId + " — enter arena when ready.");
+            SetStatus("Match " + result.Value.matchId + " started.");
             _stateMachine.Enter(GameState.LoadingMatch);
             _stateMachine.Enter(GameState.LocalArena);
         }

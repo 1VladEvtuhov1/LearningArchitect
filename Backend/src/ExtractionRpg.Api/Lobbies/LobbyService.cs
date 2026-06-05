@@ -181,8 +181,11 @@ public sealed class LobbyService
 
         string matchId = $"match_{Guid.NewGuid():N}"[..19];
         string connectUrl = MatchConnectUrlBuilder.Build(template, matchId);
+        IReadOnlyList<string> participantUserIds = lobby.Players
+            .Select(player => player.UserId)
+            .ToList();
 
-        MatchRecord match = _matches.Create(matchId, lobbyId, user.UserId, connectUrl);
+        MatchRecord match = _matches.Create(matchId, lobbyId, user.UserId, connectUrl, participantUserIds);
         lobby.State = LobbyState.InMatch;
 
         return Results.Ok(new MatchStartResponse(match.MatchId, match.ConnectUrl));

@@ -98,4 +98,33 @@ namespace LearningArchitect.Modules.InterviewArena.Net
         public string matchId;
         public string connectUrl;
     }
+
+    [Serializable]
+    public sealed class SubmitMatchResultRequestDto
+    {
+        public string outcome;
+        public float elapsedSeconds;
+
+        public SubmitMatchResultRequestDto(string outcome, float elapsedSeconds)
+        {
+            this.outcome = outcome;
+            this.elapsedSeconds = elapsedSeconds;
+        }
+    }
+
+    [Serializable]
+    public sealed class MatchResultResponseDto
+    {
+        public string matchId;
+        public string userId;
+        public string outcome;
+        public float elapsedSeconds;
+        public string submittedAt;
+    }
+
+    public static class MatchOutcomeValues
+    {
+        public const string Extracted = "Extracted";
+        public const string Death = "Death";
+    }
 }

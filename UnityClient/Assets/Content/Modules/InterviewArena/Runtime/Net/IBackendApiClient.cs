@@ -37,5 +37,11 @@ namespace LearningArchitect.Modules.InterviewArena.Net
             string sessionToken,
             string lobbyId,
             CancellationToken cancellationToken = default);
+
+        Task<ApiResult<MatchResultResponseDto>> SubmitMatchResultAsync(
+            string sessionToken,
+            string matchId,
+            SubmitMatchResultRequestDto body,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -36,7 +36,8 @@ When `InterviewArena_BackendApiConfig` has **Use Online Flow** enabled, the Aren
 1. Start backend: see `Backend/README.md` (`dotnet run` → `http://localhost:5000`).
 2. Play **Interview Arena** scene (or enter from showcase dock).
 3. **Login** with any username (3–16 chars) → **Lobby browser** → create/join lobby → **Ready** → host **Start Match** → arena.
-4. **Skip Offline** / **Enter Arena** bypass backend and jump straight to local gameplay.
+4. **Skip Offline** bypass backend and jump straight to local gameplay.
+5. After **Start Match**, arena loads automatically. Finish portal submits `Extracted` result to backend.
 
 Config asset: `Assets/Content/Modules/InterviewArena/Data/InterviewArena_BackendApiConfig.asset` (created by **Setup Complete**). Script: `Runtime/Net/BackendApiConfig.cs`.
 
@@ -46,6 +47,7 @@ Config asset: `Assets/Content/Modules/InterviewArena/Data/InterviewArena_Backend
 | Auth / lobby services | `Runtime/Services/AuthService.cs`, `LobbyService.cs` |
 | Session (PlayerPrefs) | `Runtime/Services/SessionStorage.cs` |
 | Online UI overlay | `Runtime/UI/InterviewArenaOnlineFlowController.cs` |
+| Match result reporter | `Runtime/Core/InterviewArenaMatchReporter.cs` |
 
 ## Player authoring (no runtime spawn)
 

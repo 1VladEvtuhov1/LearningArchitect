@@ -34,6 +34,7 @@
 ## Phase — Match + results (MVP3)
 
 - [x] Match start from lobby (`POST /api/lobbies/{id}/start`, in-memory `matchId` + `connectUrl` stub)
+- [x] Match result submit (`POST /api/matches/{id}/result`, in-memory per player)
 - [ ] Result persistence (PostgreSQL)
 - [ ] Run history + leaderboard read API
 - [ ] Multiplayer sync strategy (TBD: dedicated server vs relay)

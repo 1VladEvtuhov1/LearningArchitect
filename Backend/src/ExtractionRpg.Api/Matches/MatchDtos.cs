@@ -10,6 +10,15 @@ public sealed class MatchConnectOptions
 
 public sealed record MatchStartResponse(string MatchId, string ConnectUrl);
 
+public sealed record SubmitMatchResultRequest(string Outcome, float ElapsedSeconds);
+
+public sealed record MatchResultResponse(
+    string MatchId,
+    string UserId,
+    string Outcome,
+    float ElapsedSeconds,
+    DateTimeOffset SubmittedAt);
+
 public static class MatchConnectUrlBuilder
 {
     public static string Build(string template, string matchId) =>

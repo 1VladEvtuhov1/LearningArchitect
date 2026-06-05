@@ -76,7 +76,32 @@ Host-triggered start when ready-check passes (exact shape TBD).
 
 ### `POST /api/matches/{matchId}/result`
 
-Persist extraction/death outcome and stats.
+Authenticated lobby participant submits extraction/death outcome.
+
+Request:
+
+```json
+{
+  "outcome": "Extracted",
+  "elapsedSeconds": 95.5
+}
+```
+
+`outcome`: `Extracted` | `Death`.
+
+Response:
+
+```json
+{
+  "matchId": "match_100",
+  "userId": "u_abc",
+  "outcome": "Extracted",
+  "elapsedSeconds": 95.5,
+  "submittedAt": "2026-05-31T12:00:00Z"
+}
+```
+
+Errors: `MATCH_NOT_FOUND`, `NOT_MATCH_PARTICIPANT`, `RESULT_ALREADY_SUBMITTED`, `MATCH_OUTCOME_INVALID`.
 
 ## Errors
 

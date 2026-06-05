@@ -15,6 +15,11 @@ public static class ApiErrorCodes
     public const string MatchAlreadyStarted = "MATCH_ALREADY_STARTED";
     public const string HostOnly = "HOST_ONLY";
     public const string PlayerNotReady = "PLAYER_NOT_READY";
+    public const string MatchNotFound = "MATCH_NOT_FOUND";
+    public const string NotMatchParticipant = "NOT_MATCH_PARTICIPANT";
+    public const string ResultAlreadySubmitted = "RESULT_ALREADY_SUBMITTED";
+    public const string MatchOutcomeInvalid = "MATCH_OUTCOME_INVALID";
+    public const string ElapsedSecondsInvalid = "ELAPSED_SECONDS_INVALID";
 }
 
 public static class ApiResults

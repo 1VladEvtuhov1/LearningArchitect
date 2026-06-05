@@ -46,5 +46,13 @@ namespace LearningArchitect.Modules.InterviewArena.Tests.Editor
             StringAssert.Contains("Forest Run", json);
             StringAssert.Contains("4", json);
         }
+
+        [Test]
+        public void Serializes_submit_match_result_request()
+        {
+            string json = BackendJsonParser.Serialize(new SubmitMatchResultRequestDto(MatchOutcomeValues.Extracted, 42f));
+            StringAssert.Contains(MatchOutcomeValues.Extracted, json);
+            StringAssert.Contains("42", json);
+        }
     }
 }

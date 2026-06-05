@@ -93,6 +93,18 @@ namespace LearningArchitect.Modules.InterviewArena.Net
                 sessionToken,
                 cancellationToken);
 
+        public Task<ApiResult<MatchResultResponseDto>> SubmitMatchResultAsync(
+            string sessionToken,
+            string matchId,
+            SubmitMatchResultRequestDto body,
+            CancellationToken cancellationToken = default) =>
+            SendJsonAsync<SubmitMatchResultRequestDto, MatchResultResponseDto>(
+                $"/api/matches/{matchId}/result",
+                UnityWebRequest.kHttpVerbPOST,
+                body,
+                sessionToken,
+                cancellationToken);
+
         private async Task<ApiResult<TResponse>> SendJsonAsync<TRequest, TResponse>(
             string path,
             string method,

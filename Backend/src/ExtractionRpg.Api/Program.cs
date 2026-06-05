@@ -18,6 +18,7 @@ builder.Services.AddSingleton<ILobbyRepository, InMemoryLobbyRepository>();
 builder.Services.AddSingleton<IMatchRepository, InMemoryMatchRepository>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<LobbyService>();
+builder.Services.AddSingleton<MatchService>();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(options =>
@@ -81,6 +82,7 @@ else
 app.MapAuthEndpoints();
 app.MapProfileEndpoints();
 app.MapLobbyEndpoints();
+app.MapMatchEndpoints();
 
 app.Run();
 

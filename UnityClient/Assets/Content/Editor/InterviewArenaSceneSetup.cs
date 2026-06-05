@@ -90,6 +90,7 @@ namespace LearningArchitect.EditorTools
             bootstrapObject.transform.SetParent(roots.Gameplay, false);
             InterviewArenaRuntimeContext context = bootstrapObject.AddComponent<InterviewArenaRuntimeContext>();
             bootstrapObject.AddComponent<InterviewArenaBootstrap>();
+            bootstrapObject.AddComponent<InterviewArenaMatchReporter>();
 
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem));
             AddUiInputModule(eventSystem);

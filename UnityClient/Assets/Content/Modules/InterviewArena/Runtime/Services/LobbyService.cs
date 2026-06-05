@@ -51,9 +51,19 @@ namespace LearningArchitect.Modules.InterviewArena.Services
             CancellationToken cancellationToken = default) =>
             _client.SetReadyAsync(SessionStorage.GetToken(), lobbyId, isReady, cancellationToken);
 
-        public Task<ApiResult<MatchStartResponseDto>> StartAsync(
+        public async Task<ApiResult<MatchStartResponseDto>> StartAsync(
             string lobbyId,
-            CancellationToken cancellationToken = default) =>
-            _client.StartLobbyAsync(SessionStorage.GetToken(), lobbyId, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            ApiResult<MatchStartResponseDto> result = await _client.StartLobbyAsync(
+                SessionStorage.GetToken(),
+                lobbyId,
+                cancellationToken);
+
+            if (result.Succeeded && result.Value != null)
+                SessionStorage.SaveMatch(result.Value.matchId);
+
+            return result;
+        }
     }
 }
