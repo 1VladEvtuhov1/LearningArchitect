@@ -29,6 +29,16 @@ Root **`Docs/`** holds client/server product narrative only.
 
 First backend PR after workspace migration: folders + README + docker-compose — **no** API business logic.
 
+## D-WS-005: Opaque session tokens (MVP auth)
+
+Backend auth uses **server-issued opaque session tokens** (not JWT) stored in-memory for MVP2.
+
+- Client sends `Authorization: Bearer {sessionToken}`
+- `POST /api/auth/login-by-name` creates or reuses a user by username and returns a new token
+- Persistence moves to PostgreSQL in a later milestone (`IUserRepository` / `ISessionStore` abstractions)
+
+Rationale: simpler MVP, matches draft API shape, easy to swap storage without changing Unity contract.
+
 ## Inherited product decisions (summary)
 
 | ID | Topic | Location |

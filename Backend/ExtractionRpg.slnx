@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ExtractionRpg.Api/ExtractionRpg.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExtractionRpg.Api.Tests/ExtractionRpg.Api.Tests.csproj" />
+  </Folder>
+</Solution>

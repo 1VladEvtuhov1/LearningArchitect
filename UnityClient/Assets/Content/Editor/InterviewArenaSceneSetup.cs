@@ -27,6 +27,7 @@ namespace LearningArchitect.EditorTools
         private const string PlayerPrefabPath = "Assets/Content/Modules/InterviewArena/Prefabs/InterviewArenaPlayer.prefab";
         private const string BuffSpeedConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BuffSpeed.asset";
         private const string BuffMeleeConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BuffMelee.asset";
+        private const string BackendApiConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BackendApiConfig.asset";
 
         [MenuItem("Learning Architect/Interview Arena/Setup Interview Arena Scenes")]
         public static void SetupAll()
@@ -93,7 +94,10 @@ namespace LearningArchitect.EditorTools
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem));
             AddUiInputModule(eventSystem);
 
-            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerIframeHud playerIframeHud, out PlayerBuffHud playerBuffHud);
+            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerIframeHud playerIframeHud, out PlayerBuffHud playerBuffHud, out GameObject popupsCanvasObject);
+
+            BackendApiConfig backendConfig = EnsureBackendApiConfigAsset();
+            InterviewArenaOnlineFlowController onlineFlow = WireOnlineFlow(popupsCanvasObject.transform, context, backendConfig);
 
             ReparentDefaultCameraAndLight(roots.Cameras, roots.Lighting, out InterviewArenaCameraFollow cameraFollow);
 
@@ -114,6 +118,8 @@ namespace LearningArchitect.EditorTools
             serializedContext.FindProperty("playerPrefab").objectReferenceValue = null;
             serializedContext.FindProperty("cameraFollow").objectReferenceValue = cameraFollow;
             serializedContext.FindProperty("combatServices").objectReferenceValue = combatServices;
+            serializedContext.FindProperty("backendConfig").objectReferenceValue = backendConfig;
+            serializedContext.FindProperty("onlineFlow").objectReferenceValue = onlineFlow;
             serializedContext.ApplyModifiedPropertiesWithoutUndo();
 
             if (cameraFollow != null)
@@ -1229,11 +1235,12 @@ namespace LearningArchitect.EditorTools
             Transform uiRoot,
             out Transform hudDynamicRoot,
             out PlayerIframeHud playerIframeHud,
-            out PlayerBuffHud playerBuffHud)
+            out PlayerBuffHud playerBuffHud,
+            out GameObject popupsCanvasObject)
         {
             GameObject staticCanvasObject = CreateOverlayCanvas(uiRoot, "Canvas_Static", 0);
             GameObject hudCanvasObject = CreateOverlayCanvas(uiRoot, "Canvas_HUD_Dynamic", 10);
-            GameObject popupsCanvasObject = CreateOverlayCanvas(uiRoot, "Canvas_Popups", 20);
+            GameObject popupsCanvas = CreateOverlayCanvas(uiRoot, "Canvas_Popups", 20);
             GameObject debugCanvasObject = CreateOverlayCanvas(uiRoot, "Canvas_Debug", 100);
             debugCanvasObject.SetActive(false);
 
@@ -1262,7 +1269,7 @@ namespace LearningArchitect.EditorTools
             subtitle.color = ShowcasePalette.TextSecondary;
 
             GameObject popupPanel = new GameObject("Container - InterviewArenaPopups", typeof(RectTransform));
-            popupPanel.transform.SetParent(popupsCanvasObject.transform, false);
+            popupPanel.transform.SetParent(popupsCanvas.transform, false);
             StretchRect(popupPanel.GetComponent<RectTransform>());
 
             Button backButton = CreateButton(
@@ -1284,6 +1291,38 @@ namespace LearningArchitect.EditorTools
             playerIframeHud = CreatePlayerIframeHud(hudCanvasObject.transform);
             playerBuffHud = CreatePlayerBuffHud(hudCanvasObject.transform);
             hudDynamicRoot = hudCanvasObject.transform;
+            popupsCanvasObject = popupsCanvas;
+        }
+
+        private static BackendApiConfig EnsureBackendApiConfigAsset()
+        {
+            BackendApiConfig existing = AssetDatabase.LoadAssetAtPath<BackendApiConfig>(BackendApiConfigPath);
+            if (existing != null)
+                return existing;
+
+            EnsureFolder("Assets/Content/Modules/InterviewArena", "Data");
+            BackendApiConfig asset = ScriptableObject.CreateInstance<BackendApiConfig>();
+            AssetDatabase.CreateAsset(asset, BackendApiConfigPath);
+            return asset;
+        }
+
+        private static InterviewArenaOnlineFlowController WireOnlineFlow(
+            Transform popupsCanvas,
+            InterviewArenaRuntimeContext context,
+            BackendApiConfig backendConfig)
+        {
+            GameObject host = new GameObject("InterviewArenaOnlineFlow", typeof(RectTransform), typeof(InterviewArenaOnlineFlowController));
+            host.transform.SetParent(popupsCanvas, false);
+            RectTransform rect = host.GetComponent<RectTransform>();
+            StretchRect(rect);
+
+            InterviewArenaOnlineFlowController flow = host.GetComponent<InterviewArenaOnlineFlowController>();
+            SerializedObject serialized = new SerializedObject(flow);
+            serialized.FindProperty("context").objectReferenceValue = context;
+            serialized.FindProperty("backendConfig").objectReferenceValue = backendConfig;
+            serialized.FindProperty("panelRoot").objectReferenceValue = rect;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return flow;
         }
 
         private static PlayerBuffHud CreatePlayerBuffHud(Transform canvasParent)

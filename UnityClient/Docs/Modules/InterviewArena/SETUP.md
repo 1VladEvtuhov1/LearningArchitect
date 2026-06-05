@@ -29,6 +29,24 @@ One-time steps after pulling the repo:
 
 Cyan disc — **+35% move speed** for 10s. Orange disc — **+45% melee damage** for 10s. Hold **E** ~0.5s while standing in the pickup trigger.
 
+## Online flow (MVP2)
+
+When `InterviewArena_BackendApiConfig` has **Use Online Flow** enabled, the Arena scene shows a login overlay before gameplay:
+
+1. Start backend: see `Backend/README.md` (`dotnet run` → `http://localhost:5000`).
+2. Play **Interview Arena** scene (or enter from showcase dock).
+3. **Login** with any username (3–16 chars) → **Lobby browser** → create/join lobby → **Ready** → host **Start Match** → arena.
+4. **Skip Offline** / **Enter Arena** bypass backend and jump straight to local gameplay.
+
+Config asset: `Assets/Content/Modules/InterviewArena/Data/InterviewArena_BackendApiConfig.asset` (created by **Setup Complete**). Script: `Runtime/Net/BackendApiConfig.cs`.
+
+| Piece | Location |
+|-------|----------|
+| HTTP client | `Runtime/Net/UnityWebRequestBackendApiClient.cs` |
+| Auth / lobby services | `Runtime/Services/AuthService.cs`, `LobbyService.cs` |
+| Session (PlayerPrefs) | `Runtime/Services/SessionStorage.cs` |
+| Online UI overlay | `Runtime/UI/InterviewArenaOnlineFlowController.cs` |
+
 ## Player authoring (no runtime spawn)
 
 MVP1 expects a **prefab + scene instance**, not `CreatePrimitive` at runtime:
@@ -52,4 +70,6 @@ See **`SCENE_COMPOSITION.md`** — hierarchy (`Level` / `Gameplay` / `Actors` / 
 | Hub button | `InterviewArenaLaunchDock` |
 | Arena scene root | `InterviewArenaBootstrap` |
 | Arena HUD | `InterviewArenaSceneUI` |
+| Online flow overlay | `InterviewArenaOnlineFlowController` |
+| Backend config | `Data/InterviewArena_BackendApiConfig.asset` |
 | Player prefab | `Prefabs/InterviewArenaPlayer.prefab` (authoring) |

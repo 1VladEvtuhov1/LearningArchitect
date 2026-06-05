@@ -1,10 +1,14 @@
 # API Contract (Draft)
 
-Product-level API summary. **Not implemented** in `Backend/` yet.
+Product-level API summary. **Auth MVP** in `Backend/src/ExtractionRpg.Api/`.
 
 Canonical detailed draft: `UnityClient/Docs/Modules/InterviewArena/docs/09_SERVER_API_DRAFT.md`.
 
-Base URL (local): `http://localhost:5000` (TBD when API project is created).
+Base URL (local): `http://localhost:5000`
+
+Health: `GET /health`, `GET /health/ready` (Postgres when `docker compose` is up).
+
+**Implemented:** auth, profile, lobby list/create/join/ready/**start** (in-memory match record).
 
 ## Auth
 
@@ -51,6 +55,19 @@ Join lobby.
 
 Set ready flag.
 
+### `POST /api/lobbies/{lobbyId}/start`
+
+Host-only. All members must be ready. Response:
+
+```json
+{
+  "matchId": "match_100",
+  "connectUrl": "wss://localhost:5001/matches/match_100"
+}
+```
+
+Errors: `HOST_ONLY`, `PLAYER_NOT_READY`, `MATCH_ALREADY_STARTED`.
+
 ## Match
 
 ### `POST /api/matches/start`
@@ -79,5 +96,5 @@ Lobby presence and match events — see `UnityClient/Docs/Modules/InterviewArena
 ## Implementation Notes
 
 - Pin-code login may replace or supplement username login; update this doc when chosen.
-- JWT vs opaque session tokens — decide in first backend milestone.
-- Do not implement endpoints in the migration PR; scaffold only under `Backend/`.
+- Session tokens are **opaque** (server-side), not JWT — see `Docs/Decisions.md` D-WS-005.
+- Users/sessions are **in-memory** until PostgreSQL persistence lands (MVP3+).

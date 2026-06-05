@@ -29,9 +29,15 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private PlayerIframeHud playerIframeHud;
         [SerializeField] private PlayerBuffHud playerBuffHud;
 
+        [Header("Online")]
+        [SerializeField] private BackendApiConfig backendConfig;
+        [SerializeField] private InterviewArenaOnlineFlowController onlineFlow;
+
         private GameStateMachine stateMachine;
 
         public GameStateMachine StateMachine => stateMachine;
+        public BackendApiConfig BackendConfig => backendConfig;
+        public InterviewArenaOnlineFlowController OnlineFlow => onlineFlow;
         public PlayerConfig PlayerConfig => playerConfig;
         public PlayerMotor Player => player;
         public Transform SpawnPoint => spawnPoint;
@@ -44,7 +50,19 @@ namespace LearningArchitect.Modules.InterviewArena
         private void Awake()
         {
             stateMachine = new GameStateMachine();
-            stateMachine.Enter(GameState.LocalArena);
+            stateMachine.Enter(GameState.Boot);
+        }
+
+        public bool ShouldDeferGameplayWire()
+        {
+            if (backendConfig == null || !backendConfig.UseOnlineFlow)
+                return false;
+
+            InterviewArenaOnlineFlowController flow = onlineFlow;
+            if (flow == null)
+                flow = GetComponentInChildren<InterviewArenaOnlineFlowController>(true);
+
+            return flow != null;
         }
 
         public Result TryWirePlayerAndCamera()

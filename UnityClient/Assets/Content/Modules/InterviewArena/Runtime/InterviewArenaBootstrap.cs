@@ -14,6 +14,9 @@ namespace LearningArchitect.Modules.InterviewArena
         private void Awake()
         {
             context = context != null ? context : GetComponent<InterviewArenaRuntimeContext>();
+            if (context.ShouldDeferGameplayWire())
+                return;
+
             Result wireResult = context.TryWirePlayerAndCamera();
             if (!wireResult.Succeeded)
                 Debug.LogError("[InterviewArena] " + wireResult.Error, context);
