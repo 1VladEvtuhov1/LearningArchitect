@@ -1,6 +1,7 @@
 {
   "name": "LearningArchitect.Editor",
   "references": [
+    "LearningArchitect.Shared",
     "LearningArchitect.Showcase",
     "LearningArchitect.Modules.Animation3D",
     "LearningArchitect.Modules.InterviewArena",
