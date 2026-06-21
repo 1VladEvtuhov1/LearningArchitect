@@ -1,7 +1,8 @@
 {
   "name": "LearningArchitect.Modules.InterviewArena.Tests.Editor",
   "references": [
-    "LearningArchitect.Modules.InterviewArena"
+    "LearningArchitect.Modules.InterviewArena",
+    "LearningArchitect.Shared"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"
