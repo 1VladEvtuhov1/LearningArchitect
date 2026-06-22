@@ -1,5 +1,6 @@
 using System;
 using LearningArchitect.Core;
+using LearningArchitect.Shared.Settings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -268,7 +269,11 @@ namespace LearningArchitect.UI
             Instance = this;
             if (!initialized)
             {
-                currentLanguage = (ShowcaseLanguage)PlayerPrefs.GetInt(PlayerPrefsKey, (int)currentLanguage);
+                GameSettings.EnsureLoaded();
+                currentLanguage = (ShowcaseLanguage)GameSettings.Current.language;
+                if (!JsonFileGameSettingsStore.Exists())
+                    currentLanguage = (ShowcaseLanguage)PlayerPrefs.GetInt(PlayerPrefsKey, (int)currentLanguage);
+
                 ValidateReferences();
                 initialized = true;
             }
@@ -370,6 +375,7 @@ namespace LearningArchitect.UI
         private void ApplyLanguage(ShowcaseLanguage language, bool raiseEvent)
         {
             currentLanguage = language;
+            GameSettings.SetLanguage((int)currentLanguage);
             PlayerPrefs.SetInt(PlayerPrefsKey, (int)currentLanguage);
             PlayerPrefs.Save();
             ApplyChromeTexts();

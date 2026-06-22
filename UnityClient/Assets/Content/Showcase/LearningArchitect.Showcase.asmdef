@@ -1,6 +1,7 @@
 {
   "name": "LearningArchitect.Showcase",
   "references": [
+    "LearningArchitect.Shared",
     "UnityEngine.UI",
     "Unity.TextMeshPro",
     "Unity.InputSystem",
