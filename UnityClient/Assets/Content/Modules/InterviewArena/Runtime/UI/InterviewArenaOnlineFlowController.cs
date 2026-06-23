@@ -1,6 +1,7 @@
 using System.Text;
 using LearningArchitect.Modules.InterviewArena.Net;
 using LearningArchitect.Modules.InterviewArena.Services;
+using LearningArchitect.Shared.Settings;
 using LearningArchitect.UI;
 using TMPro;
 using UnityEngine;
@@ -43,14 +44,33 @@ namespace LearningArchitect.Modules.InterviewArena
                 return;
 
             _stateMachine = context.StateMachine;
+            if (_stateMachine == null)
+            {
+                Debug.LogError("[InterviewArena] Online flow requires InterviewArenaRuntimeContext.StateMachine.", this);
+                return;
+            }
+
             _stateMachine.StateChanged += HandleStateChanged;
         }
 
         private void Start()
         {
+            if (_stateMachine == null && context != null)
+            {
+                _stateMachine = context.StateMachine;
+                if (_stateMachine != null)
+                    _stateMachine.StateChanged += HandleStateChanged;
+            }
+
             if (context == null || backendConfig == null || !backendConfig.UseOnlineFlow)
             {
                 EnterLocalArenaImmediate();
+                return;
+            }
+
+            if (_stateMachine == null)
+            {
+                Debug.LogError("[InterviewArena] Online flow cannot start without StateMachine.", this);
                 return;
             }
 
@@ -63,6 +83,7 @@ namespace LearningArchitect.Modules.InterviewArena
 
             EnsurePanelRoot();
             BuildPanels();
+            PrefillUsernameFromSettings();
             SetGameplayActive(false);
             _stateMachine.Enter(GameState.Login);
             ShowPanel(_loginPanel);
@@ -101,6 +122,17 @@ namespace LearningArchitect.Modules.InterviewArena
             root.transform.SetParent(parent, false);
             panelRoot = root.GetComponent<RectTransform>();
             Stretch(panelRoot);
+        }
+
+        private void PrefillUsernameFromSettings()
+        {
+            if (_usernameInput == null)
+                return;
+
+            GameSettings.EnsureLoaded();
+            string lastUsername = GameSettings.Current.lastUsername;
+            if (!string.IsNullOrWhiteSpace(lastUsername))
+                _usernameInput.text = lastUsername;
         }
 
         private void BuildPanels()

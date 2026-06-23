@@ -1,6 +1,8 @@
 {
   "name": "LearningArchitect.Modules.InterviewArena",
   "references": [
+    "LearningArchitect.Modules.Animation3D",
+    "LearningArchitect.Shared",
     "LearningArchitect.Showcase",
     "Unity.InputSystem",
     "Unity.TextMeshPro",

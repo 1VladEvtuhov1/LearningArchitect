@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LearningArchitect.Modules.InterviewArena.Net;
+using LearningArchitect.Shared.Settings;
 
 namespace LearningArchitect.Modules.InterviewArena.Services
 {
@@ -22,6 +23,7 @@ namespace LearningArchitect.Modules.InterviewArena.Services
                 result.Value.sessionToken,
                 result.Value.userId,
                 result.Value.username);
+            GameSettings.SetLastUsername(result.Value.username);
 
             return result;
         }
