@@ -46,22 +46,53 @@ namespace LearningArchitect.Modules.Animation3D
             Vector3 flatVelocity = velocity;
             flatVelocity.y = 0f;
 
-            Vector3 desiredForward = flatVelocity.sqrMagnitude > 0.0001f
-                ? flatVelocity.normalized
-                : smoothedForward;
+            bool usesDirectionalLocomotion = profile != null &&
+                !string.IsNullOrWhiteSpace(profile.MoveXParameter);
 
-            float turnAmount = 0f;
-            if (smoothedForward.sqrMagnitude > 0.0001f && desiredForward.sqrMagnitude > 0.0001f)
-                turnAmount = Mathf.Clamp(Vector3.SignedAngle(smoothedForward, desiredForward, Vector3.up) / 90f, -1f, 1f);
+            if (!usesDirectionalLocomotion)
+            {
+                Vector3 desiredForward = flatVelocity.sqrMagnitude > 0.0001f
+                    ? flatVelocity.normalized
+                    : smoothedForward;
 
-            float turnResponsiveness = profile == null ? 8f : profile.TurnResponsiveness;
-            float smoothing = 1f - Mathf.Exp(-turnResponsiveness * Mathf.Max(0f, deltaTime));
-            smoothedForward = Vector3.Slerp(smoothedForward, desiredForward, smoothing);
+                float turnAmount = 0f;
+                if (smoothedForward.sqrMagnitude > 0.0001f && desiredForward.sqrMagnitude > 0.0001f)
+                    turnAmount = Mathf.Clamp(Vector3.SignedAngle(smoothedForward, desiredForward, Vector3.up) / 90f, -1f, 1f);
 
-            if (smoothedForward.sqrMagnitude > 0.0001f)
-                transform.localRotation = Quaternion.LookRotation(smoothedForward, Vector3.up);
+                float turnResponsiveness = profile == null ? 8f : profile.TurnResponsiveness;
+                float smoothing = 1f - Mathf.Exp(-turnResponsiveness * Mathf.Max(0f, deltaTime));
+                smoothedForward = Vector3.Slerp(smoothedForward, desiredForward, smoothing);
 
-            ApplyAnimatorParameters(profile, flatVelocity.magnitude, turnAmount, deltaTime, isShooting);
+                if (smoothedForward.sqrMagnitude > 0.0001f)
+                    transform.localRotation = Quaternion.LookRotation(smoothedForward, Vector3.up);
+
+                ApplyAnimatorParameters(profile, flatVelocity.magnitude, turnAmount, deltaTime, isShooting);
+                return;
+            }
+
+            HumanoidLocomotionAnimation.ResolveLocalMove(
+                flatVelocity,
+                transform.forward,
+                profile.SpeedNormalization,
+                out float moveX,
+                out float moveY,
+                out float speed01);
+
+            float turn = 0f;
+            if (flatVelocity.sqrMagnitude > 0.01f)
+            {
+                Vector3 forward = transform.forward;
+                forward.y = 0f;
+                if (forward.sqrMagnitude > 0.0001f)
+                {
+                    turn = Mathf.Clamp(
+                        Vector3.SignedAngle(forward.normalized, flatVelocity.normalized, Vector3.up) / 90f,
+                        -1f,
+                        1f);
+                }
+            }
+
+            ApplyAnimatorParameters(profile, speed01, moveX, moveY, turn, deltaTime, isShooting);
         }
 
         private void ResolveReferences()
@@ -89,22 +120,39 @@ namespace LearningArchitect.Modules.Animation3D
             animator.cullingMode = profile.CullingMode;
         }
 
-        private void ApplyAnimatorParameters(HumanoidAnimationProfileSO profile, float speed, float turnAmount, float deltaTime, bool isShooting)
+        private void ApplyAnimatorParameters(
+            HumanoidAnimationProfileSO profile,
+            float speed01,
+            float moveX,
+            float moveY,
+            float turnAmount,
+            float deltaTime,
+            bool isShooting)
         {
             if (animator == null || profile == null)
                 return;
 
-            float speed01 = Mathf.Clamp01(speed / profile.SpeedNormalization);
             float dampTime = profile.ParameterDampTime;
             bool isMoving = speed01 >= profile.MovingThreshold;
 
             SetFloat(profile.SpeedParameter, speed01, dampTime, deltaTime);
-            SetFloat(profile.MoveXParameter, 0f, dampTime, deltaTime);
-            SetFloat(profile.MoveYParameter, speed01, dampTime, deltaTime);
+            SetFloat(profile.MoveXParameter, moveX, dampTime, deltaTime);
+            SetFloat(profile.MoveYParameter, moveY, dampTime, deltaTime);
             SetFloat(profile.TurnParameter, turnAmount, dampTime, deltaTime);
             SetBool(profile.MovingParameter, isMoving);
             SetBool(profile.GroundedParameter, true);
             SetBool(profile.ShootingParameter, isShooting);
+        }
+
+        private void ApplyAnimatorParameters(
+            HumanoidAnimationProfileSO profile,
+            float speed,
+            float turnAmount,
+            float deltaTime,
+            bool isShooting)
+        {
+            float speed01 = Mathf.Clamp01(speed / profile.SpeedNormalization);
+            ApplyAnimatorParameters(profile, speed01, 0f, speed01, turnAmount, deltaTime, isShooting);
         }
 
         private void SetFloat(string parameterName, float value, float dampTime, float deltaTime)

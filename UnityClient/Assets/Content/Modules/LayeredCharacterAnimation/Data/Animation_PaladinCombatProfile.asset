@@ -15,13 +15,13 @@ MonoBehaviour:
   actorPrefab: {fileID: 4521194826964460208, guid: b8749b9ab2f603241aa689143d6e402a, type: 3}
   avatar: {fileID: 9000000, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
   animatorController: {fileID: 9100000, guid: f143d232332b8dd47864b4059365f869, type: 2}
-  idleClip: {fileID: -203655887218126122, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
-  locomotionClip: {fileID: -203655887218126122, guid: 49a02a90a2270454eaae628f8b5de95a, type: 3}
+  idleClip: {fileID: -203655887218126122, guid: 797039c20f81c24478bb52f87cc17835, type: 3}
+  locomotionClip: {fileID: -203655887218126122, guid: 522659f8e2ef9fa499d9120a808e14c3, type: 3}
   turnLeftClip: {fileID: 0}
   turnRightClip: {fileID: 0}
   jumpClip: {fileID: 0}
   speedParameter: Speed
-  moveXParameter: 
+  moveXParameter: MoveX
   moveYParameter: MoveY
   turnParameter: Turn
   movingParameter: IsMoving
