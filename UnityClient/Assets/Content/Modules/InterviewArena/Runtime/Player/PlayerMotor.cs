@@ -18,6 +18,8 @@ namespace LearningArchitect.Modules.InterviewArena
         private GroundDetector ground;
         private PlayerBuffController buffController;
         private CapsuleCollider capsule;
+        private ArenaHoverMotor hoverMotor;
+        private ArenaCursorAim cursorAim;
         private float coyoteTimer;
         private float dashCooldownTimer;
         private float dashTimer;
@@ -39,6 +41,8 @@ namespace LearningArchitect.Modules.InterviewArena
             ground = GetComponent<GroundDetector>();
             buffController = GetComponent<PlayerBuffController>();
             capsule = GetComponent<CapsuleCollider>();
+            hoverMotor = GetComponent<ArenaHoverMotor>();
+            cursorAim = GetComponent<ArenaCursorAim>();
 
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.constraints = RigidbodyConstraints.FreezeRotation;
@@ -54,6 +58,9 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             arenaFloor = floorCollider;
             loggedMissingArenaFloor = false;
+
+            if (hoverMotor != null)
+                hoverMotor.ConfigureArenaFloor(floorCollider);
         }
 
         public void SnapToSpawnPose(Vector3 planarPosition, Quaternion rotation, Collider floorCollider = null)
@@ -91,6 +98,21 @@ namespace LearningArchitect.Modules.InterviewArena
                 InterviewArenaAuthoringLog.MissingReference(this, nameof(movementCamera));
             if (ground != null && config != null && viewPivot != null)
                 ground.ApplyConfig(config, viewPivot);
+
+            if (hoverMotor != null)
+            {
+                Transform anchor = hoverMotor.transform.Find("HoverAnchor");
+                hoverMotor.ApplyConfig(
+                    config,
+                    camera,
+                    anchor != null ? anchor : viewPivot);
+            }
+
+            if (cursorAim != null)
+                cursorAim.ApplyConfig(config, camera, ViewPivot);
+
+            if (config != null && config.UseArenaHover)
+                body.useGravity = false;
         }
 
         private void Update()
@@ -109,6 +131,17 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             if (config == null)
                 return;
+
+            if (UsesArenaHover())
+            {
+                if (dashTimer > 0f)
+                {
+                    ApplyDashVelocity();
+                    ApplyWallSlide(true);
+                }
+
+                return;
+            }
 
             if (input.ConsumeJump() && coyoteTimer > 0f)
                 Jump();
@@ -198,6 +231,8 @@ namespace LearningArchitect.Modules.InterviewArena
         private void BeginDash(Vector2 moveInput)
         {
             dashDirection = GetCameraRelativeDirection(moveInput);
+            if (dashDirection.sqrMagnitude < 0.01f && cursorAim != null)
+                dashDirection = cursorAim.AimDirection;
             if (dashDirection.sqrMagnitude < 0.01f)
                 dashDirection = viewPivot.forward;
 
@@ -350,6 +385,11 @@ namespace LearningArchitect.Modules.InterviewArena
                 return 0.35f;
 
             return Mathf.Max(0.35f, capsule.radius * capsule.transform.lossyScale.x + 0.1f);
+        }
+
+        private bool UsesArenaHover()
+        {
+            return config != null && config.UseArenaHover && hoverMotor != null && hoverMotor.enabled;
         }
     }
 }

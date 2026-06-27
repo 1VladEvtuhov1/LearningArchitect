@@ -37,6 +37,22 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private float groundCheckDistance = 0.2f;
         [SerializeField] private LayerMask groundMask = ~0;
 
+        [Header("Arena Hover (Battlerite-style)")]
+        [SerializeField] private bool useArenaHover = true;
+        [SerializeField] private float hoverHeight = 0.14f;
+        [SerializeField] private float hoverSpring = 120f;
+        [SerializeField] private float hoverDamper = 18f;
+        [SerializeField] private float hoverGravity = 34f;
+        [SerializeField] private float maxVerticalSpeed = 12f;
+        [SerializeField] private float probeRadius = 0.26f;
+        [SerializeField] private float probeExtraDistance = 0.55f;
+        [SerializeField] private float forwardProbeOffset = 0.45f;
+        [SerializeField] private float sideProbeOffset = 0.25f;
+        [SerializeField] private float maxStepHeight = 0.42f;
+        [SerializeField] private float inputDeadZone = 0.05f;
+        [SerializeField] private float aimTurnSpeed = 900f;
+
+        public bool UseArenaHover => useArenaHover;
         public float MoveSpeed => moveSpeed;
         public float GroundAcceleration => groundAcceleration;
         public float GroundDeceleration => groundDeceleration;
@@ -57,5 +73,17 @@ namespace LearningArchitect.Modules.InterviewArena
         public float GroundCheckRadius => groundCheckRadius;
         public float GroundCheckDistance => groundCheckDistance;
         public LayerMask GroundMask => groundMask;
+        public float HoverHeight => hoverHeight;
+        public float HoverSpring => hoverSpring;
+        public float HoverDamper => hoverDamper;
+        public float HoverGravity => hoverGravity;
+        public float MaxVerticalSpeed => maxVerticalSpeed;
+        public float ProbeRadius => probeRadius;
+        public float ProbeExtraDistance => probeExtraDistance;
+        public float ForwardProbeOffset => forwardProbeOffset;
+        public float SideProbeOffset => sideProbeOffset;
+        public float MaxStepHeight => maxStepHeight;
+        public float InputDeadZone => inputDeadZone;
+        public float AimTurnSpeed => aimTurnSpeed;
     }
 }
