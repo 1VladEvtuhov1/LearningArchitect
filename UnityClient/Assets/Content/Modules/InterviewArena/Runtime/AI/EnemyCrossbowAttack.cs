@@ -11,9 +11,11 @@ namespace LearningArchitect.Modules.InterviewArena
 
         private CrossbowWeaponConfig config;
         private float cooldownTimer;
+        private float shootAnimTimer;
 
         public Transform AimOrigin => aimOrigin != null ? aimOrigin : transform;
         public bool IsBusy => cooldownTimer > 0f;
+        public bool IsShootingAnimActive => shootAnimTimer > 0f;
 
         public void ApplyConfig(CrossbowWeaponConfig weaponConfig, Transform origin, ProjectilePool pool, CombatTeam team)
         {
@@ -45,12 +47,15 @@ namespace LearningArchitect.Modules.InterviewArena
                 return false;
 
             cooldownTimer = config.Cooldown;
+            shootAnimTimer = 0.35f;
             return true;
         }
 
         private void Update()
         {
             cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
+            if (shootAnimTimer > 0f)
+                shootAnimTimer = Mathf.Max(0f, shootAnimTimer - Time.deltaTime);
         }
     }
 }
