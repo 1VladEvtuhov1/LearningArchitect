@@ -33,7 +33,7 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private BackendApiConfig backendConfig;
         [SerializeField] private InterviewArenaOnlineFlowController onlineFlow;
 
-        private GameStateMachine stateMachine;
+        private GameStateMachine stateMachine = new GameStateMachine();
 
         public GameStateMachine StateMachine => stateMachine;
         public BackendApiConfig BackendConfig => backendConfig;
