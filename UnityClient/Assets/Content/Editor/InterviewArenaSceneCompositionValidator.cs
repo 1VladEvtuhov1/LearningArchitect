@@ -63,6 +63,7 @@ namespace LearningArchitect.EditorTools
                 ValidateBootstrap(scene, report);
                 ValidateCombatServices(scene, report);
                 ValidatePlayerPool(scene, report);
+                ValidatePlayerLocomotionWiring(scene, report);
                 ValidateRuntimePlayersSection(scene, report);
                 ValidateRuntimeProjectiles(scene, report);
                 ValidateUiCanvases(scene, report);
@@ -226,6 +227,62 @@ namespace LearningArchitect.EditorTools
                     $"Projectile '{projectile.name}' is not under Runtime/Projectiles.",
                     projectile);
             }
+        }
+
+        private static void ValidatePlayerLocomotionWiring(Scene scene, SceneCompositionReport report)
+        {
+            PlayerMotor player = Object.FindFirstObjectByType<PlayerMotor>();
+            if (player == null)
+                return;
+
+            SerializedObject motorSerialized = new SerializedObject(player);
+            if (motorSerialized.FindProperty("movementCamera").objectReferenceValue == null)
+                report.AddError("PlayerMotor.movementCamera is not assigned.", player);
+
+            if (motorSerialized.FindProperty("viewPivot").objectReferenceValue == null)
+                report.AddError("PlayerMotor.viewPivot is not assigned.", player);
+
+            ArenaHoverMotor hover = player.GetComponent<ArenaHoverMotor>();
+            if (hover == null)
+            {
+                report.AddError("Player is missing ArenaHoverMotor.", player);
+                return;
+            }
+
+            SerializedObject hoverSerialized = new SerializedObject(hover);
+            if (hoverSerialized.FindProperty("hoverAnchor").objectReferenceValue == null)
+                report.AddError("ArenaHoverMotor.hoverAnchor is not assigned.", hover);
+
+            if (hoverSerialized.FindProperty("inputReader").objectReferenceValue == null)
+                report.AddError("ArenaHoverMotor.inputReader is not assigned.", hover);
+
+            ArenaCursorAim aim = player.GetComponent<ArenaCursorAim>();
+            if (aim == null)
+            {
+                report.AddError("Player is missing ArenaCursorAim.", player);
+                return;
+            }
+
+            SerializedObject aimSerialized = new SerializedObject(aim);
+            if (aimSerialized.FindProperty("aimPivot").objectReferenceValue == null)
+                report.AddError("ArenaCursorAim.aimPivot is not assigned.", aim);
+
+            if (aimSerialized.FindProperty("targetCamera").objectReferenceValue == null)
+                report.AddError("ArenaCursorAim.targetCamera is not assigned.", aim);
+
+            InterviewArenaRuntimeContext context = Object.FindFirstObjectByType<InterviewArenaRuntimeContext>();
+            if (context == null)
+                return;
+
+            SerializedObject contextSerialized = new SerializedObject(context);
+            InterviewArenaCameraFollow follow =
+                contextSerialized.FindProperty("cameraFollow").objectReferenceValue as InterviewArenaCameraFollow;
+            if (follow == null)
+                return;
+
+            SerializedObject followSerialized = new SerializedObject(follow);
+            if (followSerialized.FindProperty("target").objectReferenceValue == null)
+                report.AddError("InterviewArenaCameraFollow.target is not assigned.", follow);
         }
 
         private static void ValidateRuntimePlayersSection(Scene scene, SceneCompositionReport report)

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 2020790043256380411}
   - component: {fileID: 8318304734302113417}
   - component: {fileID: 2523350694490343182}
+  - component: {fileID: 8604396105153609389}
   m_Layer: 8
   m_Name: InterviewArena_HollowSoldier
   m_TagString: Untagged
@@ -41,6 +42,7 @@ Transform:
   m_LocalScale: {x: 0.92, y: 1.1, z: 0.92}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1055929265854150525}
   - {fileID: 8142066970949843619}
   - {fileID: 2581770178850441436}
   m_Father: {fileID: 0}
@@ -83,7 +85,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 92014944704150010}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -268,6 +270,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.EnemyBrain
   config: {fileID: 11400000, guid: 9a81ba6b861bb6845877c1b66683befe, type: 2}
   facingPivot: {fileID: 8142066970949843619}
+--- !u!114 &8604396105153609389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92014944704150010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a54569b1e69c2e478ad43ac55bafa82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.ArenaHumanoidVisual
+  profile: {fileID: 11400000, guid: 07ba9fa5137873946b2f25ec4dfe40a1, type: 2}
+  visualAnchor: {fileID: 1055929265854150525}
+  localPosition: {x: 0, y: 0, z: 0}
+  localEulerAngles: {x: 0, y: 0, z: 0}
+  localScale: {x: 1, y: 1, z: 1}
+  hideCapsuleRenderer: 1
 --- !u!1 &279885640030795734
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,6 +627,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3418062408334618634}
+  m_Father: {fileID: 7918604856038799027}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3163514371160280270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1055929265854150525}
+  m_Layer: 0
+  m_Name: VisualAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1055929265854150525
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3163514371160280270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 7918604856038799027}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4479550605133921961

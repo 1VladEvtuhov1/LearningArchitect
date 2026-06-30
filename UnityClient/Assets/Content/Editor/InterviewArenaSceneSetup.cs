@@ -1,5 +1,7 @@
 using LearningArchitect.Core;
+using LearningArchitect.Modules.Animation3D;
 using LearningArchitect.Modules.InterviewArena;
+using LearningArchitect.Shared.Events;
 using LearningArchitect.UI;
 using System;
 using TMPro;
@@ -28,6 +30,9 @@ namespace LearningArchitect.EditorTools
         private const string BuffSpeedConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BuffSpeed.asset";
         private const string BuffMeleeConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BuffMelee.asset";
         private const string BackendApiConfigPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_BackendApiConfig.asset";
+        private const string RunCompletedEventPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_RunCompletedEvent.asset";
+        private const string PaladinCombatProfilePath =
+            "Assets/Content/Modules/LayeredCharacterAnimation/Data/Animation_PaladinCombatProfile.asset";
 
         [MenuItem("Learning Architect/Interview Arena/Setup Interview Arena Scenes")]
         public static void SetupAll()
@@ -91,6 +96,12 @@ namespace LearningArchitect.EditorTools
             InterviewArenaRuntimeContext context = bootstrapObject.AddComponent<InterviewArenaRuntimeContext>();
             bootstrapObject.AddComponent<InterviewArenaBootstrap>();
             bootstrapObject.AddComponent<InterviewArenaMatchReporter>();
+            GameEvent runCompletedEvent = EnsureRunCompletedGameEventAsset();
+            InterviewArenaRunCompletedEventBridge runEventBridge =
+                bootstrapObject.AddComponent<InterviewArenaRunCompletedEventBridge>();
+            SerializedObject runEventBridgeSerialized = new SerializedObject(runEventBridge);
+            runEventBridgeSerialized.FindProperty("runCompletedEvent").objectReferenceValue = runCompletedEvent;
+            runEventBridgeSerialized.ApplyModifiedPropertiesWithoutUndo();
 
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem));
             AddUiInputModule(eventSystem);
@@ -159,9 +170,19 @@ namespace LearningArchitect.EditorTools
                 body = root.AddComponent<Rigidbody>();
             body.mass = 1f;
             body.angularDamping = 0.05f;
+            body.useGravity = false;
             body.constraints = RigidbodyConstraints.FreezeRotation;
             body.collisionDetectionMode = CollisionDetectionMode.Continuous;
             ApplyLocomotionMaterial(root);
+            DisableCapsuleMeshRenderer(root);
+
+            GameObject hoverAnchor = new GameObject("HoverAnchor");
+            hoverAnchor.transform.SetParent(root.transform, false);
+            hoverAnchor.transform.localPosition = new Vector3(0f, 0.05f, 0f);
+
+            GameObject visualAnchor = new GameObject("VisualAnchor");
+            visualAnchor.transform.SetParent(root.transform, false);
+            visualAnchor.transform.localPosition = new Vector3(0f, -1f, 0f);
 
             GameObject viewPivot = new GameObject("ViewPivot");
             viewPivot.transform.SetParent(root.transform, false);
@@ -190,11 +211,15 @@ namespace LearningArchitect.EditorTools
             root.AddComponent<PlayerBuffController>();
             root.AddComponent<PlayerBuffPickupInteractor>();
             root.AddComponent<PlayerBuffVfx>();
+            WireArenaHumanoidVisual(root, visualAnchor.transform, EnsurePaladinCombatProfile());
+            WirePlayerSupportReferences(root);
 
             SerializedObject motorSerialized = new SerializedObject(motor);
             motorSerialized.FindProperty("config").objectReferenceValue = config;
             motorSerialized.FindProperty("viewPivot").objectReferenceValue = viewPivot.transform;
             motorSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+            WirePlayerLocomotionReferences(root, config, null, null);
 
             SerializedObject groundSerialized = new SerializedObject(ground);
             groundSerialized.FindProperty("config").objectReferenceValue = config;
@@ -261,14 +286,32 @@ namespace LearningArchitect.EditorTools
             if (spawn == null)
                 spawn = context.transform;
 
+            RemoveExistingScenePlayer(context);
+
+            PlayerConfig config = context.PlayerConfig != null
+                ? context.PlayerConfig
+                : EnsurePlayerConfigAsset();
+
             GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
             StripEmbeddedPlayerBoltPool(instance);
             ParentPlayerUnderActorsRoot(instance, context);
 
             Collider floor = ResolvePreviewPlatformCollider(context);
+            if (floor == null)
+            {
+                SerializedObject contextSerialized = new SerializedObject(context);
+                floor = contextSerialized.FindProperty("arenaFloorCollider").objectReferenceValue as Collider;
+            }
+
+            Camera arenaCamera = ResolveSceneArenaCamera(context);
+            WirePlayerLocomotionReferences(instance, config, arenaCamera, floor);
+            WirePlayerSupportReferences(instance);
+
             PlayerMotor motor = instance.GetComponent<PlayerMotor>();
             if (motor != null)
                 motor.SnapToSpawnPose(spawn.position, spawn.rotation, floor);
+
+            WireCameraFollowTarget(context, motor);
 
             SerializedObject serializedContext = new SerializedObject(context);
             serializedContext.FindProperty("player").objectReferenceValue = motor;
@@ -300,6 +343,8 @@ namespace LearningArchitect.EditorTools
                 hudSerialized.FindProperty("playerHealth").objectReferenceValue = playerHealth;
                 hudSerialized.ApplyModifiedPropertiesWithoutUndo();
             }
+
+            MarkPlayerInstanceWiringDirty(instance);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -487,7 +532,11 @@ namespace LearningArchitect.EditorTools
 
             Renderer renderer = root.GetComponent<Renderer>();
             if (renderer != null)
-                renderer.sharedMaterial.color = new Color(0.16f, 0.12f, 0.2f, 1f);
+                renderer.enabled = false;
+
+            GameObject visualAnchor = new GameObject("VisualAnchor");
+            visualAnchor.transform.SetParent(root.transform, false);
+            visualAnchor.transform.localPosition = new Vector3(0f, -1f, 0f);
 
             GameObject facingPivot = new GameObject("FacingPivot");
             facingPivot.transform.SetParent(root.transform, false);
@@ -514,6 +563,7 @@ namespace LearningArchitect.EditorTools
             respawn.ApplyConfig(config);
             EnemyBrain brain = root.AddComponent<EnemyBrain>();
             brain.ApplyConfig(config, facingPivot.transform);
+            WireArenaHumanoidVisual(root, visualAnchor.transform, EnsurePaladinCombatProfile());
 
             SerializedObject sensorSerialized = new SerializedObject(sensor);
             sensorSerialized.FindProperty("awarenessOrigin").objectReferenceValue = facingPivot.transform;
@@ -793,25 +843,18 @@ namespace LearningArchitect.EditorTools
             if (platform == null)
                 return;
 
-            CapsuleCollider capsule = platform.GetComponent<CapsuleCollider>();
-            if (capsule == null)
-            {
-                MeshCollider meshCollider = platform.GetComponent<MeshCollider>();
-                if (meshCollider != null)
-                    UnityEngine.Object.DestroyImmediate(meshCollider);
+            if (platform.TryGetComponent<CapsuleCollider>(out CapsuleCollider capsule))
+                UnityEngine.Object.DestroyImmediate(capsule);
 
-                BoxCollider boxCollider = platform.GetComponent<BoxCollider>();
-                if (boxCollider != null)
-                    UnityEngine.Object.DestroyImmediate(boxCollider);
+            if (platform.TryGetComponent<MeshCollider>(out MeshCollider meshCollider))
+                UnityEngine.Object.DestroyImmediate(meshCollider);
 
-                capsule = platform.AddComponent<CapsuleCollider>();
-            }
+            if (!platform.TryGetComponent<BoxCollider>(out BoxCollider boxCollider))
+                boxCollider = platform.AddComponent<BoxCollider>();
 
-            capsule.isTrigger = false;
-            capsule.height = 2f;
-            capsule.radius = 0.5f;
-            capsule.direction = 1;
-            capsule.center = Vector3.zero;
+            boxCollider.isTrigger = false;
+            boxCollider.center = Vector3.zero;
+            boxCollider.size = Vector3.one;
             ApplyLocomotionMaterial(platform);
         }
 
@@ -899,10 +942,30 @@ namespace LearningArchitect.EditorTools
             {
                 StripEmbeddedPlayerBoltPool(player.gameObject);
                 ParentPlayerUnderActorsRoot(player.gameObject, context);
+                Collider floor = ResolvePreviewPlatformCollider(context);
+                Camera arenaCamera = ResolveSceneArenaCamera(context);
+                PlayerConfig config = context.PlayerConfig != null
+                    ? context.PlayerConfig
+                    : EnsurePlayerConfigAsset();
+                WirePlayerLocomotionReferences(player.gameObject, config, arenaCamera, floor);
+                WirePlayerSupportReferences(player.gameObject);
+                WireCameraFollowTarget(context, player);
                 combatServices.WirePlayerCrossbow(player);
             }
 
             ReparentDefaultCameraAndLight(roots.Cameras, roots.Lighting, out _);
+
+            Transform levelRoot = roots.Level;
+            Transform platformTransform = levelRoot != null ? levelRoot.Find("Static/PreviewPlatform") : null;
+            if (platformTransform == null && levelRoot != null)
+                platformTransform = levelRoot.Find("PreviewPlatform");
+            if (platformTransform != null)
+            {
+                ConfigurePreviewPlatformCollider(platformTransform.gameObject);
+                serializedContext.FindProperty("arenaFloorCollider").objectReferenceValue =
+                    platformTransform.GetComponent<Collider>();
+            }
+
             serializedContext.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -1293,6 +1356,217 @@ namespace LearningArchitect.EditorTools
             playerBuffHud = CreatePlayerBuffHud(hudCanvasObject.transform);
             hudDynamicRoot = hudCanvasObject.transform;
             popupsCanvasObject = popupsCanvas;
+        }
+
+        private static GameEvent EnsureRunCompletedGameEventAsset()
+        {
+            GameEvent existing = AssetDatabase.LoadAssetAtPath<GameEvent>(RunCompletedEventPath);
+            if (existing != null)
+                return existing;
+
+            EnsureFolder("Assets/Content/Modules/InterviewArena", "Data");
+            GameEvent asset = ScriptableObject.CreateInstance<GameEvent>();
+            AssetDatabase.CreateAsset(asset, RunCompletedEventPath);
+            return asset;
+        }
+
+        private static HumanoidAnimationProfileSO EnsurePaladinCombatProfile()
+        {
+            HumanoidAnimationProfileSO profile =
+                AssetDatabase.LoadAssetAtPath<HumanoidAnimationProfileSO>(PaladinCombatProfilePath);
+            if (profile != null)
+                return profile;
+
+            Debug.LogWarning(
+                "[InterviewArena] Missing Paladin combat profile. "
+                + "Run Learning Architect → Setup Paladin Combat Animation first.");
+            return null;
+        }
+
+        private static void DisableCapsuleMeshRenderer(GameObject root)
+        {
+            if (root == null || !root.TryGetComponent<MeshRenderer>(out MeshRenderer renderer))
+                return;
+
+            renderer.enabled = false;
+        }
+
+        private static void WireArenaHumanoidVisual(
+            GameObject root,
+            Transform visualAnchor,
+            HumanoidAnimationProfileSO profile)
+        {
+            if (root == null || visualAnchor == null || profile == null)
+                return;
+
+            ArenaHumanoidVisual visual = root.GetComponent<ArenaHumanoidVisual>();
+            if (visual == null)
+                visual = root.AddComponent<ArenaHumanoidVisual>();
+
+            SerializedObject serialized = new SerializedObject(visual);
+            serialized.FindProperty("profile").objectReferenceValue = profile;
+            serialized.FindProperty("visualAnchor").objectReferenceValue = visualAnchor;
+            serialized.FindProperty("localPosition").vector3Value = Vector3.zero;
+            serialized.FindProperty("hideCapsuleRenderer").boolValue = true;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void EnsureArenaBattleriteLocomotion(
+            GameObject root,
+            PlayerConfig config,
+            Camera camera = null,
+            Collider arenaFloor = null)
+        {
+            if (root == null || config == null)
+                return;
+
+            Transform hoverAnchor = root.transform.Find("HoverAnchor");
+            if (hoverAnchor == null)
+            {
+                GameObject anchorObject = new GameObject("HoverAnchor");
+                anchorObject.transform.SetParent(root.transform, false);
+                anchorObject.transform.localPosition = new Vector3(0f, 0.05f, 0f);
+                hoverAnchor = anchorObject.transform;
+            }
+
+            PlayerMotor motor = root.GetComponent<PlayerMotor>();
+            Transform viewPivot = motor != null ? motor.ViewPivot : root.transform;
+
+            ArenaHoverMotor hoverMotor = root.GetComponent<ArenaHoverMotor>();
+            if (hoverMotor == null)
+                hoverMotor = root.AddComponent<ArenaHoverMotor>();
+
+            ArenaCursorAim cursorAim = root.GetComponent<ArenaCursorAim>();
+            if (cursorAim == null)
+                cursorAim = root.AddComponent<ArenaCursorAim>();
+
+            PlayerInputReader input = root.GetComponent<PlayerInputReader>();
+            Rigidbody body = root.GetComponent<Rigidbody>();
+            if (body != null)
+            {
+                body.useGravity = false;
+                body.interpolation = RigidbodyInterpolation.Interpolate;
+            }
+
+            SerializedObject hoverSerialized = new SerializedObject(hoverMotor);
+            hoverSerialized.FindProperty("config").objectReferenceValue = config;
+            if (input != null)
+                hoverSerialized.FindProperty("inputReader").objectReferenceValue = input;
+            hoverSerialized.FindProperty("hoverAnchor").objectReferenceValue = hoverAnchor;
+            if (camera != null)
+                hoverSerialized.FindProperty("cameraRoot").objectReferenceValue = camera.transform;
+            if (arenaFloor != null)
+                hoverSerialized.FindProperty("arenaFloor").objectReferenceValue = arenaFloor;
+            hoverSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+            SerializedObject aimSerialized = new SerializedObject(cursorAim);
+            aimSerialized.FindProperty("config").objectReferenceValue = config;
+            aimSerialized.FindProperty("aimPivot").objectReferenceValue = viewPivot;
+            if (camera != null)
+                aimSerialized.FindProperty("targetCamera").objectReferenceValue = camera;
+            aimSerialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void WirePlayerLocomotionReferences(
+            GameObject root,
+            PlayerConfig config,
+            Camera camera,
+            Collider arenaFloor)
+        {
+            if (root == null || config == null)
+                return;
+
+            EnsureArenaBattleriteLocomotion(root, config, camera, arenaFloor);
+
+            PlayerMotor motor = root.GetComponent<PlayerMotor>();
+            if (motor == null)
+                return;
+
+            SerializedObject motorSerialized = new SerializedObject(motor);
+            motorSerialized.FindProperty("config").objectReferenceValue = config;
+            if (camera != null)
+                motorSerialized.FindProperty("movementCamera").objectReferenceValue = camera;
+            if (arenaFloor != null)
+                motorSerialized.FindProperty("arenaFloor").objectReferenceValue = arenaFloor;
+            motorSerialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void WirePlayerSupportReferences(GameObject root)
+        {
+            if (root == null)
+                return;
+
+            Health health = root.GetComponent<Health>();
+            InvulnerabilityWorldIndicator indicator = root.GetComponent<InvulnerabilityWorldIndicator>();
+            if (health != null && indicator != null)
+            {
+                SerializedObject indicatorSerialized = new SerializedObject(indicator);
+                indicatorSerialized.FindProperty("health").objectReferenceValue = health;
+                indicatorSerialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static Camera ResolveSceneArenaCamera(InterviewArenaRuntimeContext context)
+        {
+            if (context == null)
+                return UnityEngine.Object.FindFirstObjectByType<Camera>();
+
+            SerializedObject contextSerialized = new SerializedObject(context);
+            InterviewArenaCameraFollow follow =
+                contextSerialized.FindProperty("cameraFollow").objectReferenceValue as InterviewArenaCameraFollow;
+            if (follow != null)
+            {
+                Camera camera = follow.GetComponent<Camera>();
+                if (camera != null)
+                    return camera;
+            }
+
+            return UnityEngine.Object.FindFirstObjectByType<Camera>();
+        }
+
+        private static void WireCameraFollowTarget(InterviewArenaRuntimeContext context, PlayerMotor motor)
+        {
+            if (context == null || motor == null)
+                return;
+
+            SerializedObject contextSerialized = new SerializedObject(context);
+            InterviewArenaCameraFollow follow =
+                contextSerialized.FindProperty("cameraFollow").objectReferenceValue as InterviewArenaCameraFollow;
+            if (follow == null)
+                return;
+
+            SerializedObject followSerialized = new SerializedObject(follow);
+            followSerialized.FindProperty("target").objectReferenceValue = motor.ViewPivot;
+            followSerialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void RemoveExistingScenePlayer(InterviewArenaRuntimeContext context)
+        {
+            if (context == null)
+                return;
+
+            SerializedObject contextSerialized = new SerializedObject(context);
+            PlayerMotor previous = contextSerialized.FindProperty("player").objectReferenceValue as PlayerMotor;
+            if (previous != null)
+                UnityEngine.Object.DestroyImmediate(previous.gameObject);
+        }
+
+        private static void MarkPlayerInstanceWiringDirty(GameObject playerInstance)
+        {
+            if (playerInstance == null)
+                return;
+
+            EditorUtility.SetDirty(playerInstance);
+
+            MonoBehaviour[] behaviours = playerInstance.GetComponents<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                if (behaviours[i] == null)
+                    continue;
+
+                EditorUtility.SetDirty(behaviours[i]);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(behaviours[i]);
+            }
         }
 
         private static BackendApiConfig EnsureBackendApiConfigAsset()
