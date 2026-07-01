@@ -47,5 +47,6 @@
 
 ## Where to Track Active Work
 
+- **Skills & interview checklist (what to build next):** `SkillsRoadmap.md`
 - Unity showcase threads: `UnityClient/Docs/OpenThreads.md`
 - Arena backlog milestones: `UnityClient/Docs/Modules/InterviewArena/docs/04_BACKLOG.md`

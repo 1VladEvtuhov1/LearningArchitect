@@ -30,7 +30,7 @@ The most suspicious size contributors in the repository are:
 
 Things that are large in the repository but are not automatically a WebGL build problem:
 
-- `Assets/Screenshots` total: about `1.9 MB`
+- `Assets/Content/Screenshots` total: about `1.9 MB`
   Move these out of `Assets/` for project cleanliness, but they are only a build problem if referenced.
 
 Things that are not currently a meaningful size problem:
@@ -47,7 +47,7 @@ Things that are not currently a meaningful size problem:
    - disabling read/write
    - replacing it with a smaller sliced texture if possible
 
-2. Move `Assets/Screenshots` outside `Assets/`.
+2. Move `Assets/Content/Screenshots` outside `Assets/`.
    This reduces editor/import noise and prevents accidental references.
 
 3. Keep WebGL stress presets conservative.

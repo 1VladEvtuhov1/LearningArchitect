@@ -48,12 +48,18 @@ Config asset: `Assets/Content/Modules/InterviewArena/Data/InterviewArena_Backend
 | Session (PlayerPrefs) | `Runtime/Services/SessionStorage.cs` |
 | Online UI overlay | `Runtime/UI/InterviewArenaOnlineFlowController.cs` |
 | Match result reporter | `Runtime/Core/InterviewArenaMatchReporter.cs` |
+| Run completed GameEvent | `Data/InterviewArena_RunCompletedEvent.asset`, `InterviewArenaRunCompletedEventBridge` |
+
+## Shared (settings & events)
+
+- **JSON settings:** `Assets/Content/Shared/Settings/` → `game_settings.json` under `persistentDataPath` (language, last username, master volume). Migrated from legacy PlayerPrefs on first load.
+- **GameEvent:** `Assets/Content/Shared/Events/` — assign `InterviewArena_RunCompletedEvent` in inspector; use **GameEventListener** for responses. Custom inspector lists scene subscribers.
 
 ## Player authoring (no runtime spawn)
 
 MVP1 expects a **prefab + scene instance**, not `CreatePrimitive` at runtime:
 
-1. **Learning Architect → Interview Arena → Create Player Prefab Asset** (optional, creates `Prefabs/InterviewArenaPlayer.prefab`)
+1. **Learning Architect → Interview Arena → Create Player Prefab Asset** (Paladin humanoid visual + hidden capsule collider)
 2. Drag prefab into `InterviewArena` scene **or** run **Wire Scene Player From Prefab**
 3. Assign **Player** on `InterviewArenaBootstrap` (can stay empty until you wire it)
 
