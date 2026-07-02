@@ -3,6 +3,7 @@ using UnityEngine;
 namespace LearningArchitect.Modules.InterviewArena
 {
     [RequireComponent(typeof(Rigidbody))]
+    [DefaultExecutionOrder(20)]
     [DisallowMultipleComponent]
     public sealed class ArenaHoverMotor : MonoBehaviour
     {
@@ -13,8 +14,11 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private Collider arenaFloor;
 
         private Rigidbody body;
+        private PlayerMotor playerMotor;
         private PlayerBuffController buffController;
         private CapsuleCollider capsule;
+
+        public bool IsGrounded { get; private set; }
 
         private Vector3 Velocity
         {
@@ -27,6 +31,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
+            playerMotor = GetComponent<PlayerMotor>();
             buffController = GetComponent<PlayerBuffController>();
             capsule = GetComponent<CapsuleCollider>();
 
@@ -59,10 +64,18 @@ namespace LearningArchitect.Modules.InterviewArena
 
             Vector2 move = inputReader.CurrentFrame.Move;
             Vector3 wishDirection = BuildWishDirection(move);
-            GroundInfo ground = ProbeGround(wishDirection);
+            bool suppressGroundProbe = playerMotor != null && playerMotor.SuppressHoverGroundProbe;
+            GroundInfo ground = suppressGroundProbe
+                ? GroundInfo.Empty
+                : ProbeGround(wishDirection);
+
+            IsGrounded = ground.IsWalkable &&
+                Mathf.Abs(Vector3.Dot(Velocity, Vector3.up)) < config.MaxVerticalSpeed * 0.35f;
 
             ApplyHover(ground);
-            ApplyMovement(wishDirection, ground, move);
+
+            if (playerMotor == null || !playerMotor.IsDashing)
+                ApplyMovement(wishDirection, ground, move);
             ApplyWallSlide(ground.IsWalkable);
             ClampVerticalSpeed();
             ClampToArena();

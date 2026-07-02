@@ -5,6 +5,7 @@ namespace LearningArchitect.Modules.InterviewArena
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(PlayerInputReader))]
     [RequireComponent(typeof(GroundDetector))]
+    [DefaultExecutionOrder(-20)]
     [DisallowMultipleComponent]
     public sealed class PlayerMotor : MonoBehaviour
     {
@@ -23,6 +24,9 @@ namespace LearningArchitect.Modules.InterviewArena
         private float coyoteTimer;
         private float dashCooldownTimer;
         private float dashTimer;
+        private float jumpGraceTimer;
+        private float jumpAnimTimer;
+        private float dashAnimTimer;
         private Vector3 dashDirection = Vector3.forward;
         private Vector3 cachedCameraForward = Vector3.forward;
         private Vector3 cachedCameraRight = Vector3.right;
@@ -31,8 +35,19 @@ namespace LearningArchitect.Modules.InterviewArena
         private bool jumpCutApplied;
 
         public Transform ViewPivot => viewPivot != null ? viewPivot : transform;
-        public bool IsGrounded => ground != null && ground.IsGrounded;
+        public bool IsGrounded => IsLocomotionGrounded();
         public bool IsWalkable => ground != null && ground.IsWalkable;
+        public bool IsDashing => dashTimer > 0f;
+        public bool SuppressHoverGroundProbe => jumpGraceTimer > 0f;
+        public bool IsJumpAnimActive => jumpAnimTimer > 0f;
+        public bool IsDashAnimActive => dashAnimTimer > 0f;
+        public bool JumpAnimBackward { get; private set; }
+        public float DashCooldownRemaining => dashCooldownTimer;
+        public float DashCooldownNormalized =>
+            config != null && config.DashCooldown > 0f
+                ? Mathf.Clamp01(dashCooldownTimer / config.DashCooldown)
+                : 0f;
+        public bool IsDashOnCooldown => dashCooldownTimer > 0.001f;
 
         private void Awake()
         {
@@ -83,6 +98,9 @@ namespace LearningArchitect.Modules.InterviewArena
             }
 
             jumpCutApplied = false;
+            jumpGraceTimer = 0f;
+            jumpAnimTimer = 0f;
+            dashAnimTimer = 0f;
         }
 
         public void ApplyConfig(PlayerConfig playerConfig, Camera camera)
@@ -134,10 +152,13 @@ namespace LearningArchitect.Modules.InterviewArena
 
             if (UsesArenaHover())
             {
+                if (input.ConsumeJump() && coyoteTimer > 0f)
+                    Jump();
+
                 if (dashTimer > 0f)
                 {
                     ApplyDashVelocity();
-                    ApplyWallSlide(true);
+                    ApplyWallSlide(IsLocomotionGrounded());
                 }
 
                 return;
@@ -164,8 +185,11 @@ namespace LearningArchitect.Modules.InterviewArena
         private void BufferDashFromInput()
         {
             PlayerInputFrame frame = input.CurrentFrame;
-            if (input.ConsumeDash() && dashCooldownTimer <= 0f && frame.Move.sqrMagnitude > 0.01f)
+            if (input.ConsumeDash() && dashCooldownTimer <= 0f &&
+                frame.Move.sqrMagnitude > config.InputDeadZone * config.InputDeadZone)
+            {
                 BeginDash(frame.Move);
+            }
         }
 
         private void ApplyVariableJumpCut()
@@ -211,7 +235,7 @@ namespace LearningArchitect.Modules.InterviewArena
 
         private void UpdateCoyoteTime()
         {
-            if (ground.IsWalkable)
+            if (IsLocomotionGrounded())
             {
                 coyoteTimer = config.CoyoteTime;
                 jumpCutApplied = false;
@@ -226,19 +250,30 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             dashCooldownTimer = Mathf.Max(0f, dashCooldownTimer - Time.deltaTime);
             dashTimer = Mathf.Max(0f, dashTimer - Time.deltaTime);
+            jumpGraceTimer = Mathf.Max(0f, jumpGraceTimer - Time.deltaTime);
+            jumpAnimTimer = Mathf.Max(0f, jumpAnimTimer - Time.deltaTime);
+            dashAnimTimer = Mathf.Max(0f, dashAnimTimer - Time.deltaTime);
+        }
+
+        private bool IsLocomotionGrounded()
+        {
+            if (UsesArenaHover() && hoverMotor != null)
+                return hoverMotor.IsGrounded;
+
+            return ground != null && ground.IsWalkable;
         }
 
         private void BeginDash(Vector2 moveInput)
         {
             dashDirection = GetCameraRelativeDirection(moveInput);
-            if (dashDirection.sqrMagnitude < 0.01f && cursorAim != null)
-                dashDirection = cursorAim.AimDirection;
             if (dashDirection.sqrMagnitude < 0.01f)
-                dashDirection = viewPivot.forward;
+                return;
 
             dashTimer = config.DashDuration;
             dashCooldownTimer = config.DashCooldown;
+            dashAnimTimer = config.DashDuration + 0.08f;
             jumpCutApplied = false;
+
             body.linearVelocity = new Vector3(
                 dashDirection.x * config.DashImpulse,
                 body.linearVelocity.y,
@@ -257,10 +292,22 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             coyoteTimer = 0f;
             jumpCutApplied = false;
+            jumpGraceTimer = 0.2f;
+            jumpAnimTimer = 0.62f;
+            JumpAnimBackward = ResolveJumpBackward();
             Vector3 velocity = body.linearVelocity;
             velocity.y = 0f;
             body.linearVelocity = velocity;
             body.AddForce(Vector3.up * config.JumpImpulse, ForceMode.Impulse);
+        }
+
+        private bool ResolveJumpBackward()
+        {
+            Vector2 move = input.CurrentFrame.Move;
+            if (move.sqrMagnitude < config.InputDeadZone * config.InputDeadZone)
+                return false;
+
+            return move.y < -0.35f;
         }
 
         private void ApplyPlanarMovement(Vector2 moveInput)
@@ -299,8 +346,13 @@ namespace LearningArchitect.Modules.InterviewArena
                 config.RotationSpeed * Time.fixedDeltaTime);
             body.MoveRotation(nextRotation);
 
-            if (viewPivot != null && viewPivot != transform)
+            if (viewPivot != null && viewPivot != transform && !UsesCursorAimForFacing())
                 viewPivot.rotation = nextRotation;
+        }
+
+        private bool UsesCursorAimForFacing()
+        {
+            return cursorAim != null && cursorAim.enabled && UsesArenaHover();
         }
 
         private float ResolveAcceleration(Vector3 currentPlanar, Vector3 targetPlanar, bool grounded)
