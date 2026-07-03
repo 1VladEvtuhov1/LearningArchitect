@@ -119,9 +119,12 @@ namespace LearningArchitect.EditorTools
             AnimationClip strafeLeftClip = LoadClip("strafe");
             AnimationClip strafeRightClip = LoadClip("strafe (2)");
             AnimationClip fireClip = LoadClip("firing rifle");
+            AnimationClip jumpForwardClip = LoadClip("jump forward");
+            AnimationClip jumpBackwardClip = LoadClip("jump backward");
 
             if (idleClip == null || runForwardClip == null || runBackClip == null ||
-                strafeLeftClip == null || strafeRightClip == null || fireClip == null)
+                strafeLeftClip == null || strafeRightClip == null || fireClip == null ||
+                jumpForwardClip == null || jumpBackwardClip == null)
             {
                 Debug.LogError("[ShooterAnimationSetup] Missing one or more shooter clips. Run Setup Shooter Rig first.");
                 return;
@@ -134,16 +137,98 @@ namespace LearningArchitect.EditorTools
             EnsureParameter(controller, "IsMoving", AnimatorControllerParameterType.Bool);
             EnsureParameter(controller, "IsGrounded", AnimatorControllerParameterType.Bool);
             EnsureParameter(controller, "IsShooting", AnimatorControllerParameterType.Bool);
+            EnsureParameter(controller, "Jump", AnimatorControllerParameterType.Trigger);
+            EnsureParameter(controller, "JumpBackward", AnimatorControllerParameterType.Bool);
+            EnsureParameter(controller, "Dash", AnimatorControllerParameterType.Trigger);
 
             RebuildBaseLocomotionLayer(controller, idleClip, runForwardClip, runBackClip, strafeLeftClip, strafeRightClip);
+            RebuildActionStates(controller, jumpForwardClip, jumpBackwardClip, runForwardClip);
             RebuildUpperBodyLayer(controller, fireClip);
-            UpdateProfile(idleClip, runForwardClip);
+            UpdateProfile(idleClip, runForwardClip, jumpForwardClip, jumpBackwardClip);
 
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("[ShooterAnimationSetup] Combat controller rebuilt: 5-clip directional locomotion + firing rifle upper body.");
+            Debug.Log("[ShooterAnimationSetup] Combat controller rebuilt: directional locomotion + jump/dash + firing rifle upper body.");
+        }
+
+        private static void RebuildActionStates(
+            AnimatorController controller,
+            AnimationClip jumpForward,
+            AnimationClip jumpBackward,
+            AnimationClip dashClip)
+        {
+            AnimatorControllerLayer baseLayer = controller.layers[0];
+            AnimatorStateMachine stateMachine = baseLayer.stateMachine;
+            AnimatorState locomotionState = stateMachine.defaultState;
+            if (locomotionState == null)
+                return;
+
+            RemoveStatesNamed(stateMachine, "Jump Forward", "Jump Backward", "Dash");
+
+            AnimatorState jumpForwardState = stateMachine.AddState("Jump Forward", new Vector3(540f, -80f, 0f));
+            jumpForwardState.motion = jumpForward;
+
+            AnimatorState jumpBackwardState = stateMachine.AddState("Jump Backward", new Vector3(540f, 80f, 0f));
+            jumpBackwardState.motion = jumpBackward;
+
+            AnimatorState dashState = stateMachine.AddState("Dash", new Vector3(540f, 200f, 0f));
+            dashState.motion = dashClip;
+            dashState.speed = 1.35f;
+
+            AddAnyStateTrigger(stateMachine, jumpForwardState, "Jump", requireBackward: false);
+            AddAnyStateTrigger(stateMachine, jumpBackwardState, "Jump", requireBackward: true);
+            AddAnyStateTrigger(stateMachine, dashState, "Dash", requireBackward: null);
+
+            AddReturnTransition(jumpForwardState, locomotionState, 0.9f);
+            AddReturnTransition(jumpBackwardState, locomotionState, 0.9f);
+            AddReturnTransition(dashState, locomotionState, 0.72f);
+        }
+
+        private static void RemoveStatesNamed(AnimatorStateMachine stateMachine, params string[] names)
+        {
+            HashSet<string> targets = new HashSet<string>(names);
+            for (int i = stateMachine.states.Length - 1; i >= 0; i--)
+            {
+                if (targets.Contains(stateMachine.states[i].state.name))
+                    stateMachine.RemoveState(stateMachine.states[i].state);
+            }
+        }
+
+        private static void AddAnyStateTrigger(
+            AnimatorStateMachine stateMachine,
+            AnimatorState destination,
+            string triggerName,
+            bool? requireBackward)
+        {
+            AnimatorStateTransition transition = stateMachine.AddAnyStateTransition(destination);
+            transition.hasExitTime = false;
+            transition.duration = 0.08f;
+            transition.canTransitionToSelf = false;
+            transition.AddCondition(AnimatorConditionMode.If, 0f, triggerName);
+
+            if (requireBackward.HasValue)
+            {
+                transition.AddCondition(
+                    requireBackward.Value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot,
+                    0f,
+                    "JumpBackward");
+            }
+        }
+
+        private static void AddReturnTransition(
+            AnimatorState source,
+            AnimatorState destination,
+            float normalizedExitTime)
+        {
+            for (int i = source.transitions.Length - 1; i >= 0; i--)
+                source.RemoveTransition(source.transitions[i]);
+
+            AnimatorStateTransition transition = source.AddTransition(destination);
+            transition.hasExitTime = true;
+            transition.exitTime = Mathf.Clamp01(normalizedExitTime);
+            transition.duration = 0.1f;
         }
 
         private static void RebuildBaseLocomotionLayer(
@@ -229,7 +314,11 @@ namespace LearningArchitect.EditorTools
             stateMachine.defaultState = defaultState;
         }
 
-        private static void UpdateProfile(AnimationClip idleClip, AnimationClip runForwardClip)
+        private static void UpdateProfile(
+            AnimationClip idleClip,
+            AnimationClip runForwardClip,
+            AnimationClip jumpForwardClip,
+            AnimationClip jumpBackwardClip)
         {
             HumanoidAnimationProfileSO profile =
                 AssetDatabase.LoadAssetAtPath<HumanoidAnimationProfileSO>(ProfilePath);
@@ -239,8 +328,13 @@ namespace LearningArchitect.EditorTools
             SerializedObject serialized = new SerializedObject(profile);
             serialized.FindProperty("idleClip").objectReferenceValue = idleClip;
             serialized.FindProperty("locomotionClip").objectReferenceValue = runForwardClip;
+            serialized.FindProperty("jumpClip").objectReferenceValue = jumpForwardClip;
+            serialized.FindProperty("jumpBackwardClip").objectReferenceValue = jumpBackwardClip;
             serialized.FindProperty("moveXParameter").stringValue = "MoveX";
             serialized.FindProperty("moveYParameter").stringValue = "MoveY";
+            serialized.FindProperty("jumpTriggerParameter").stringValue = "Jump";
+            serialized.FindProperty("jumpBackwardParameter").stringValue = "JumpBackward";
+            serialized.FindProperty("dashTriggerParameter").stringValue = "Dash";
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(profile);
         }
