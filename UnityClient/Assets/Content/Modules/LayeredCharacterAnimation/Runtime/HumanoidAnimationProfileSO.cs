@@ -16,6 +16,7 @@ namespace LearningArchitect.Modules.Animation3D
         [SerializeField] private AnimationClip turnLeftClip;
         [SerializeField] private AnimationClip turnRightClip;
         [SerializeField] private AnimationClip jumpClip;
+        [SerializeField] private AnimationClip jumpBackwardClip;
 
         [Header("Animator Parameters")]
         [SerializeField] private string speedParameter = "Speed";
@@ -25,8 +26,14 @@ namespace LearningArchitect.Modules.Animation3D
         [SerializeField] private string movingParameter = "IsMoving";
         [SerializeField] private string groundedParameter = "IsGrounded";
         [SerializeField] private string shootingParameter = "IsShooting";
+        [SerializeField] private string fireTriggerParameter = "Fire";
+        [SerializeField] private string jumpTriggerParameter = "Jump";
+        [SerializeField] private string jumpBackwardParameter = "JumpBackward";
+        [SerializeField] private string dashTriggerParameter = "Dash";
 
         [Header("Runtime Tuning")]
+        [Tooltip("Extra local/world Y rotation so authored aim clips align with +Z forward.")]
+        [SerializeField] private float visualYawOffsetDegrees;
         [SerializeField] private float speedNormalization = 1.8f;
         [SerializeField] private float parameterDampTime = 0.12f;
         [SerializeField] private float turnResponsiveness = 8f;
@@ -44,6 +51,7 @@ namespace LearningArchitect.Modules.Animation3D
         public AnimationClip TurnLeftClip => turnLeftClip;
         public AnimationClip TurnRightClip => turnRightClip;
         public AnimationClip JumpClip => jumpClip;
+        public AnimationClip JumpBackwardClip => jumpBackwardClip;
         public string SpeedParameter => speedParameter;
         public string MoveXParameter => moveXParameter;
         public string MoveYParameter => moveYParameter;
@@ -51,6 +59,11 @@ namespace LearningArchitect.Modules.Animation3D
         public string MovingParameter => movingParameter;
         public string GroundedParameter => groundedParameter;
         public string ShootingParameter => shootingParameter;
+        public string FireTriggerParameter => fireTriggerParameter;
+        public string JumpTriggerParameter => jumpTriggerParameter;
+        public string JumpBackwardParameter => jumpBackwardParameter;
+        public string DashTriggerParameter => dashTriggerParameter;
+        public float VisualYawOffsetDegrees => visualYawOffsetDegrees;
         public float SpeedNormalization => Mathf.Max(0.01f, speedNormalization);
         public float ParameterDampTime => Mathf.Max(0f, parameterDampTime);
         public float TurnResponsiveness => Mathf.Max(0f, turnResponsiveness);
