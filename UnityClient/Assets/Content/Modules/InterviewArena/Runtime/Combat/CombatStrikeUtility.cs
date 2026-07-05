@@ -16,11 +16,81 @@ namespace LearningArchitect.Modules.InterviewArena
             int excludeInstanceId,
             out int overlapCount)
         {
+            return TryMeleeOverlapStrike(
+                queryService,
+                strikeOrigin,
+                forwardOffset,
+                strikeRadius,
+                hitMask,
+                sourceTeam,
+                damage,
+                knockbackImpulse,
+                excludeInstanceId,
+                out overlapCount,
+                out _,
+                out _);
+        }
+
+        public static int TryMeleeOverlapStrike(
+            PhysicsQueryService queryService,
+            Transform strikeOrigin,
+            float forwardOffset,
+            float strikeRadius,
+            LayerMask hitMask,
+            CombatTeam sourceTeam,
+            float damage,
+            float knockbackImpulse,
+            int excludeInstanceId,
+            out int overlapCount,
+            out Vector3 primaryHitPoint,
+            out bool hasPrimaryHitPoint)
+        {
+            Vector3 strikeDirection = strikeOrigin != null ? strikeOrigin.forward : Vector3.forward;
+            return TryMeleeOverlapStrike(
+                queryService,
+                strikeOrigin,
+                strikeDirection,
+                forwardOffset,
+                strikeRadius,
+                hitMask,
+                sourceTeam,
+                damage,
+                knockbackImpulse,
+                excludeInstanceId,
+                out overlapCount,
+                out primaryHitPoint,
+                out hasPrimaryHitPoint);
+        }
+
+        public static int TryMeleeOverlapStrike(
+            PhysicsQueryService queryService,
+            Transform strikeOrigin,
+            Vector3 strikeDirection,
+            float forwardOffset,
+            float strikeRadius,
+            LayerMask hitMask,
+            CombatTeam sourceTeam,
+            float damage,
+            float knockbackImpulse,
+            int excludeInstanceId,
+            out int overlapCount,
+            out Vector3 primaryHitPoint,
+            out bool hasPrimaryHitPoint)
+        {
             overlapCount = 0;
+            primaryHitPoint = default;
+            hasPrimaryHitPoint = false;
+
             if (queryService == null || strikeOrigin == null)
                 return 0;
 
-            Vector3 center = strikeOrigin.position + strikeOrigin.forward * forwardOffset;
+            strikeDirection.y = 0f;
+            if (strikeDirection.sqrMagnitude < 0.0001f)
+                strikeDirection = strikeOrigin.forward;
+
+            strikeDirection.Normalize();
+
+            Vector3 center = strikeOrigin.position + strikeDirection * forwardOffset;
             overlapCount = queryService.OverlapSphere(center, strikeRadius, hitMask);
             if (overlapCount <= 0)
                 return 0;
@@ -29,14 +99,16 @@ namespace LearningArchitect.Modules.InterviewArena
                 damage,
                 sourceTeam,
                 center,
-                strikeOrigin.forward,
+                strikeDirection,
                 knockbackImpulse);
 
             return CombatHitResolver.ApplyStrikeHits(
                 queryService,
                 overlapCount,
                 template,
-                excludeInstanceId);
+                excludeInstanceId,
+                out primaryHitPoint,
+                out hasPrimaryHitPoint);
         }
     }
 }

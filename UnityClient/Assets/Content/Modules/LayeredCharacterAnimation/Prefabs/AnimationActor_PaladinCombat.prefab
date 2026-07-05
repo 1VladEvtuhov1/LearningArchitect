@@ -95,6 +95,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8977196674112339873}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8123456789012345678}
   m_SourcePrefab: {fileID: 100100000, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
 --- !u!4 &3888104087333156874 stripped
 Transform:
@@ -120,6 +123,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Animation3D.HumanoidCrowdActor
   animator: {fileID: 7139752171964293744}
   visualRoot: {fileID: 3888104087333156874}
+--- !u!114 &8123456789012345678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4521194826964460208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d4e5f6789012345678abcdef012345, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Animation3D.HumanoidUpperBodyAimIk
+  animator: {fileID: 7139752171964293744}
 --- !u!95 &7139752171964293744 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}

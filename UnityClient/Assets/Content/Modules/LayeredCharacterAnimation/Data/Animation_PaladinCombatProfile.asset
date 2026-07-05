@@ -17,8 +17,8 @@ MonoBehaviour:
   animatorController: {fileID: 9100000, guid: f143d232332b8dd47864b4059365f869, type: 2}
   idleClip: {fileID: -203655887218126122, guid: 47dc52f613c94204f95ab7071dfc7d0f, type: 3}
   locomotionClip: {fileID: -203655887218126122, guid: 23a2d9f6064d65449992c3275de9738b, type: 3}
-  turnLeftClip: {fileID: 0}
-  turnRightClip: {fileID: 0}
+  turnLeftClip: {fileID: 7400012, guid: 7c3c4d895ee89ce43b0e1138cc8994e0, type: 3}
+  turnRightClip: {fileID: 7400010, guid: 7c3c4d895ee89ce43b0e1138cc8994e0, type: 3}
   jumpClip: {fileID: -203655887218126122, guid: e3ad144579c4acb40b7249a7adbcb621, type: 3}
   jumpBackwardClip: {fileID: -203655887218126122, guid: 7423399d9317e1044be014d80aa6a529, type: 3}
   speedParameter: Speed
@@ -32,11 +32,33 @@ MonoBehaviour:
   jumpTriggerParameter: Jump
   jumpBackwardParameter: JumpBackward
   dashTriggerParameter: Dash
+  meleeTriggerParameter: Melee
+  hitTriggerParameter: Hit
+  turnInPlaceParameter: TurnInPlace
+  turnDirectionParameter: TurnDirection
+  turnAngleParameter: TurnAngle
   visualYawOffsetDegrees: 90
+  visualYawOffsetMeleeDegrees: 0
+  aimStanceParameter: IsBowStance
+  aimYawParameter: AimYaw
   speedNormalization: 1.35
   parameterDampTime: 0.08
   turnResponsiveness: 10
   movingThreshold: 0.08
+  maxUpperBodyAimDegrees: 75
+  upperBodyAimBodyWeight: 0.35
+  upperBodyAimHeadWeight: 0.85
+  upperBodyAimEyesWeight: 1
+  upperBodyAimClampWeight: 0.45
+  upperBodyAimLookDistance: 8
+  upperBodyAimSmoothSpeed: 14
+  upperBodyAimWeightBlendSpeed: 12
+  idleTurnStartAngle: 5
+  idleTurnStopAngle: 2
+  turnInPlaceDegreesPerSecond: 240
+  turnInPlaceAnimatorDampTime: 0.08
+  turnInPlaceAimIkWeight: 0.65
+  movingTurnDegreesPerSecond: 720
   randomizeStartTime: 1
   applyRootMotion: 0
   updateMode: 0

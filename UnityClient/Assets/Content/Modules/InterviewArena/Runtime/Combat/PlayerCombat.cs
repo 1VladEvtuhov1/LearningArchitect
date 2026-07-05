@@ -32,6 +32,9 @@ namespace LearningArchitect.Modules.InterviewArena
 
             if (input.ConsumeMeleeAttack())
             {
+                if (TryGetComponent(out PlayerCombatStance stance))
+                    stance.SetStance(ArenaCombatStance.MeleeReady);
+
                 if (melee != null)
                     melee.TryStrike();
                 else if (!warnedMissingMelee)
@@ -43,6 +46,9 @@ namespace LearningArchitect.Modules.InterviewArena
 
             if (input.ConsumeCrossbowAttack())
             {
+                if (TryGetComponent(out PlayerCombatStance stance))
+                    stance.SetStance(ArenaCombatStance.BowAim);
+
                 if (crossbow != null)
                     crossbow.TryFire();
                 else if (!warnedMissingCrossbow)

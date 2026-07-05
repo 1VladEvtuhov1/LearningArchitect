@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: InterviewArena_MeleeWeapon
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.MeleeWeaponConfig
   damage: 28
-  cooldown: 0.55
+  strikeDuration: 2.16
+  hitWindowStartNormalized: 0.42
+  hitWindowEndNormalized: 0.54
   forwardOffset: 0.85
   strikeRadius: 0.95
   knockbackImpulse: 4.5

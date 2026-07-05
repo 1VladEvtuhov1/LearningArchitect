@@ -203,6 +203,7 @@ namespace LearningArchitect.EditorTools
             CrossbowWeaponController crossbow = root.AddComponent<CrossbowWeaponController>();
             crossbow.ApplyConfig(crossbowConfig, crossbowMuzzle.transform, null, CombatTeam.Player);
 
+            root.AddComponent<PlayerCombatStance>();
             root.AddComponent<PlayerCombat>();
 
             Health playerHealth = root.AddComponent<Health>();

@@ -19,8 +19,12 @@ namespace LearningArchitect.Modules.InterviewArena
             PhysicsQueryService queryService,
             int overlapCount,
             in DamageInfo damageTemplate,
-            int excludeInstanceId)
+            int excludeInstanceId,
+            out Vector3 primaryHitPoint,
+            out bool hasPrimaryHitPoint)
         {
+            primaryHitPoint = damageTemplate.HitPoint;
+            hasPrimaryHitPoint = false;
             Span<int> damagedTargets = stackalloc int[OverlapCapacity];
             int damagedCount = 0;
 
@@ -43,6 +47,12 @@ namespace LearningArchitect.Modules.InterviewArena
                 damagedTargets[damagedCount++] = targetId;
 
                 Vector3 hitPoint = collider.ClosestPoint(damageTemplate.HitPoint);
+                if (!hasPrimaryHitPoint)
+                {
+                    primaryHitPoint = hitPoint;
+                    hasPrimaryHitPoint = true;
+                }
+
                 DamageInfo info = new DamageInfo(
                     damageTemplate.Amount,
                     damageTemplate.SourceTeam,
@@ -53,6 +63,21 @@ namespace LearningArchitect.Modules.InterviewArena
             }
 
             return damagedCount;
+        }
+
+        public static int ApplyStrikeHits(
+            PhysicsQueryService queryService,
+            int overlapCount,
+            in DamageInfo damageTemplate,
+            int excludeInstanceId)
+        {
+            return ApplyStrikeHits(
+                queryService,
+                overlapCount,
+                in damageTemplate,
+                excludeInstanceId,
+                out _,
+                out _);
         }
 
         private const int OverlapCapacity = 16;

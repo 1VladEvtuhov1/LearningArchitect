@@ -25,6 +25,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private bool dashBuffered;
         private bool meleeBuffered;
         private bool crossbowBuffered;
+        private bool stanceToggleBuffered;
 
         public PlayerInputFrame CurrentFrame => currentFrame;
         public bool JumpHeld { get; private set; }
@@ -74,6 +75,15 @@ namespace LearningArchitect.Modules.InterviewArena
             return true;
         }
 
+        public bool ConsumeStanceToggle()
+        {
+            if (!stanceToggleBuffered)
+                return false;
+
+            stanceToggleBuffered = false;
+            return true;
+        }
+
         private void BufferActions()
         {
             if (WasJumpPressed())
@@ -87,6 +97,9 @@ namespace LearningArchitect.Modules.InterviewArena
 
             if (WasCrossbowPressed())
                 crossbowBuffered = true;
+
+            if (WasStanceTogglePressed())
+                stanceToggleBuffered = true;
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -159,6 +172,16 @@ namespace LearningArchitect.Modules.InterviewArena
             return gamepad != null && gamepad.buttonNorth.wasPressedThisFrame;
         }
 
+        private static bool WasStanceTogglePressed()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.tabKey.wasPressedThisFrame)
+                return true;
+
+            Gamepad gamepad = Gamepad.current;
+            return gamepad != null && gamepad.dpad.up.wasPressedThisFrame;
+        }
+
         private static bool WasPointerPressedThisFrame(int button)
         {
             Mouse mouse = Mouse.current;
@@ -210,6 +233,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private static bool WasDashPressed() => false;
         private static bool WasMeleePressed() => false;
         private static bool WasCrossbowPressed() => false;
+        private static bool WasStanceTogglePressed() => false;
 
         private PlayerInputFrame ReadMoveFrame() => default;
 #endif
