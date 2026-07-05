@@ -15,11 +15,12 @@ MonoBehaviour:
   actorPrefab: {fileID: 4521194826964460208, guid: b8749b9ab2f603241aa689143d6e402a, type: 3}
   avatar: {fileID: 9000000, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
   animatorController: {fileID: 9100000, guid: f143d232332b8dd47864b4059365f869, type: 2}
-  idleClip: {fileID: -203655887218126122, guid: 797039c20f81c24478bb52f87cc17835, type: 3}
-  locomotionClip: {fileID: -203655887218126122, guid: 522659f8e2ef9fa499d9120a808e14c3, type: 3}
+  idleClip: {fileID: -203655887218126122, guid: 47dc52f613c94204f95ab7071dfc7d0f, type: 3}
+  locomotionClip: {fileID: -203655887218126122, guid: 23a2d9f6064d65449992c3275de9738b, type: 3}
   turnLeftClip: {fileID: 0}
   turnRightClip: {fileID: 0}
-  jumpClip: {fileID: 0}
+  jumpClip: {fileID: -203655887218126122, guid: e3ad144579c4acb40b7249a7adbcb621, type: 3}
+  jumpBackwardClip: {fileID: -203655887218126122, guid: 7423399d9317e1044be014d80aa6a529, type: 3}
   speedParameter: Speed
   moveXParameter: MoveX
   moveYParameter: MoveY
@@ -27,6 +28,11 @@ MonoBehaviour:
   movingParameter: IsMoving
   groundedParameter: IsGrounded
   shootingParameter: IsShooting
+  fireTriggerParameter: Fire
+  jumpTriggerParameter: Jump
+  jumpBackwardParameter: JumpBackward
+  dashTriggerParameter: Dash
+  visualYawOffsetDegrees: 90
   speedNormalization: 1.35
   parameterDampTime: 0.08
   turnResponsiveness: 10
