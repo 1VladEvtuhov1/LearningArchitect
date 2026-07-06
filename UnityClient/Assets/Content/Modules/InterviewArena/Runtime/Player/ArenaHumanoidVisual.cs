@@ -9,6 +9,7 @@ namespace LearningArchitect.Modules.InterviewArena
     /// Arena mode: body yaw follows cursor aim; legs animate from planar speed.
     /// </summary>
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(60)]
     public sealed class ArenaHumanoidVisual : MonoBehaviour
     {
         [SerializeField] private HumanoidAnimationProfileSO profile;
@@ -22,10 +23,14 @@ namespace LearningArchitect.Modules.InterviewArena
         private Animator animator;
         private Rigidbody body;
         private PlayerMotor playerMotor;
+        private ArenaHoverMotor hoverMotor;
         private ArenaCursorAim cursorAim;
         private CrossbowWeaponController playerCrossbow;
         private EnemyCrossbowAttack enemyCrossbow;
         private bool initialized;
+        private bool wasJumpAnimActive;
+        private bool wasDashAnimActive;
+        private bool wasShootingAnimActive;
 
         public HumanoidAnimationProfileSO Profile => profile;
 
@@ -33,6 +38,7 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             body = GetComponent<Rigidbody>();
             playerMotor = GetComponent<PlayerMotor>();
+            hoverMotor = GetComponent<ArenaHoverMotor>();
             cursorAim = GetComponent<ArenaCursorAim>();
             playerCrossbow = GetComponent<CrossbowWeaponController>();
             enemyCrossbow = GetComponent<EnemyCrossbowAttack>();
@@ -70,8 +76,17 @@ namespace LearningArchitect.Modules.InterviewArena
                 out float moveY,
                 out float speed01);
 
+            if (speed01 < profile.MovingThreshold)
+            {
+                speed01 = 0f;
+                moveX = 0f;
+                moveY = 0f;
+            }
+
             float turnAmount = ResolveStrafeTurn(flatVelocity, aimPivot);
-            ApplyAnimatorParameters(speed01, moveX, moveY, turnAmount, Time.deltaTime, IsShooting());
+            bool grounded = ResolveGrounded();
+            ApplyActionTriggers();
+            ApplyAnimatorParameters(speed01, moveX, moveY, turnAmount, grounded, Time.deltaTime);
         }
 
         public void ApplyProfile(HumanoidAnimationProfileSO animationProfile, Transform anchor = null)
@@ -82,6 +97,9 @@ namespace LearningArchitect.Modules.InterviewArena
 
             initialized = false;
             animator = null;
+            wasJumpAnimActive = false;
+            wasDashAnimActive = false;
+            wasShootingAnimActive = false;
             EnsureVisualInstance();
         }
 
@@ -101,14 +119,22 @@ namespace LearningArchitect.Modules.InterviewArena
             if (aimPivot == null)
                 return;
 
-            Vector3 aimForward = aimPivot.forward;
-            aimForward.y = 0f;
-            if (aimForward.sqrMagnitude < 0.001f)
+            Transform pivot = visualAnchor != null ? visualAnchor : crowdActor.transform;
+            float yawOffset = profile != null ? profile.VisualYawOffsetDegrees : 0f;
+            Quaternion offset = Quaternion.Euler(0f, yawOffset, 0f);
+
+            if (pivot.parent == aimPivot)
+            {
+                pivot.localRotation = offset;
+                return;
+            }
+
+            Vector3 forward = aimPivot.forward;
+            forward.y = 0f;
+            if (forward.sqrMagnitude < 0.001f)
                 return;
 
-            Quaternion bodyRotation = Quaternion.LookRotation(aimForward.normalized, Vector3.up);
-            Transform pivot = visualAnchor != null ? visualAnchor : crowdActor.transform;
-            pivot.rotation = bodyRotation;
+            pivot.rotation = Quaternion.LookRotation(forward.normalized, Vector3.up) * offset;
         }
 
         private static float ResolveStrafeTurn(Vector3 flatVelocity, Transform aimPivot)
@@ -127,6 +153,47 @@ namespace LearningArchitect.Modules.InterviewArena
                 1f);
         }
 
+        private bool ResolveGrounded()
+        {
+            if (playerMotor != null)
+                return playerMotor.IsGrounded;
+
+            if (hoverMotor != null)
+                return hoverMotor.IsGrounded;
+
+            return true;
+        }
+
+        private void ApplyActionTriggers()
+        {
+            if (animator == null || profile == null)
+                return;
+
+            if (playerMotor != null)
+            {
+                bool jumpAnimActive = playerMotor.IsJumpAnimActive;
+                if (jumpAnimActive && !wasJumpAnimActive)
+                {
+                    SetBool(profile.JumpBackwardParameter, playerMotor.JumpAnimBackward);
+                    SetTrigger(profile.JumpTriggerParameter);
+                }
+
+                wasJumpAnimActive = jumpAnimActive;
+
+                bool dashAnimActive = playerMotor.IsDashAnimActive;
+                if (dashAnimActive && !wasDashAnimActive)
+                    SetTrigger(profile.DashTriggerParameter);
+
+                wasDashAnimActive = dashAnimActive;
+            }
+
+            bool shootingAnimActive = IsShooting();
+            if (shootingAnimActive && !wasShootingAnimActive)
+                SetTrigger(profile.FireTriggerParameter);
+
+            wasShootingAnimActive = shootingAnimActive;
+        }
+
         private void EnsureVisualInstance()
         {
             if (profile == null || !profile.HasActorPrefab)
@@ -140,6 +207,9 @@ namespace LearningArchitect.Modules.InterviewArena
                 crowdActor = parent.GetComponentInChildren<HumanoidCrowdActor>(true);
 
             if (crowdActor != null)
+                return;
+
+            if (!Application.isPlaying)
                 return;
 
             GameObject instance = Instantiate(profile.ActorPrefab, parent);
@@ -176,22 +246,31 @@ namespace LearningArchitect.Modules.InterviewArena
             float moveX,
             float moveY,
             float turnAmount,
-            float deltaTime,
-            bool isShooting)
+            bool grounded,
+            float deltaTime)
         {
             if (animator == null || profile == null)
                 return;
 
             float dampTime = profile.ParameterDampTime;
             bool isMoving = speed01 >= profile.MovingThreshold;
+            bool actionActive = playerMotor != null &&
+                (playerMotor.IsJumpAnimActive || playerMotor.IsDashAnimActive);
+
+            if (actionActive)
+            {
+                speed01 = 0f;
+                moveX = 0f;
+                moveY = 0f;
+                isMoving = false;
+            }
 
             SetFloat(profile.SpeedParameter, speed01, dampTime, deltaTime);
             SetFloat(profile.MoveXParameter, moveX, dampTime, deltaTime);
             SetFloat(profile.MoveYParameter, moveY, dampTime, deltaTime);
             SetFloat(profile.TurnParameter, turnAmount, dampTime, deltaTime);
             SetBool(profile.MovingParameter, isMoving);
-            SetBool(profile.GroundedParameter, true);
-            SetBool(profile.ShootingParameter, isShooting);
+            SetBool(profile.GroundedParameter, grounded);
         }
 
         private void SetFloat(string parameterName, float value, float dampTime, float deltaTime)
@@ -211,6 +290,14 @@ namespace LearningArchitect.Modules.InterviewArena
                 return;
 
             animator.SetBool(parameterName, value);
+        }
+
+        private void SetTrigger(string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameterName))
+                return;
+
+            animator.SetTrigger(parameterName);
         }
     }
 }

@@ -50,7 +50,7 @@ namespace LearningArchitect.Modules.InterviewArena
 
             CombatHitFeedback.PlayCrossbowFire(origin);
             cooldownTimer = config.Cooldown;
-            shootAnimTimer = 0.35f;
+            shootAnimTimer = 0.55f;
             return true;
         }
 
