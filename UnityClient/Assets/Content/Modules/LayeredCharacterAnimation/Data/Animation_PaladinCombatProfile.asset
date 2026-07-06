@@ -53,8 +53,10 @@ MonoBehaviour:
   upperBodyAimLookDistance: 8
   upperBodyAimSmoothSpeed: 14
   upperBodyAimWeightBlendSpeed: 12
-  idleTurnStartAngle: 5
-  idleTurnStopAngle: 2
+  idleTurnStartAngle: 20
+  idleTurnStopAngle: 8
+  idleTurnExitHoldTime: 0.2
+  invertTurnDirection: 0
   turnInPlaceDegreesPerSecond: 240
   turnInPlaceAnimatorDampTime: 0.08
   turnInPlaceAimIkWeight: 0.65

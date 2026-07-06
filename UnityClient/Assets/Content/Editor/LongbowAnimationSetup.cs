@@ -139,8 +139,7 @@ namespace LearningArchitect.EditorTools
             EnsureParameter(controller, "TurnAngle", AnimatorControllerParameterType.Float);
 
             LongswordAnimationSetup.ConfigureLongswordTurnRig(out _);
-            LongswordAnimationSetup.ConfigureLongswordMeleeLocomotionRig(out _);
-            LongswordAnimationSetup.ConfigureLongswordAttackRig(out _);
+            LongswordAnimationSetup.ConfigureLongswordUpdatePackageRig(out _);
             AssetDatabase.Refresh();
 
             if (!LongswordAnimationSetup.TryLoadMeleeLocomotionClips(
@@ -190,8 +189,8 @@ namespace LearningArchitect.EditorTools
             if (LongswordAnimationSetup.TryApplyTurnInPlaceToController(controller))
                 Debug.Log("[LongbowAnimationSetup] Longsword turn-in-place layer applied.");
 
-            if (LongswordAnimationSetup.TryPatchMeleeAttackToController(controller))
-                Debug.Log("[LongbowAnimationSetup] Longsword melee attack applied.");
+            if (LongswordAnimationSetup.TryPatchActionClipsToController(controller))
+                Debug.Log("[LongbowAnimationSetup] Longsword Update actions applied (melee, dash, hit).");
 
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
@@ -648,7 +647,8 @@ namespace LearningArchitect.EditorTools
             AnimationClip sprintClip = LoadClip(SprintClipPath, SprintClipName);
             AnimationClip meleeClip = LongswordAnimationSetup.TryLoadMeleeAttackClip()
                 ?? LoadClip(MeleeClipPath, MeleeClipName);
-            AnimationClip hitClip = LoadClip(HitClipPath, HitClipName);
+            AnimationClip hitClip = LongswordAnimationSetup.TryLoadHitReactClip()
+                ?? LoadClip(HitClipPath, HitClipName);
 
             if (sprintClip == null || meleeClip == null)
             {
@@ -692,10 +692,13 @@ namespace LearningArchitect.EditorTools
             AnimatorState meleeLocomotion,
             AnimationClip dashFallback)
         {
-            AnimationClip sprintClip = TryLoadSprintClip() ?? dashFallback;
+            AnimationClip sprintClip = LongswordAnimationSetup.TryLoadDashClip()
+                ?? TryLoadSprintClip()
+                ?? dashFallback;
             AnimationClip meleeClip = LongswordAnimationSetup.TryLoadMeleeAttackClip()
                 ?? LoadClip(MeleeClipPath, MeleeClipName);
-            AnimationClip hitClip = LoadClip(HitClipPath, HitClipName);
+            AnimationClip hitClip = LongswordAnimationSetup.TryLoadHitReactClip()
+                ?? LoadClip(HitClipPath, HitClipName);
 
             if (sprintClip == null)
                 sprintClip = dashFallback;
@@ -789,7 +792,9 @@ namespace LearningArchitect.EditorTools
                     continue;
 
                 state.motion = sprintClip;
-                state.speed = sprintClip.name.Contains("Sprint") ? 1.15f : 1f;
+                state.speed = sprintClip.name.Contains("Sprint") || sprintClip.name.Contains("SprintBash")
+                    ? 1.1f
+                    : 1f;
                 return;
             }
         }

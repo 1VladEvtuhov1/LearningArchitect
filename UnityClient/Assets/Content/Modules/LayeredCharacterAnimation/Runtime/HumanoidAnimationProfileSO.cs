@@ -57,8 +57,10 @@ namespace LearningArchitect.Modules.Animation3D
         [SerializeField] private float upperBodyAimSmoothSpeed = 14f;
         [SerializeField] private float upperBodyAimWeightBlendSpeed = 12f;
         [Header("Turn In Place")]
-        [SerializeField] private float idleTurnStartAngle = 5f;
-        [SerializeField] private float idleTurnStopAngle = 2f;
+        [SerializeField] private float idleTurnStartAngle = 20f;
+        [SerializeField] private float idleTurnStopAngle = 5f;
+        [SerializeField] private float idleTurnExitHoldTime = 0.2f;
+        [SerializeField] private bool invertTurnDirection;
         [SerializeField] private float turnInPlaceDegreesPerSecond = 240f;
         [SerializeField] private float turnInPlaceAnimatorDampTime = 0.08f;
         [SerializeField] private float turnInPlaceAimIkWeight = 0.65f;
@@ -111,6 +113,8 @@ namespace LearningArchitect.Modules.Animation3D
         public float UpperBodyAimWeightBlendSpeed => Mathf.Max(0f, upperBodyAimWeightBlendSpeed);
         public float IdleTurnStartAngle => Mathf.Max(0f, idleTurnStartAngle);
         public float IdleTurnStopAngle => Mathf.Max(0f, idleTurnStopAngle);
+        public float IdleTurnExitHoldTime => Mathf.Max(0f, idleTurnExitHoldTime);
+        public bool InvertTurnDirection => invertTurnDirection;
         public float TurnInPlaceDegreesPerSecond => Mathf.Max(0f, turnInPlaceDegreesPerSecond);
         public float TurnInPlaceAnimatorDampTime => Mathf.Max(0f, turnInPlaceAnimatorDampTime);
         public float TurnInPlaceAimIkWeight => Mathf.Clamp01(turnInPlaceAimIkWeight);
