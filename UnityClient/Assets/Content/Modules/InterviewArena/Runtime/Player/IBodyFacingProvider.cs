@@ -10,4 +10,12 @@ namespace LearningArchitect.Modules.InterviewArena
         Vector3 LogicalBodyForward { get; }
         float PlanarAimLimitDegrees { get; }
     }
+
+    /// <summary>
+    /// Instant logical body yaw for attack commitment (snap toward aim before strike).
+    /// </summary>
+    public interface IBodyFacingCommit
+    {
+        void SnapPlanarFacing(Vector3 planarDirection);
+    }
 }

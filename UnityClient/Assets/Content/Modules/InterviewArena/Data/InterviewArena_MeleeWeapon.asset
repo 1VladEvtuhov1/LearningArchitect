@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: InterviewArena_MeleeWeapon
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.MeleeWeaponConfig
   damage: 28
-  strikeDuration: 2.16
-  hitWindowStartNormalized: 0.42
-  hitWindowEndNormalized: 0.54
+  strikeDuration: 1.95
+  hitWindowStartNormalized: 0.38
+  hitWindowEndNormalized: 0.52
   forwardOffset: 0.85
   strikeRadius: 0.95
   knockbackImpulse: 4.5
   strikeLungeImpulse: 2.8
+  movementLockDuration: 0.3
   hitMask:
     serializedVersion: 2
     m_Bits: 256

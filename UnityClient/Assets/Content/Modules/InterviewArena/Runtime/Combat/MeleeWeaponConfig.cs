@@ -17,6 +17,8 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private float strikeRadius = 0.95f;
         [SerializeField] private float knockbackImpulse = 4.5f;
         [SerializeField] private float strikeLungeImpulse = 2.8f;
+        [Tooltip("Planar locomotion lock at strike start (attack commitment / root).")]
+        [SerializeField] private float movementLockDuration = 0.3f;
         [SerializeField] private LayerMask hitMask = ~0;
 
         public float Damage => damage;
@@ -28,6 +30,7 @@ namespace LearningArchitect.Modules.InterviewArena
         public float StrikeRadius => strikeRadius;
         public float KnockbackImpulse => knockbackImpulse;
         public float StrikeLungeImpulse => strikeLungeImpulse;
+        public float MovementLockDuration => Mathf.Max(0f, movementLockDuration);
         public LayerMask HitMask => hitMask;
     }
 }
