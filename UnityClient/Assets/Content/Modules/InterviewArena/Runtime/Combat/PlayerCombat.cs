@@ -5,18 +5,21 @@ namespace LearningArchitect.Modules.InterviewArena
     [DefaultExecutionOrder(100)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerInputReader))]
+    [RequireComponent(typeof(PlayerActionCoordinator))]
     public sealed class PlayerCombat : MonoBehaviour
     {
         [SerializeField] private MeleeStrikeController melee;
         [SerializeField] private CrossbowWeaponController crossbow;
 
         private PlayerInputReader input;
+        private PlayerActionCoordinator actionCoordinator;
         private bool warnedMissingMelee;
         private bool warnedMissingCrossbow;
 
         private void Awake()
         {
             input = GetComponent<PlayerInputReader>();
+            actionCoordinator = GetComponent<PlayerActionCoordinator>();
             if (input == null)
                 InterviewArenaAuthoringLog.MissingReference(this, nameof(input));
             if (melee == null)
@@ -30,7 +33,7 @@ namespace LearningArchitect.Modules.InterviewArena
             if (input == null)
                 return;
 
-            if (input.ConsumeMeleeAttack())
+            if (actionCoordinator != null && actionCoordinator.CanAttack && input.ConsumeMeleeAttack())
             {
                 if (TryGetComponent(out PlayerCombatStance stance))
                     stance.SetStance(ArenaCombatStance.MeleeReady);
@@ -44,7 +47,7 @@ namespace LearningArchitect.Modules.InterviewArena
                 }
             }
 
-            if (input.ConsumeCrossbowAttack())
+            if (actionCoordinator != null && actionCoordinator.CanAttack && input.ConsumeCrossbowAttack())
             {
                 if (TryGetComponent(out PlayerCombatStance stance))
                     stance.SetStance(ArenaCombatStance.BowAim);

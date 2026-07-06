@@ -11,7 +11,7 @@ namespace LearningArchitect.Modules.InterviewArena
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(110)]
-    public sealed class ArenaHumanoidVisual : MonoBehaviour, IBodyFacingProvider
+    public sealed class ArenaHumanoidVisual : MonoBehaviour, IBodyFacingProvider, IBodyFacingCommit
     {
         [SerializeField] private HumanoidAnimationProfileSO profile;
         [SerializeField] private Transform visualAnchor;
@@ -31,12 +31,15 @@ namespace LearningArchitect.Modules.InterviewArena
         private EnemyCrossbowAttack enemyCrossbow;
         private MeleeStrikeController meleeStrike;
         private PlayerCombatStance combatStance;
+        private PlayerActionCoordinator actionCoordinator;
         private Health health;
         private Quaternion currentBodyRotation = Quaternion.identity;
         private bool bodyRotationInitialized;
         private bool isTurningInPlace;
         private float lastTurnYawSign = 1f;
         private float currentYawDelta;
+        private float turnExitHoldTimer;
+        private float lockedTurnDirection = 1f;
         private bool initialized;
         private bool wasJumpAnimActive;
         private bool wasDashAnimActive;
@@ -49,6 +52,18 @@ namespace LearningArchitect.Modules.InterviewArena
         public float PlanarAimLimitDegrees =>
             profile != null ? profile.MaxUpperBodyAimDegrees : 75f;
 
+        public void SnapPlanarFacing(Vector3 planarDirection)
+        {
+            planarDirection.y = 0f;
+            if (planarDirection.sqrMagnitude < 0.001f)
+                return;
+
+            currentBodyRotation = Quaternion.LookRotation(planarDirection.normalized, Vector3.up);
+            bodyRotationInitialized = true;
+            isTurningInPlace = false;
+            turnExitHoldTimer = 0f;
+        }
+
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
@@ -59,6 +74,7 @@ namespace LearningArchitect.Modules.InterviewArena
             enemyCrossbow = GetComponent<EnemyCrossbowAttack>();
             meleeStrike = GetComponent<MeleeStrikeController>();
             combatStance = GetComponent<PlayerCombatStance>();
+            actionCoordinator = GetComponent<PlayerActionCoordinator>();
             health = GetComponent<Health>();
 
             if (hideCapsuleRenderer)
@@ -113,7 +129,7 @@ namespace LearningArchitect.Modules.InterviewArena
 
             UpdateTurnInPlaceState(isIdle, actionActive, currentYawDelta);
 
-            if (!actionActive)
+            if (!actionActive && (actionCoordinator == null || actionCoordinator.CanTurn))
                 StepBodyRotation(isIdle, currentYawDelta, Time.deltaTime);
 
             ApplyVisualAnchorRotation();
@@ -162,6 +178,8 @@ namespace LearningArchitect.Modules.InterviewArena
             isTurningInPlace = false;
             lastTurnYawSign = 1f;
             currentYawDelta = 0f;
+            turnExitHoldTimer = 0f;
+            lockedTurnDirection = 1f;
             wasJumpAnimActive = false;
             wasDashAnimActive = false;
             wasShootingAnimActive = false;
@@ -240,6 +258,7 @@ namespace LearningArchitect.Modules.InterviewArena
             if (actionActive)
             {
                 isTurningInPlace = false;
+                turnExitHoldTimer = 0f;
                 return;
             }
 
@@ -247,17 +266,38 @@ namespace LearningArchitect.Modules.InterviewArena
             if (!isTurningInPlace)
             {
                 if (isIdle && absYaw > profile.IdleTurnStartAngle)
+                {
                     isTurningInPlace = true;
+                    turnExitHoldTimer = 0f;
+                    float sign = Mathf.Abs(yawDelta) > 0.01f ? Mathf.Sign(yawDelta) : lastTurnYawSign;
+                    lockedTurnDirection = sign == 0f ? 1f : sign;
+                }
+
+                return;
             }
-            else if (!isIdle || absYaw < profile.IdleTurnStopAngle)
+
+            if (!isIdle)
             {
                 isTurningInPlace = false;
+                turnExitHoldTimer = 0f;
+                return;
+            }
+
+            if (absYaw < profile.IdleTurnStopAngle)
+            {
+                turnExitHoldTimer += Time.deltaTime;
+                if (turnExitHoldTimer >= profile.IdleTurnExitHoldTime)
+                    isTurningInPlace = false;
+            }
+            else
+            {
+                turnExitHoldTimer = 0f;
             }
         }
 
         private void StepBodyRotation(bool isIdle, float yawDelta, float deltaTime)
         {
-            // Idle: let IK handle micro-aim until turn-in-place starts; avoid shrinking yaw delta in code.
+            // Code owns logical body yaw; turn clips are footwork only (profile.ApplyRootMotion stays off).
             if (isIdle && !isTurningInPlace)
                 return;
 
@@ -300,15 +340,6 @@ namespace LearningArchitect.Modules.InterviewArena
                 targetWeight = 0f;
             else if (isTurningInPlace)
                 targetWeight = profile.TurnInPlaceAimIkWeight;
-            else if (isIdle)
-            {
-                float absYaw = Mathf.Abs(currentYawDelta);
-                float start = profile.IdleTurnStartAngle;
-                if (absYaw > start)
-                    targetWeight = profile.TurnInPlaceAimIkWeight;
-                else if (start > 0.01f)
-                    targetWeight = Mathf.Lerp(1f, profile.TurnInPlaceAimIkWeight, absYaw / start);
-            }
 
             upperBodyAim.SetAim(bodyForward, aimDirection, targetWeight);
         }
@@ -435,7 +466,10 @@ namespace LearningArchitect.Modules.InterviewArena
                 (playerMotor.IsJumpAnimActive || playerMotor.IsDashAnimActive))
                 return true;
 
-            if (meleeStrike != null && meleeStrike.IsMeleeAnimActive)
+            if (actionCoordinator != null && actionCoordinator.HasActiveAction)
+                return true;
+
+            if (IsShooting())
                 return true;
 
             return false;
@@ -480,9 +514,14 @@ namespace LearningArchitect.Modules.InterviewArena
             bool turnActive = isTurningInPlace && !actionActive;
             SetBool(profile.TurnInPlaceParameter, turnActive);
 
-            float turnDirection = turnActive && Mathf.Abs(currentYawDelta) > 0.01f
-                ? Mathf.Sign(currentYawDelta)
-                : 0f;
+            float turnDirection = 0f;
+            if (turnActive)
+            {
+                turnDirection = lockedTurnDirection;
+                if (profile.InvertTurnDirection)
+                    turnDirection = -turnDirection;
+            }
+
             SetFloat(
                 profile.TurnDirectionParameter,
                 turnDirection,

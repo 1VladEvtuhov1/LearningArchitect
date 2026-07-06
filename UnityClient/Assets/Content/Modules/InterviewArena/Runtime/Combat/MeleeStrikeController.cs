@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace LearningArchitect.Modules.InterviewArena
 {
+    [DefaultExecutionOrder(-25)]
     [DisallowMultipleComponent]
     public sealed class MeleeStrikeController : MonoBehaviour
     {
@@ -14,7 +15,9 @@ namespace LearningArchitect.Modules.InterviewArena
         private Rigidbody body;
         private PlayerBuffController buffController;
         private IBodyFacingProvider bodyFacing;
+        private IBodyFacingCommit bodyFacingCommit;
         private ArenaCursorAim cursorAim;
+        private PlayerActionCoordinator actionCoordinator;
         private float strikeElapsed;
         private bool strikeActive;
         private bool hitWindowResolved;
@@ -28,7 +31,9 @@ namespace LearningArchitect.Modules.InterviewArena
             body = GetComponent<Rigidbody>();
             buffController = GetComponent<PlayerBuffController>();
             bodyFacing = GetComponent<IBodyFacingProvider>();
+            bodyFacingCommit = GetComponent<IBodyFacingCommit>();
             cursorAim = GetComponent<ArenaCursorAim>();
+            actionCoordinator = GetComponent<PlayerActionCoordinator>();
         }
 
         public void ApplyConfig(MeleeWeaponConfig weaponConfig, Transform origin, CombatTeam team)
@@ -43,22 +48,49 @@ namespace LearningArchitect.Modules.InterviewArena
             if (config == null || strikeActive)
                 return false;
 
+            if (actionCoordinator != null && !actionCoordinator.CanAttack)
+                return false;
+
             strikeActive = true;
             strikeElapsed = 0f;
             hitWindowResolved = false;
             swingFeedbackPlayed = false;
+            CommitAttackFacing();
+            ZeroPlanarVelocity();
+            PublishStrikeLock();
             return true;
+        }
+
+        private void CommitAttackFacing()
+        {
+            Vector3 aimDirection = ResolveAimDirection();
+            if (bodyFacingCommit != null)
+                bodyFacingCommit.SnapPlanarFacing(aimDirection);
+        }
+
+        private void ZeroPlanarVelocity()
+        {
+            if (body == null)
+                return;
+
+            Vector3 velocity = body.linearVelocity;
+            body.linearVelocity = new Vector3(0f, velocity.y, 0f);
         }
 
         private void Update()
         {
             if (!strikeActive || config == null)
+            {
+                ClearStrikeLock();
                 return;
+            }
 
             strikeElapsed += Time.deltaTime;
             float duration = config.StrikeDuration;
             float hitStart = config.HitWindowStartNormalized * duration;
             float hitEnd = config.HitWindowEndNormalized * duration;
+
+            PublishStrikeLock();
 
             if (!swingFeedbackPlayed && strikeElapsed >= hitStart)
             {
@@ -72,7 +104,26 @@ namespace LearningArchitect.Modules.InterviewArena
                 ResolveHitWindow();
 
             if (strikeElapsed >= duration)
+            {
                 strikeActive = false;
+                ClearStrikeLock();
+            }
+        }
+
+        private void PublishStrikeLock()
+        {
+            if (actionCoordinator == null || config == null)
+                return;
+
+            float remaining = config.StrikeDuration - strikeElapsed;
+            bool inStartup = strikeElapsed < config.MovementLockDuration;
+            actionCoordinator.SetLock(CharacterActionLock.MeleeStrike(remaining, inStartup));
+        }
+
+        private void ClearStrikeLock()
+        {
+            if (actionCoordinator != null)
+                actionCoordinator.ClearLock(CharacterActionKind.MeleeStrike);
         }
 
         private void ResolveHitWindow()
@@ -118,9 +169,6 @@ namespace LearningArchitect.Modules.InterviewArena
             return forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
         }
 
-        /// <summary>
-        /// Melee hits within the same ±arc as upper-body aim (variant B), not full ViewPivot rotation.
-        /// </summary>
         private Vector3 ResolveStrikeDirection()
         {
             Vector3 aimDirection = ResolveAimDirection();

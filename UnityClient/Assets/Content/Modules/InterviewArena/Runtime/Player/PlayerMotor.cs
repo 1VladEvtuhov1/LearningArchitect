@@ -5,6 +5,8 @@ namespace LearningArchitect.Modules.InterviewArena
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(PlayerInputReader))]
     [RequireComponent(typeof(GroundDetector))]
+    [RequireComponent(typeof(PlayerActionCoordinator))]
+    [RequireComponent(typeof(PlayerHealthHitstun))]
     [DefaultExecutionOrder(-20)]
     [DisallowMultipleComponent]
     public sealed class PlayerMotor : MonoBehaviour
@@ -21,6 +23,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private CapsuleCollider capsule;
         private ArenaHoverMotor hoverMotor;
         private ArenaCursorAim cursorAim;
+        private PlayerActionCoordinator actionCoordinator;
         private float coyoteTimer;
         private float dashCooldownTimer;
         private float dashTimer;
@@ -58,6 +61,7 @@ namespace LearningArchitect.Modules.InterviewArena
             capsule = GetComponent<CapsuleCollider>();
             hoverMotor = GetComponent<ArenaHoverMotor>();
             cursorAim = GetComponent<ArenaCursorAim>();
+            actionCoordinator = GetComponent<PlayerActionCoordinator>();
 
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.constraints = RigidbodyConstraints.FreezeRotation;
@@ -129,6 +133,12 @@ namespace LearningArchitect.Modules.InterviewArena
             if (cursorAim != null)
                 cursorAim.ApplyConfig(config, camera, ViewPivot);
 
+            if (input != null)
+                input.ApplyConfig(config);
+
+            if (TryGetComponent(out PlayerHealthHitstun hitstun))
+                hitstun.ApplyConfig(config);
+
             if (config != null && config.UseArenaHover)
                 body.useGravity = false;
         }
@@ -142,7 +152,6 @@ namespace LearningArchitect.Modules.InterviewArena
             UpdateCoyoteTime();
             UpdateDashTimers();
             ApplyVariableJumpCut();
-            BufferDashFromInput();
         }
 
         private void FixedUpdate()
@@ -150,11 +159,10 @@ namespace LearningArchitect.Modules.InterviewArena
             if (config == null)
                 return;
 
+            TryConsumeLocomotionBuffers();
+
             if (UsesArenaHover())
             {
-                if (input.ConsumeJump() && coyoteTimer > 0f)
-                    Jump();
-
                 if (dashTimer > 0f)
                 {
                     ApplyDashVelocity();
@@ -163,9 +171,6 @@ namespace LearningArchitect.Modules.InterviewArena
 
                 return;
             }
-
-            if (input.ConsumeJump() && coyoteTimer > 0f)
-                Jump();
 
             if (dashTimer > 0f)
             {
@@ -176,20 +181,53 @@ namespace LearningArchitect.Modules.InterviewArena
                 return;
             }
 
-            ApplyPlanarMovement(input.CurrentFrame.Move);
+            if (CanApplyPlanarLocomotion())
+                ApplyPlanarMovement(input.CurrentFrame.Move);
+
             ApplyWallSlide(ground.IsWalkable);
             ApplyFallGravity();
             ClampToArena();
         }
 
-        private void BufferDashFromInput()
+        private void TryConsumeLocomotionBuffers()
         {
-            PlayerInputFrame frame = input.CurrentFrame;
-            if (input.ConsumeDash() && dashCooldownTimer <= 0f &&
-                frame.Move.sqrMagnitude > config.InputDeadZone * config.InputDeadZone)
-            {
-                BeginDash(frame.Move);
-            }
+            if (dashTimer > 0f)
+                return;
+
+            if (TryBeginDashFromBuffer())
+                return;
+
+            if (actionCoordinator != null && !actionCoordinator.CanJump)
+                return;
+
+            if (input.ConsumeJump() && coyoteTimer > 0f)
+                Jump();
+        }
+
+        private bool TryBeginDashFromBuffer()
+        {
+            if (actionCoordinator != null && !actionCoordinator.CanDash)
+                return false;
+
+            if (!input.ConsumeDash() || dashCooldownTimer > 0f)
+                return false;
+
+            Vector2 move = input.CurrentFrame.Move;
+            if (move.sqrMagnitude <= config.InputDeadZone * config.InputDeadZone)
+                return false;
+
+            BeginDash(move);
+            return true;
+        }
+
+        private bool CanApplyPlanarLocomotion() =>
+            actionCoordinator == null || actionCoordinator.CanMove;
+
+        public void InterruptDash()
+        {
+            dashTimer = 0f;
+            if (actionCoordinator != null)
+                actionCoordinator.ClearLock(CharacterActionKind.Dash);
         }
 
         private void ApplyVariableJumpCut()
@@ -250,6 +288,9 @@ namespace LearningArchitect.Modules.InterviewArena
         {
             dashCooldownTimer = Mathf.Max(0f, dashCooldownTimer - Time.deltaTime);
             dashTimer = Mathf.Max(0f, dashTimer - Time.deltaTime);
+            if (dashTimer <= 0f && actionCoordinator != null)
+                actionCoordinator.ClearLock(CharacterActionKind.Dash);
+
             jumpGraceTimer = Mathf.Max(0f, jumpGraceTimer - Time.deltaTime);
             jumpAnimTimer = Mathf.Max(0f, jumpAnimTimer - Time.deltaTime);
             dashAnimTimer = Mathf.Max(0f, dashAnimTimer - Time.deltaTime);
@@ -274,6 +315,9 @@ namespace LearningArchitect.Modules.InterviewArena
             dashAnimTimer = config.DashDuration + 0.08f;
             jumpCutApplied = false;
 
+            if (actionCoordinator != null)
+                actionCoordinator.SetLock(CharacterActionLock.Dash(config.DashDuration));
+
             body.linearVelocity = new Vector3(
                 dashDirection.x * config.DashImpulse,
                 body.linearVelocity.y,
@@ -295,6 +339,10 @@ namespace LearningArchitect.Modules.InterviewArena
             jumpGraceTimer = 0.2f;
             jumpAnimTimer = 0.62f;
             JumpAnimBackward = ResolveJumpBackward();
+
+            if (actionCoordinator != null && config.JumpActionLockDuration > 0f)
+                actionCoordinator.SetLock(CharacterActionLock.Jump(config.JumpActionLockDuration));
+
             Vector3 velocity = body.linearVelocity;
             velocity.y = 0f;
             body.linearVelocity = velocity;
@@ -312,6 +360,13 @@ namespace LearningArchitect.Modules.InterviewArena
 
         private void ApplyPlanarMovement(Vector2 moveInput)
         {
+            if (actionCoordinator != null && !actionCoordinator.CanMove)
+            {
+                Vector3 velocity = body.linearVelocity;
+                body.linearVelocity = new Vector3(0f, velocity.y, 0f);
+                return;
+            }
+
             Vector3 wishDirection = GetCameraRelativeDirection(moveInput);
             bool grounded = ground.IsWalkable;
             float control = grounded ? 1f : config.AirControl;

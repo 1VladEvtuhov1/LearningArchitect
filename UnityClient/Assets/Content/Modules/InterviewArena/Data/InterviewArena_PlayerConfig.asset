@@ -36,3 +36,6 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
+  actionInputBufferDuration: 0.2
+  hitstunDuration: 0.35
+  jumpActionLockDuration: 0.15

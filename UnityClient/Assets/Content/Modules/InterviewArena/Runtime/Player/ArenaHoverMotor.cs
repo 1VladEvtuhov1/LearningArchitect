@@ -16,6 +16,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private Rigidbody body;
         private PlayerMotor playerMotor;
         private PlayerBuffController buffController;
+        private PlayerActionCoordinator actionCoordinator;
         private CapsuleCollider capsule;
 
         public bool IsGrounded { get; private set; }
@@ -33,6 +34,7 @@ namespace LearningArchitect.Modules.InterviewArena
             body = GetComponent<Rigidbody>();
             playerMotor = GetComponent<PlayerMotor>();
             buffController = GetComponent<PlayerBuffController>();
+            actionCoordinator = GetComponent<PlayerActionCoordinator>();
             capsule = GetComponent<CapsuleCollider>();
 
             if (inputReader == null)
@@ -187,6 +189,13 @@ namespace LearningArchitect.Modules.InterviewArena
 
         private void ApplyMovement(Vector3 wishDirection, GroundInfo ground, Vector2 moveInput)
         {
+            if (actionCoordinator != null && !actionCoordinator.CanMove)
+            {
+                Vector3 velocity = Velocity;
+                Velocity = new Vector3(0f, velocity.y, 0f);
+                return;
+            }
+
             Vector3 planeNormal = ground.IsWalkable ? ground.Normal : Vector3.up;
             float speedMultiplier = buffController != null
                 ? buffController.GetMultiplier(BuffKind.MoveSpeed)

@@ -52,6 +52,14 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private float inputDeadZone = 0.05f;
         [SerializeField] private float aimTurnSpeed = 900f;
 
+        [Header("Input Feel")]
+        [Tooltip("Forgiveness window for jump, dash, melee, and crossbow presses.")]
+        [SerializeField] private float actionInputBufferDuration = 0.2f;
+        [Tooltip("Movement / attack lock after receiving damage.")]
+        [SerializeField] private float hitstunDuration = 0.35f;
+        [Tooltip("Blocks dash/attack re-entry at jump start.")]
+        [SerializeField] private float jumpActionLockDuration = 0.15f;
+
         public bool UseArenaHover => useArenaHover;
         public float MoveSpeed => moveSpeed;
         public float GroundAcceleration => groundAcceleration;
@@ -85,5 +93,8 @@ namespace LearningArchitect.Modules.InterviewArena
         public float MaxStepHeight => maxStepHeight;
         public float InputDeadZone => inputDeadZone;
         public float AimTurnSpeed => aimTurnSpeed;
+        public float ActionInputBufferDuration => Mathf.Max(0f, actionInputBufferDuration);
+        public float HitstunDuration => Mathf.Max(0f, hitstunDuration);
+        public float JumpActionLockDuration => Mathf.Max(0f, jumpActionLockDuration);
     }
 }

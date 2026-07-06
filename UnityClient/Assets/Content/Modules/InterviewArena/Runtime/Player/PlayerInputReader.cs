@@ -11,7 +11,7 @@ namespace LearningArchitect.Modules.InterviewArena
     }
 
     /// <summary>
-    /// Samples input in Update; jump/dash are buffered for FixedUpdate consumption (stable physics).
+    /// Samples input in Update; jump/dash/combat actions use timed buffers for FixedUpdate / LateUpdate consumption.
     /// Uses the Input System package only (no legacy UnityEngine.Input calls).
     /// </summary>
     [DefaultExecutionOrder(-100)]
@@ -19,61 +19,48 @@ namespace LearningArchitect.Modules.InterviewArena
     public sealed class PlayerInputReader : MonoBehaviour
     {
         [SerializeField] private float moveDeadZone = 0.12f;
+        [SerializeField] private float actionInputBufferDuration = 0.2f;
 
         private PlayerInputFrame currentFrame;
-        private bool jumpBuffered;
-        private bool dashBuffered;
-        private bool meleeBuffered;
-        private bool crossbowBuffered;
+        private TimedInputBuffer jumpBuffer;
+        private TimedInputBuffer dashBuffer;
+        private TimedInputBuffer meleeBuffer;
+        private TimedInputBuffer crossbowBuffer;
         private bool stanceToggleBuffered;
 
         public PlayerInputFrame CurrentFrame => currentFrame;
         public bool JumpHeld { get; private set; }
         public bool InteractHeld { get; private set; }
 
+        public void ApplyConfig(PlayerConfig config)
+        {
+            if (config == null)
+                return;
+
+            actionInputBufferDuration = config.ActionInputBufferDuration;
+        }
+
         private void Update()
         {
+            float deltaTime = Time.deltaTime;
+            jumpBuffer.Tick(deltaTime);
+            dashBuffer.Tick(deltaTime);
+            meleeBuffer.Tick(deltaTime);
+            crossbowBuffer.Tick(deltaTime);
+
             currentFrame = ReadMoveFrame();
             JumpHeld = ReadJumpHeld();
             InteractHeld = ReadInteractHeld();
             BufferActions();
         }
 
-        public bool ConsumeJump()
-        {
-            if (!jumpBuffered)
-                return false;
+        public bool ConsumeJump() => jumpBuffer.Consume();
 
-            jumpBuffered = false;
-            return true;
-        }
+        public bool ConsumeDash() => dashBuffer.Consume();
 
-        public bool ConsumeDash()
-        {
-            if (!dashBuffered)
-                return false;
+        public bool ConsumeMeleeAttack() => meleeBuffer.Consume();
 
-            dashBuffered = false;
-            return true;
-        }
-
-        public bool ConsumeMeleeAttack()
-        {
-            if (!meleeBuffered)
-                return false;
-
-            meleeBuffered = false;
-            return true;
-        }
-
-        public bool ConsumeCrossbowAttack()
-        {
-            if (!crossbowBuffered)
-                return false;
-
-            crossbowBuffered = false;
-            return true;
-        }
+        public bool ConsumeCrossbowAttack() => crossbowBuffer.Consume();
 
         public bool ConsumeStanceToggle()
         {
@@ -87,16 +74,16 @@ namespace LearningArchitect.Modules.InterviewArena
         private void BufferActions()
         {
             if (WasJumpPressed())
-                jumpBuffered = true;
+                jumpBuffer.Press(actionInputBufferDuration);
 
             if (WasDashPressed())
-                dashBuffered = true;
+                dashBuffer.Press(actionInputBufferDuration);
 
             if (WasMeleePressed())
-                meleeBuffered = true;
+                meleeBuffer.Press(actionInputBufferDuration);
 
             if (WasCrossbowPressed())
-                crossbowBuffered = true;
+                crossbowBuffer.Press(actionInputBufferDuration);
 
             if (WasStanceTogglePressed())
                 stanceToggleBuffered = true;
