@@ -31,8 +31,7 @@
 3. `SETUP.md` — editor menus  
 4. `INTEGRATION_ASSESSMENT.md` — fit в репозиторий  
 5. `docs/04_BACKLOG.md` — lobby, backend, multiplayer  
-
-## Planned runtime layout
+6. `docs/05_GAME_FEEL_PLAN.md` — полировка отклика персонажа  
 
 ```text
 Assets/Content/Modules/InterviewArena/

@@ -37,7 +37,7 @@ Review it regularly and trim anything that has become a stable decision or a res
 
 ### Authoring Contract State
 
-- `Docs/HubAndCarrierAuthoring.md` is now the explicit contract doc for:
+- `docs/HubAndCarrierAuthoring.md` is now the explicit contract doc for:
   - the hub prefab baseline;
   - `DescriptionPanel` viewport contract;
   - reusable carrier-prefab wiring.

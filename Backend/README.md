@@ -34,7 +34,7 @@ dotnet run
 - Root: `http://localhost:5000/`
 - Liveness: `GET /health`
 - Readiness (Postgres): `GET /health/ready`
-- Login: `POST /api/auth/login-by-name` — see `Docs/ApiContract.md`
+- Login: `POST /api/auth/login-by-name` — see `docs/ApiContract.md`
 - Profile: `GET /api/profile/me` with `Authorization: Bearer {sessionToken}`
 - OpenAPI (Development): `/openapi/v1.json`
 
@@ -60,7 +60,7 @@ dotnet test
 - [x] `GET /api/lobbies`, `POST /api/lobbies`, join, ready, **start match**
 - [x] Structured API errors (`errorCode`, `message`)
 
-## Next (see `Docs/Roadmap.md`)
+## Next (see `docs/Roadmap.md`)
 
 - PostgreSQL persistence for users/sessions/lobbies
 - Match start + result persistence

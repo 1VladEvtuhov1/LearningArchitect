@@ -1,6 +1,6 @@
 # Client–Server Flow
 
-High-level flow for ExtractionRPG / Interview Arena multiplayer loop. Backend is **not implemented** yet; this document defines the target contract for client and API work.
+High-level flow for ExtractionRPG / Interview Arena multiplayer loop. Backend **MVP2/MVP3 in-memory** paths are implemented (auth, lobby, match start/result); PostgreSQL persistence and authoritative multiplayer sync remain open.
 
 ## End-to-End Flow
 
@@ -48,17 +48,20 @@ High-level flow for ExtractionRPG / Interview Arena multiplayer loop. Backend is
 2. Server persists run summary (duration, outcome, stats).
 3. Client shows result screen; optional leaderboard fetch.
 
-## Current State (migration baseline)
+## Current State
 
 | Phase | Unity client | Backend |
 |-------|--------------|---------|
 | Local arena | ✅ Interview Arena scene, local play | — |
-| Login / lobby | — | — |
-| Match sync | — | — |
-| Results / leaderboard | — | — |
+| Login / lobby | ✅ HTTP client + online flow controller | ✅ in-memory auth + lobbies |
+| Match start / result submit | ✅ via `IBackendApiClient` | ✅ in-memory match records |
+| Result persistence / leaderboard | — | ⏳ PostgreSQL |
+| Multiplayer sync (authority) | — | ⏳ TBD |
+
+Workspace map: [[LearningArchitect/docs/Architecture]]. Status detail: [[LearningArchitect/docs/Roadmap]].
 
 ## Related Docs
 
-- API shapes: `ApiContract.md`
-- Arena client design: `UnityClient/Docs/Modules/InterviewArena/docs/02_LOBBY_AND_ACCOUNTS.md`
-- Detailed API draft: `UnityClient/Docs/Modules/InterviewArena/docs/09_SERVER_API_DRAFT.md`
+- API shapes: [[LearningArchitect/docs/ApiContract]]
+- Arena client design: `UnityClient/docs/Modules/InterviewArena/docs/02_LOBBY_AND_ACCOUNTS.md`
+- Detailed API draft: `UnityClient/docs/Modules/InterviewArena/docs/09_SERVER_API_DRAFT.md`

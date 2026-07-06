@@ -105,7 +105,7 @@ Next Useful Steps:
 
 Primary Files:
 
-- `Docs/TestingStrategy.md`
+- `docs/TestingStrategy.md`
 - `Assets/Content/Showcase/Tests/EditMode/Core`
 - `Assets/Content/Showcase/UI`
 
@@ -137,7 +137,7 @@ Primary Files:
 - `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationProfileSO.cs`
 - `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidCrowdActor.cs`
 - `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
-- `Docs/HumanoidAnimationSetup.md`
+- `docs/HumanoidAnimationSetup.md`
 
 ### T-005: Finish Carrier-Prefab Cleanup Across Modules
 
@@ -155,7 +155,7 @@ Known State:
 - `ShowcaseVisualInstanceFactory` centralizes runtime marker instantiation and collider stripping;
 - AI runtime has already been reduced to the prefab-driven path and no longer carries dead `PrimitiveType` configuration through the simulation host;
 - layered animation now also uses the real actor-prefab path and no longer keeps procedural fallback visuals.
-- the contract is now documented explicitly in `Docs/HubAndCarrierAuthoring.md`.
+- the contract is now documented explicitly in `docs/HubAndCarrierAuthoring.md`.
 
 Next Useful Steps:
 
@@ -211,8 +211,8 @@ Goal:
 
 Known State:
 
-- full design package lives in `Docs/Modules/InterviewArena/` (imported from `Assets/Content/interview-arena-project-docs`);
-- integration assessment and phased rollout documented in `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`;
+- full design package lives in `docs/Modules/InterviewArena/` (imported from `Assets/Content/interview-arena-project-docs`);
+- integration assessment and phased rollout documented in `docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`;
 - Cursor rules: `.cursor/rules/interview-arena.mdc`;
 - architecture core in code (`GameStateMachine`, `InterviewArenaRuntimeContext`, `PhysicsQueryService`, buffered input, slope locomotion);
 - player mechanics polished without requiring a configured scene (prefab fields may stay empty).
@@ -226,6 +226,6 @@ Next Useful Steps:
 
 Primary Files:
 
-- `Docs/Modules/InterviewArena/README.md`
-- `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
-- `Docs/Modules/InterviewArena/docs/04_BACKLOG.md`
+- `docs/Modules/InterviewArena/README.md`
+- `docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+- `docs/Modules/InterviewArena/docs/04_BACKLOG.md`

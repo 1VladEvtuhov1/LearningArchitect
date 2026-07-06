@@ -2,7 +2,7 @@
 
 Project-specific notes for shipping `LearningArchitect` as a lightweight WebGL showcase.
 
-For the operational build and deployment checklist, see `Docs/WebDeployment.md`.
+For the operational build and deployment checklist, see `docs/WebDeployment.md`.
 
 ## Goals
 

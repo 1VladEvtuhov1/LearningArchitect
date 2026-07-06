@@ -175,7 +175,7 @@ Unity WebGL + Netcode/транспорты — ограничения памят
 
 ## Чеклист перед стартом кода
 
-- [ ] Зафиксировать D-00X в `Docs/Decisions.md` (hub-only entry, mock server policy)  
+- [ ] Зафиксировать D-00X в `docs/Decisions.md` (hub-only entry, mock server policy)  
 - [ ] Добавить T-007 в `OpenThreads.md`  
 - [ ] Выбрать backend stack (`11_BACKEND_STACK_OPTIONS.md`)  
 - [ ] Определить stress presets и `visualLimit` для WebGL  
@@ -186,7 +186,7 @@ Unity WebGL + Netcode/транспорты — ограничения памят
 
 ## Связанные файлы репозитория
 
-- `Docs/Architecture.md` — extension workflow  
-- `Docs/WebDeployment.md` — WebGL constraints  
-- `Docs/TestingStrategy.md` — EditMode vs PlayMode vs server tests  
+- `docs/Architecture.md` — extension workflow  
+- `docs/WebDeployment.md` — WebGL constraints  
+- `docs/TestingStrategy.md` — EditMode vs PlayMode vs server tests  
 - `.cursor/rules/interview-arena.mdc` — правила для агента при работе над модулем  

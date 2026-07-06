@@ -8,7 +8,7 @@ This folder is the **Unity project** for ExtractionRPG. Open it in Unity Hub —
 2. Open `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`.
 3. For Interview Arena: **Learning Architect → Interview Arena → Setup Complete (Prefabs + Scene + Wire Player)** (or existing setup menu).
 
-Product-level docs: `../Docs/README.md`. Portfolio site: `../Site/`.
+Product-level docs: `../docs/README.md`. Portfolio site: `../Site/`.
 
 ---
 
@@ -44,7 +44,7 @@ Active module groups:
 - architecture-pattern modules: `Update Loop Strategies`, `Object Pooling`, `VFX Delivery`
 - simulation modules: `Effects System`, `AI System`, `Inventory Systems`, `Layered Character Animation`
 
-The full module taxonomy and per-variant breakdown live in `Architecture.md` (this folder). Product workspace overview: `../../Docs/Architecture.md`.
+The full module taxonomy and per-variant breakdown live in `Architecture.md` (this folder). Product workspace overview: `../../docs/Architecture.md`.
 
 ## Core Ideas
 
@@ -124,14 +124,14 @@ The embedded demo is meant to support interview review, not to act like a produc
 
 Unity-specific (paths relative to `UnityClient/`):
 
-- Documentation index: `Docs/README.md`
-- Showcase architecture: `Docs/Architecture.md`
-- Web runbook: `Docs/WebDeployment.md`
-- Testing strategy: `Docs/TestingStrategy.md`
+- Documentation index: `docs/README.md`
+- Showcase architecture: `docs/Architecture.md`
+- Web runbook: `docs/WebDeployment.md`
+- Testing strategy: `docs/TestingStrategy.md`
 
 Product workspace (repository root):
 
-- `../Docs/README.md` — ExtractionRPG overview, API, roadmap
+- `../docs/README.md` — ExtractionRPG overview, API, roadmap
 - `../README.md` — how to open Unity client
 
 ## Tooling Notes

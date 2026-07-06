@@ -29,7 +29,7 @@ Open the Unity project from `UnityClient/` in Unity Hub. Paths below are relativ
 
 ## Documentation
 
-- Unity client docs: `UnityClient/Docs/`
-- Product workspace docs: `../../Docs/`
+- Unity client docs: `UnityClient/docs/`
+- Product workspace docs: `../../docs/`
 
-Do not use this folder as a dump for external doc packages — specs belong in `UnityClient/Docs/`.
+Do not use this folder as a dump for external doc packages — specs belong in `UnityClient/docs/`.

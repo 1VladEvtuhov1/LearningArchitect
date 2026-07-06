@@ -347,7 +347,7 @@ The animation module was the last major holdout here and now also requires a rea
 
 The practical authoring contract for the hub prefab, `DescriptionPanel`, and reusable carriers lives in:
 
-- `Docs/HubAndCarrierAuthoring.md`
+- `docs/HubAndCarrierAuthoring.md`
 
 ## Hub UI Authoring
 
@@ -465,17 +465,17 @@ The current architecture favors integration-level validation because most value 
 
 Detailed guidance for test layering, suite categories, and build-safety rules lives in:
 
-- `Docs/TestingStrategy.md`
+- `docs/TestingStrategy.md`
 
 Project continuity notes live in:
 
-- `Docs/Decisions.md`
-- `Docs/OpenThreads.md`
-- `Docs/WorkingMemory.md`
+- `docs/Decisions.md`
+- `docs/OpenThreads.md`
+- `docs/WorkingMemory.md`
 
 ## Planned Module: Interview Arena
 
-A large planned module (**Interview Arena**) is documented under `Docs/Modules/InterviewArena/`.
+A large planned module (**Interview Arena**) is documented under `docs/Modules/InterviewArena/`.
 
 Intent:
 
@@ -485,7 +485,7 @@ Intent:
 
 Integration assessment and phased rollout:
 
-- `Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+- `docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
 
 Runtime code lives under `Assets/Content/Modules/InterviewArena/`. The playable shell is a **separate scene** (`Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity`), opened from the hub via `InterviewArenaLaunchDock` and `ShowcaseSceneLoader` — not via the module/variant extension workflow below.
 

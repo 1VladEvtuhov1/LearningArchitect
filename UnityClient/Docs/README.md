@@ -2,7 +2,7 @@
 
 Unity-specific documentation. All paths like `Assets/...` in this folder are relative to **`UnityClient/`**.
 
-Product-level docs (client + backend + roadmap): **`../../Docs/`** at repository root.
+Product-level docs (client + backend + roadmap): **`../../docs/`** at repository root.
 
 This folder is intentionally split into a small set of documents with different roles.
 
@@ -78,7 +78,7 @@ If you are preparing delivery or a demo:
 - `Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
   - fit, risks, and phased integration with the existing showcase hub.
 
-Product workspace docs live in **`../../Docs/`** (not duplicated here).
+Product workspace docs live in **`../../docs/`** (not duplicated here).
 
 ## Source-Of-Truth Rules
 

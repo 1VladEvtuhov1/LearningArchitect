@@ -2,7 +2,7 @@
 
 Product-level API summary. **Auth MVP** in `Backend/src/ExtractionRpg.Api/`.
 
-Canonical detailed draft: `UnityClient/Docs/Modules/InterviewArena/docs/09_SERVER_API_DRAFT.md`.
+Canonical detailed draft: `UnityClient/docs/Modules/InterviewArena/docs/09_SERVER_API_DRAFT.md`.
 
 Base URL (local): `http://localhost:5000`
 
@@ -116,10 +116,10 @@ Structured error body:
 
 ## WebSocket (planned)
 
-Lobby presence and match events — see `UnityClient/Docs/Modules/InterviewArena/docs/02_LOBBY_AND_ACCOUNTS.md`.
+Lobby presence and match events — see `UnityClient/docs/Modules/InterviewArena/docs/02_LOBBY_AND_ACCOUNTS.md`.
 
 ## Implementation Notes
 
 - Pin-code login may replace or supplement username login; update this doc when chosen.
-- Session tokens are **opaque** (server-side), not JWT — see `Docs/Decisions.md` D-WS-005.
+- Session tokens are **opaque** (server-side), not JWT — see `docs/Decisions.md` D-WS-005.
 - Users/sessions are **in-memory** until PostgreSQL persistence lands (MVP3+).

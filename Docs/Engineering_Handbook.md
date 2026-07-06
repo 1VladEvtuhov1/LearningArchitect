@@ -28,7 +28,7 @@
 
 - Текущий код и соседние классы  
 - [`AGENT_PROJECT.md`](AGENT_PROJECT.md) — пути, wiring, существующий API репозитория  
-- `Docs/README.md`, `Docs/Roadmap.md`, документация модуля  
+- `docs/README.md`, `docs/Roadmap.md`, документация модуля  
 - Roadmap / SkillsRoadmap (что делать, не как)  
 - Реализация в репозитории важнее любой абстракции  
 
