@@ -27,6 +27,7 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private InterviewArenaCameraFollow cameraFollow;
         [SerializeField] private InterviewArenaCombatServices combatServices;
         [SerializeField] private PlayerIframeHud playerIframeHud;
+        [SerializeField] private PlayerDashCooldownHud playerDashCooldownHud;
         [SerializeField] private PlayerBuffHud playerBuffHud;
 
         [Header("Online")]
@@ -83,6 +84,8 @@ namespace LearningArchitect.Modules.InterviewArena
                 missing.Add(nameof(cameraFollow));
             if (playerIframeHud == null)
                 missing.Add(nameof(playerIframeHud));
+            if (playerDashCooldownHud == null)
+                missing.Add(nameof(playerDashCooldownHud));
             if (playerBuffHud == null)
                 missing.Add(nameof(playerBuffHud));
             if (projectilesRoot == null)
@@ -106,6 +109,7 @@ namespace LearningArchitect.Modules.InterviewArena
             cameraFollow.SetTarget(followTarget);
 
             WirePlayerIframeHud();
+            WirePlayerDashCooldownHud();
             WirePlayerBuffHud();
             WirePlayerCombatServices();
             WireSceneEnemies();
@@ -136,6 +140,11 @@ namespace LearningArchitect.Modules.InterviewArena
             }
 
             playerIframeHud.BindPlayerHealth(health);
+        }
+
+        private void WirePlayerDashCooldownHud()
+        {
+            playerDashCooldownHud.BindPlayerMotor(player);
         }
 
         private void WirePlayerBuffHud()

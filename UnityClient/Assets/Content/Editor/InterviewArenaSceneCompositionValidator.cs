@@ -137,6 +137,9 @@ namespace LearningArchitect.EditorTools
             if (serialized.FindProperty("playerIframeHud").objectReferenceValue == null)
                 report.AddError("InterviewArenaRuntimeContext.playerIframeHud is not assigned.", context);
 
+            if (serialized.FindProperty("playerDashCooldownHud").objectReferenceValue == null)
+                report.AddError("InterviewArenaRuntimeContext.playerDashCooldownHud is not assigned.", context);
+
             if (serialized.FindProperty("playerBuffHud").objectReferenceValue == null)
                 report.AddError("InterviewArenaRuntimeContext.playerBuffHud is not assigned.", context);
 

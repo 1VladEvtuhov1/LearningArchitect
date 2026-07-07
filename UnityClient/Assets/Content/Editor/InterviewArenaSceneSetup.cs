@@ -106,7 +106,7 @@ namespace LearningArchitect.EditorTools
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem));
             AddUiInputModule(eventSystem);
 
-            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerIframeHud playerIframeHud, out PlayerBuffHud playerBuffHud, out GameObject popupsCanvasObject);
+            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerIframeHud playerIframeHud, out PlayerDashCooldownHud playerDashCooldownHud, out PlayerBuffHud playerBuffHud, out GameObject popupsCanvasObject);
 
             BackendApiConfig backendConfig = EnsureBackendApiConfigAsset();
             InterviewArenaOnlineFlowController onlineFlow = WireOnlineFlow(popupsCanvasObject.transform, context, backendConfig);
@@ -117,6 +117,7 @@ namespace LearningArchitect.EditorTools
             serializedContext.FindProperty("playerConfig").objectReferenceValue = playerConfig;
             serializedContext.FindProperty("arenaFloorCollider").objectReferenceValue = platformCollider;
             serializedContext.FindProperty("playerIframeHud").objectReferenceValue = playerIframeHud;
+            serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue = playerDashCooldownHud;
             serializedContext.FindProperty("playerBuffHud").objectReferenceValue = playerBuffHud;
             serializedContext.FindProperty("levelRoot").objectReferenceValue = roots.Level;
             serializedContext.FindProperty("arenaRoot").objectReferenceValue = roots.Level;
@@ -180,13 +181,13 @@ namespace LearningArchitect.EditorTools
             hoverAnchor.transform.SetParent(root.transform, false);
             hoverAnchor.transform.localPosition = new Vector3(0f, 0.05f, 0f);
 
-            GameObject visualAnchor = new GameObject("VisualAnchor");
-            visualAnchor.transform.SetParent(root.transform, false);
-            visualAnchor.transform.localPosition = new Vector3(0f, -1f, 0f);
-
             GameObject viewPivot = new GameObject("ViewPivot");
             viewPivot.transform.SetParent(root.transform, false);
             viewPivot.transform.localPosition = new Vector3(0f, 0.35f, 0f);
+
+            GameObject visualAnchor = new GameObject("VisualAnchor");
+            visualAnchor.transform.SetParent(viewPivot.transform, false);
+            visualAnchor.transform.localPosition = new Vector3(0f, -1.35f, 0f);
 
             root.AddComponent<PlayerInputReader>();
             GroundDetector ground = root.AddComponent<GroundDetector>();
@@ -211,7 +212,9 @@ namespace LearningArchitect.EditorTools
             root.AddComponent<PlayerBuffController>();
             root.AddComponent<PlayerBuffPickupInteractor>();
             root.AddComponent<PlayerBuffVfx>();
-            WireArenaHumanoidVisual(root, visualAnchor.transform, EnsurePaladinCombatProfile());
+            HumanoidAnimationProfileSO combatProfile = EnsurePaladinCombatProfile();
+            WireArenaHumanoidVisual(root, visualAnchor.transform, combatProfile);
+            EnsureEmbeddedHumanoidVisual(visualAnchor.transform, combatProfile);
             WirePlayerSupportReferences(root);
 
             SerializedObject motorSerialized = new SerializedObject(motor);
@@ -262,6 +265,43 @@ namespace LearningArchitect.EditorTools
             UnityEngine.Object.DestroyImmediate(root);
             AssetDatabase.SaveAssets();
             Debug.Log($"[InterviewArena] Enemy prefab saved to {EnemyPrefabPath}");
+        }
+
+        [MenuItem("Learning Architect/Interview Arena/Bake Humanoid Visual Into Player Prefab")]
+        public static void BakeHumanoidVisualIntoPlayerPrefab()
+        {
+            HumanoidAnimationProfileSO profile = EnsurePaladinCombatProfile();
+            if (profile == null || !profile.HasActorPrefab)
+            {
+                Debug.LogError("[InterviewArena] Paladin combat animation profile or actor prefab is missing.");
+                return;
+            }
+
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+            if (prefabRoot == null)
+            {
+                Debug.LogError($"[InterviewArena] Missing prefab at {PlayerPrefabPath}.");
+                return;
+            }
+
+            try
+            {
+                Transform visualAnchor = prefabRoot.transform.Find("VisualAnchor");
+                if (visualAnchor == null)
+                {
+                    Debug.LogError("[InterviewArena] Player prefab is missing VisualAnchor.");
+                    return;
+                }
+
+                EnsureEmbeddedHumanoidVisual(visualAnchor, profile);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, PlayerPrefabPath);
+                AssetDatabase.SaveAssets();
+                Debug.Log($"[InterviewArena] Embedded humanoid visual under VisualAnchor in {PlayerPrefabPath}.");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
         }
 
         [MenuItem("Learning Architect/Interview Arena/Wire Scene Player From Prefab")]
@@ -322,6 +362,9 @@ namespace LearningArchitect.EditorTools
                 serializedContext.FindProperty("playerBuffHud").objectReferenceValue = buffHud;
             }
 
+            if (serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue == null)
+                EnsurePlayerDashCooldownHud(context, serializedContext);
+
             InterviewArenaCombatServices combatServices = ResolveOrCreateSceneCombatServices(context);
             Transform projectilesRoot = serializedContext.FindProperty("projectilesRoot").objectReferenceValue as Transform;
             if (projectilesRoot != null)
@@ -343,6 +386,11 @@ namespace LearningArchitect.EditorTools
                 hudSerialized.FindProperty("playerHealth").objectReferenceValue = playerHealth;
                 hudSerialized.ApplyModifiedPropertiesWithoutUndo();
             }
+
+            PlayerDashCooldownHud dashHud =
+                serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue as PlayerDashCooldownHud;
+            if (dashHud != null && motor != null)
+                dashHud.BindPlayerMotor(motor);
 
             MarkPlayerInstanceWiringDirty(instance);
 
@@ -662,6 +710,102 @@ namespace LearningArchitect.EditorTools
             return hud;
         }
 
+        private static PlayerDashCooldownHud CreatePlayerDashCooldownHud(Transform canvasParent)
+        {
+            GameObject host = new GameObject(
+                "Container - PlayerDashCooldownHud",
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(PlayerDashCooldownHud));
+            host.transform.SetParent(canvasParent, false);
+
+            RectTransform hostRect = host.GetComponent<RectTransform>();
+            hostRect.anchorMin = new Vector2(0f, 1f);
+            hostRect.anchorMax = new Vector2(0f, 1f);
+            hostRect.pivot = new Vector2(0f, 1f);
+            hostRect.anchoredPosition = new Vector2(28f, -172f);
+            hostRect.sizeDelta = new Vector2(220f, 18f);
+
+            CanvasGroup group = host.GetComponent<CanvasGroup>();
+
+            GameObject background = new GameObject("Image - Background", typeof(RectTransform), typeof(Image));
+            background.transform.SetParent(host.transform, false);
+            RectTransform backgroundRect = background.GetComponent<RectTransform>();
+            backgroundRect.anchorMin = Vector2.zero;
+            backgroundRect.anchorMax = Vector2.one;
+            backgroundRect.offsetMin = Vector2.zero;
+            backgroundRect.offsetMax = Vector2.zero;
+            Image backgroundImage = background.GetComponent<Image>();
+            backgroundImage.color = ShowcasePalette.WithAlpha(ShowcasePalette.PanelMain, 0.75f);
+
+            GameObject fill = new GameObject("Image - Fill", typeof(RectTransform), typeof(Image));
+            fill.transform.SetParent(host.transform, false);
+            RectTransform fillRect = fill.GetComponent<RectTransform>();
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+            Image fillImage = fill.GetComponent<Image>();
+            fillImage.color = new Color(0.95f, 0.82f, 0.35f, 0.95f);
+            fillImage.type = Image.Type.Filled;
+            fillImage.fillMethod = Image.FillMethod.Horizontal;
+            fillImage.fillOrigin = (int)Image.OriginHorizontal.Right;
+            fillImage.fillAmount = 0f;
+            fillImage.enabled = false;
+
+            TextMeshProUGUI label = CreateLabel(
+                host.transform,
+                "Text - Label",
+                12,
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(0f, 20f),
+                new Vector2(220f, 18f));
+            label.alignment = TextAlignmentOptions.Left;
+            label.text = "Shift";
+
+            PlayerDashCooldownHud hud = host.GetComponent<PlayerDashCooldownHud>();
+            SerializedObject hudSerialized = new SerializedObject(hud);
+            hudSerialized.FindProperty("fillImage").objectReferenceValue = fillImage;
+            hudSerialized.FindProperty("canvasGroup").objectReferenceValue = group;
+            hudSerialized.FindProperty("label").objectReferenceValue = label;
+            hudSerialized.ApplyModifiedPropertiesWithoutUndo();
+            return hud;
+        }
+
+        private static void EnsurePlayerDashCooldownHud(
+            InterviewArenaRuntimeContext context,
+            SerializedObject serializedContext,
+            Transform hudCanvas = null)
+        {
+            if (context == null || serializedContext == null)
+                return;
+
+            PlayerDashCooldownHud existing =
+                serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue as PlayerDashCooldownHud;
+            if (existing != null)
+                return;
+
+            existing = UnityEngine.Object.FindFirstObjectByType<PlayerDashCooldownHud>();
+            if (existing != null)
+            {
+                serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue = existing;
+                return;
+            }
+
+            if (hudCanvas == null)
+            {
+                Transform uiRoot = context.transform.root.Find("UI");
+                hudCanvas = uiRoot != null ? uiRoot.Find("Canvas_HUD_Dynamic") : null;
+            }
+
+            if (hudCanvas == null)
+                return;
+
+            existing = CreatePlayerDashCooldownHud(hudCanvas);
+            serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue = existing;
+        }
+
         private static void CreateTrainingDummy(Transform parent, string name, Vector3 position)
         {
             GameObject dummy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -927,6 +1071,13 @@ namespace LearningArchitect.EditorTools
                     PlayerBuffHud hud = hudCanvas.GetComponentInChildren<PlayerBuffHud>(true);
                     serializedContext.FindProperty("playerBuffHud").objectReferenceValue = hud;
                 }
+            }
+
+            if (serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue == null)
+            {
+                Transform hudCanvas = roots.Ui.Find("Canvas_HUD_Dynamic");
+                if (hudCanvas != null)
+                    EnsurePlayerDashCooldownHud(context, serializedContext, hudCanvas);
             }
 
             Transform bootstrap = context.transform;
@@ -1299,6 +1450,7 @@ namespace LearningArchitect.EditorTools
             Transform uiRoot,
             out Transform hudDynamicRoot,
             out PlayerIframeHud playerIframeHud,
+            out PlayerDashCooldownHud playerDashCooldownHud,
             out PlayerBuffHud playerBuffHud,
             out GameObject popupsCanvasObject)
         {
@@ -1353,6 +1505,7 @@ namespace LearningArchitect.EditorTools
             serializedUi.ApplyModifiedPropertiesWithoutUndo();
 
             playerIframeHud = CreatePlayerIframeHud(hudCanvasObject.transform);
+            playerDashCooldownHud = CreatePlayerDashCooldownHud(hudCanvasObject.transform);
             playerBuffHud = CreatePlayerBuffHud(hudCanvasObject.transform);
             hudDynamicRoot = hudCanvasObject.transform;
             popupsCanvasObject = popupsCanvas;
@@ -1409,6 +1562,31 @@ namespace LearningArchitect.EditorTools
             serialized.FindProperty("localPosition").vector3Value = Vector3.zero;
             serialized.FindProperty("hideCapsuleRenderer").boolValue = true;
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void EnsureEmbeddedHumanoidVisual(Transform visualAnchor, HumanoidAnimationProfileSO profile)
+        {
+            if (visualAnchor == null || profile == null || !profile.HasActorPrefab)
+                return;
+
+            for (int i = visualAnchor.childCount - 1; i >= 0; i--)
+            {
+                Transform child = visualAnchor.GetChild(i);
+                if (child.GetComponentInChildren<HumanoidCrowdActor>(true) != null)
+                    UnityEngine.Object.DestroyImmediate(child.gameObject);
+            }
+
+            GameObject instance = PrefabUtility.InstantiatePrefab(profile.ActorPrefab, visualAnchor) as GameObject;
+            if (instance == null)
+            {
+                Debug.LogError($"[InterviewArena] Could not instantiate actor prefab '{profile.ActorPrefab.name}'.");
+                return;
+            }
+
+            instance.name = "HumanoidVisual";
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+            instance.transform.localScale = Vector3.one;
         }
 
         private static void EnsureArenaBattleriteLocomotion(
@@ -1609,7 +1787,7 @@ namespace LearningArchitect.EditorTools
             hostRect.anchorMin = new Vector2(0f, 1f);
             hostRect.anchorMax = new Vector2(0f, 1f);
             hostRect.pivot = new Vector2(0f, 1f);
-            hostRect.anchoredPosition = new Vector2(28f, -188f);
+            hostRect.anchoredPosition = new Vector2(28f, -212f);
             hostRect.sizeDelta = new Vector2(220f, 56f);
 
             GameObject background = new GameObject("Image - Background", typeof(RectTransform), typeof(Image));
