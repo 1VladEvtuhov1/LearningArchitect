@@ -28,9 +28,15 @@ UnityClient/[Uu]ser[Ss]ettings/
 
 # Unity editor scratch / recovery / one-off test scenes
 UnityClient/Assets/_Recovery/
+UnityClient/Assets/_Recovery.meta
 **/_Recovery/
+**/_Recovery.meta
 InitTestScene*.unity
 InitTestScene*.unity.meta
+
+# Agent / local debug dumps (do not commit)
+debug-*.log
+**/debug-*.log
 
 # Local git-URL package experiments under Packages/ (not PackageCache)
 UnityClient/Packages/_*/
