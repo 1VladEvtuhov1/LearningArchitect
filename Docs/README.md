@@ -2,16 +2,16 @@
 
 Product-level documentation for the **ExtractionRPG** workspace.
 
-Unity-specific docs (showcase hub, Interview Arena scene composition, WebGL runbook) live under **`UnityClient/Docs/`**. Paths in those documents are relative to `UnityClient/` unless stated otherwise.
+Unity-specific docs (showcase hub, Interview Arena scene composition, WebGL runbook) live under **`UnityClient/docs/`**. Paths in those documents are relative to `UnityClient/` unless stated otherwise.
 
 ## Reading Order
 
-1. `Architecture.md` — workspace topology
-2. `ClientServerFlow.md` — login → match → result
-3. `ApiContract.md` — backend API draft
-4. `Roadmap.md` — phases and status
-5. `SkillsRoadmap.md` — interview skills checklist, project status, implementation priorities
-6. `Decisions.md` — durable product/workspace choices
+1. [Architecture.md](Architecture.md) — workspace topology, mermaid, cross-project links
+2. [ClientServerFlow.md](ClientServerFlow.md) — login → match → result
+3. [ApiContract.md](ApiContract.md) — backend API draft
+4. [Roadmap.md](Roadmap.md) — phases and status
+5. [SkillsRoadmap.md](SkillsRoadmap.md) — interview skills checklist, project status, implementation priorities
+6. [Decisions.md](Decisions.md) — durable product/workspace choices
 
 ## Agent workflow
 
@@ -30,7 +30,17 @@ Unity-specific docs (showcase hub, Interview Arena scene composition, WebGL runb
 
 ## Related Docs (Unity client)
 
-- Showcase architecture: `UnityClient/Docs/Architecture.md`
-- Interview Arena: `UnityClient/Docs/Modules/InterviewArena/README.md`
-- Web deployment: `UnityClient/Docs/WebDeployment.md`
-- Open threads: `UnityClient/Docs/OpenThreads.md`
+- Showcase architecture: `UnityClient/docs/Architecture.md`
+- Interview Arena: `UnityClient/docs/Modules/InterviewArena/README.md`
+- Web deployment: `UnityClient/docs/WebDeployment.md`
+- Open threads: `UnityClient/docs/OpenThreads.md`
+
+## Portfolio showcase
+
+Live WebGL demo via `Site/`. Spec: sibling repo `portfolio-hub` → `docs/projects/learningarchitect.md`  
+(Obsidian: [[portfolio-hub/docs/projects/learningarchitect]] · [[portfolio-hub/docs/PORTFOLIO]]).
+
+## Obsidian entry
+
+- [[LearningArchitect/docs/Architecture]]
+- [[Dashboard]]

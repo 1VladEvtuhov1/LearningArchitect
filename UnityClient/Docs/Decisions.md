@@ -133,7 +133,7 @@ Touches:
 - `Assets/Content/Showcase/UI/MetricsOverlayHost.cs`
 - `Assets/Content/Showcase/UI/MetricsOverlayRuntime.cs`
 - `Assets/Content/Showcase/UI/MetricsOverlayPresenter.cs`
-- `Docs/Architecture.md`
+- `docs/Architecture.md`
 - `WEBGL.md`
 
 ### D-004: Hub Prefab Visual Baseline Takes Priority Over UI Normalization
@@ -156,7 +156,7 @@ Touches:
 
 - `Assets/Content/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
 - `Assets/Content/Editor/ShowcaseLayoutTool.cs`
-- `Docs/HubAndCarrierAuthoring.md`
+- `docs/HubAndCarrierAuthoring.md`
 
 ### D-005: Description Panel Follows The Shipped Legacy Viewport Contract
 
@@ -179,7 +179,7 @@ Touches:
 - `Assets/Content/Showcase/UI/DescriptionPanel.cs`
 - `Assets/Content/Editor/ShowcaseValidator.cs`
 - `Assets/Content/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
-- `Docs/HubAndCarrierAuthoring.md`
+- `docs/HubAndCarrierAuthoring.md`
 
 ### D-006: Repo-Native Memory Before External Memory Tooling
 
@@ -189,7 +189,7 @@ Status:
 
 Decision:
 
-- project continuity is documented in-repo through `Docs/Decisions.md`, `Docs/OpenThreads.md`, and `Docs/WorkingMemory.md` before introducing external persistent-memory tooling.
+- project continuity is documented in-repo through `docs/Decisions.md`, `docs/OpenThreads.md`, and `docs/WorkingMemory.md` before introducing external persistent-memory tooling.
 
 Why:
 
@@ -199,9 +199,9 @@ Why:
 
 Touches:
 
-- `Docs/Decisions.md`
-- `Docs/OpenThreads.md`
-- `Docs/WorkingMemory.md`
+- `docs/Decisions.md`
+- `docs/OpenThreads.md`
+- `docs/WorkingMemory.md`
 
 ### D-008: Interview Arena Uses A Separate Scene
 

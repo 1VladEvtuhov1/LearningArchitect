@@ -1,7 +1,7 @@
 {
   "project": "Interview Arena",
   "hostRepository": "LearningArchitect",
-  "canonicalPath": "Docs/Modules/InterviewArena",
+  "canonicalPath": "docs/Modules/InterviewArena",
   "createdFor": "Unity WebGL multiplayer interview preparation module (showcase hub integration)",
   "files": [
     "../../.cursor/rules/interview-arena.mdc",

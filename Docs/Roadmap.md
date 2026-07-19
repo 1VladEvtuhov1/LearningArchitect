@@ -2,7 +2,7 @@
 
 ## Done (Unity client — local)
 
-- [x] Repository workspace layout: `UnityClient/`, `Backend/` scaffold, root `Docs/`, `Site/`
+- [x] Repository workspace layout: `UnityClient/`, `Backend/` scaffold, root `docs/`, `Site/`
 - [x] LearningArchitect showcase hub (7 modules, 16 variants)
 - [x] Interview Arena separate scene: locomotion, combat, AI FSM, buffs, scene composition
 - [x] WebGL-oriented defaults (layers, pooling, Brotli notes)
@@ -41,12 +41,12 @@
 
 ## Backlog
 
-- Hub experience controller (single-scene mode switch) — see `UnityClient/Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
+- Hub experience controller (single-scene mode switch) — see `UnityClient/docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
 - Localization for Arena UI via `ShowcaseContent`
-- Backend stack final choice: `UnityClient/Docs/Modules/InterviewArena/docs/11_BACKEND_STACK_OPTIONS.md`
+- Backend stack final choice: `UnityClient/docs/Modules/InterviewArena/docs/11_BACKEND_STACK_OPTIONS.md`
 
 ## Where to Track Active Work
 
 - **Skills & interview checklist (what to build next):** `SkillsRoadmap.md`
-- Unity showcase threads: `UnityClient/Docs/OpenThreads.md`
-- Arena backlog milestones: `UnityClient/Docs/Modules/InterviewArena/docs/04_BACKLOG.md`
+- Unity showcase threads: `UnityClient/docs/OpenThreads.md`
+- Arena backlog milestones: `UnityClient/docs/Modules/InterviewArena/docs/04_BACKLOG.md`

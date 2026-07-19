@@ -14,8 +14,8 @@
 | Showcase hub | `UnityClient/Assets/Content/Showcase/` |
 | Shared patterns | `UnityClient/Assets/Content/Shared/` |
 | Backend | `Backend/src/` |
-| Product docs | `Docs/` (корень репо) |
-| Unity module docs | `UnityClient/Docs/Modules/InterviewArena/` |
+| Product docs | `docs/` (корень репо) |
+| Unity module docs | `UnityClient/docs/Modules/InterviewArena/` |
 | Portfolio / WebGL shell | `Site/` |
 
 **Не править** `Assets/` в корне репо — актуальные ассеты под `UnityClient/Assets/Content/`.
@@ -26,10 +26,10 @@
 
 | Документ | Назначение |
 |----------|------------|
-| `Docs/Roadmap.md` | Продуктовые фазы (backend, WebGL, CI) |
-| `Docs/SkillsRoadmap.md` | Skills checklist, Tier A/B/C, очередь задач |
-| `UnityClient/Docs/Modules/InterviewArena/SETUP.md` | Setup Complete, Validate, Play smoke |
-| `UnityClient/Docs/OpenThreads.md` | Открытые ветки showcase |
+| `docs/Roadmap.md` | Продуктовые фазы (backend, WebGL, CI) |
+| `docs/SkillsRoadmap.md` | Skills checklist, Tier A/B/C, очередь задач |
+| `UnityClient/docs/Modules/InterviewArena/SETUP.md` | Setup Complete, Validate, Play smoke |
+| `UnityClient/docs/OpenThreads.md` | Открытые ветки showcase |
 
 ---
 
@@ -112,7 +112,7 @@
 ## Backend
 
 - Auth / lobby / match — REST в `Backend/src/`  
-- Match results пока in-memory; Postgres — по `Docs/Roadmap.md`  
+- Match results пока in-memory; Postgres — по `docs/Roadmap.md`  
 - Integration tests: `EXTRACTIONRPG_INTEGRATION=1` (см. backend README)  
 
 ---
@@ -140,7 +140,7 @@
     → A5 NavMesh, B3 UniTask, B4 Addressables
 ```
 
-Подробно: `Docs/SkillsRoadmap.md`.
+Подробно: `docs/SkillsRoadmap.md`.
 
 ---
 

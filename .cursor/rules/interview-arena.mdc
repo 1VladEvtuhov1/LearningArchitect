@@ -2,7 +2,7 @@
 description: Interview Arena module (LearningArchitect) — WebGL multiplayer arena planning and implementation
 globs:
   - "UnityClient/Assets/Content/Modules/InterviewArena/**/*.cs"
-  - "UnityClient/Docs/Modules/InterviewArena/**/*.md"
+  - "UnityClient/docs/Modules/InterviewArena/**/*.md"
 alwaysApply: false
 ---
 
@@ -10,11 +10,11 @@ alwaysApply: false
 
 Planned showcase module: compact WebGL multiplayer arena for interview preparation.
 
-**Canonical docs:** `UnityClient/Docs/Modules/InterviewArena/`. **Runtime assets & code:** `UnityClient/Assets/Content/Modules/InterviewArena/`.
+**Canonical docs:** `UnityClient/docs/Modules/InterviewArena/`. **Runtime assets & code:** `UnityClient/Assets/Content/Modules/InterviewArena/`.
 
-**Integration:** separate scene (`InterviewArena`) opened from the hub dock — **not** an 8th `ModuleDefinitionSO`. See `UnityClient/Docs/Decisions.md` D-008. Keep `ArchitectureShowcase` as the default build entry (D-001).
+**Integration:** separate scene (`InterviewArena`) opened from the hub dock — **not** an 8th `ModuleDefinitionSO`. See `UnityClient/docs/Decisions.md` D-008. Keep `ArchitectureShowcase` as the default build entry (D-001).
 
-**Unity project root:** open `UnityClient/` in Unity Hub. Product docs: `Docs/` at repository root.
+**Unity project root:** open `UnityClient/` in Unity Hub. Product docs: `docs/` at repository root.
 
 ## Main intent
 
@@ -27,7 +27,7 @@ Planned showcase module: compact WebGL multiplayer arena for interview preparati
 
 Use `LearningArchitect.Modules.InterviewArena.*` (or `InterviewArena.*` only if asmdef root name requires it — keep one convention per folder).
 
-Preferred areas (see `UnityClient/Docs/Modules/InterviewArena/docs/03_UNITY_MODULES.md`):
+Preferred areas (see `UnityClient/docs/Modules/InterviewArena/docs/03_UNITY_MODULES.md`):
 
 - Core, Auth, Lobby, Player, Physics, Combat, AI, Multiplayer, UI, Infrastructure
 
@@ -40,9 +40,9 @@ Gameplay -> Core/Data
 
 ## When editing
 
-1. Read `UnityClient/Docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md` for phased scope.
+1. Read `UnityClient/docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md` for phased scope.
 2. Match existing showcase patterns in `Assets/Content/Modules/*` and `Assets/Content/Showcase/Runtime`.
 3. User-visible strings go to `ShowcaseContent` / `ShowcaseUI`, not variant SO fields.
 4. **Do not** runtime-spawn the player with `CreatePrimitive` / `AddComponent` chains. Use prefab + scene references; empty serialized fields are fine until authored.
-5. Read `UnityClient/Docs/Modules/InterviewArena/CODE_ARCHITECTURE.md` before adding systems. Prefer NonAlloc physics, input buffering, and `PlayerConfig` tuning.
-6. Read `UnityClient/Docs/Modules/InterviewArena/SCENE_COMPOSITION.md` before changing scenes, prefab hierarchy, or UI object names. Runtime pools belong under scene services (`ArenaCombatServices`), not inside actor prefabs. UI widgets use Showcase naming: `Container -`, `Image -`, `Text -`.
+5. Read `UnityClient/docs/Modules/InterviewArena/CODE_ARCHITECTURE.md` before adding systems. Prefer NonAlloc physics, input buffering, and `PlayerConfig` tuning.
+6. Read `UnityClient/docs/Modules/InterviewArena/SCENE_COMPOSITION.md` before changing scenes, prefab hierarchy, or UI object names. Runtime pools belong under scene services (`ArenaCombatServices`), not inside actor prefabs. UI widgets use Showcase naming: `Container -`, `Image -`, `Text -`.

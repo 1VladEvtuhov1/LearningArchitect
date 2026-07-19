@@ -52,7 +52,7 @@
 | 9 | AI LOD (реже Update вдали) | ❌ | Все враги каждый кадр | Таймер по дистанции до камеры |
 | 10 | Виртуализация скролла (UI pool) | ❌ | Обычный `ScrollRect` в hub | Lobby browser при росте списка |
 | 11 | GPU Instancing | ❌ | `MaterialPropertyBlock` в VFX-модуле | Отдельный showcase-вариант или instanced crowd |
-| 12 | Profiler до/после | 🟡 | Metrics overlay, `SystemStatusSampler`, stress-модули | 2–3 скрина + цифры в `UnityClient/Docs/` |
+| 12 | Profiler до/после | 🟡 | Metrics overlay, `SystemStatusSampler`, stress-модули | 2–3 скрина + цифры в `UnityClient/docs/` |
 | 13 | Zenject / Extenject | ❌ | Composition root: `ShowcaseCompositionRoot`, `InterviewArenaRuntimeContext` | **Не обязателен** — уметь объяснить trade-off |
 | 14 | Addressables (load по ключу) | 🟡 | Пакет + группы (локализация); runtime `Load*` в коде нет | Загрузка Arena scene/prefab по ключу |
 | 15 | UniTask + CancellationToken | 🟡 | `Task` + `Task.Yield` в HTTP-клиенте; token в API | UniTask + `GetCancellationTokenOnDestroy` |
@@ -159,7 +159,7 @@
 | Тема | Статус | Действие |
 |------|--------|----------|
 | Гипотеза → профайл → фикс → повторный замер | 🟡 | Оформить 1–2 кейса в доке |
-| ADR / decisions | ✅ | `Docs/Decisions.md` |
+| ADR / decisions | ✅ | `docs/Decisions.md` |
 | Trade-offs (почему не ECS/Zenject/NGO) | 📋 | Короткая секция в `Decisions.md` |
 | Code review checklist для Unity | 📋 | Подписки, serialized refs, execution order |
 
@@ -285,8 +285,8 @@ WebGL deploy + Site                 A1–A2 loading; A6 WebGL profiler note
 | GameEvent (SO) | `UnityClient/Assets/Content/Shared/Events/` |
 | JSON settings | `UnityClient/Assets/Content/Shared/Settings/` |
 | Backend API | `Backend/src/ExtractionRpg.Api/` |
-| API contract | `Docs/ApiContract.md` |
-| Arena setup runbook | `UnityClient/Docs/Modules/InterviewArena/SETUP.md` |
+| API contract | `docs/ApiContract.md` |
+| Arena setup runbook | `UnityClient/docs/Modules/InterviewArena/SETUP.md` |
 | WebGL | `UnityClient/WEBGL.md` |
 
 ---
@@ -336,7 +336,7 @@ WebGL deploy + Site                 A1–A2 loading; A6 WebGL profiler note
 При закрытии пункта:
 
 1. Поменять статус в таблице (❌/🟡 → ✅).
-2. Добавить путь к коду или `Docs/...` с замерами.
+2. Добавить путь к коду или `docs/...` с замерами.
 3. При крупной фиче — строка в `Roadmap.md` и при необходимости `Decisions.md`.
 
 ---
@@ -349,8 +349,8 @@ WebGL deploy + Site                 A1–A2 loading; A6 WebGL profiler note
 | `ApiContract.md` | Контракт API |
 | `ClientServerFlow.md` | Login → match → result |
 | `Decisions.md` | Архитектурные решения (D-WS-*) |
-| `UnityClient/Docs/OpenThreads.md` | Активные UI/showcase задачи |
-| `UnityClient/Docs/Modules/InterviewArena/docs/04_BACKLOG.md` | Arena milestones |
-| `UnityClient/Docs/Modules/InterviewArena/SETUP.md` | Runbook Unity |
+| `UnityClient/docs/OpenThreads.md` | Активные UI/showcase задачи |
+| `UnityClient/docs/Modules/InterviewArena/docs/04_BACKLOG.md` | Arena milestones |
+| `UnityClient/docs/Modules/InterviewArena/SETUP.md` | Runbook Unity |
 
 *Последнее согласование с кодовой базой: май 2026.*

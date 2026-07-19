@@ -8,11 +8,11 @@ The repository is a **product workspace**: Unity client, backend scaffold, share
 
 - `UnityClient/` — Unity WebGL client, LearningArchitect showcase, Interview Arena scene
 - `Backend/` — ASP.NET Core backend API scaffold (implementation starts after migration)
-- `Docs/` — product-level documentation (architecture, API contract, roadmap)
+- `docs/` — product-level documentation (architecture, API contract, roadmap)
 - `Site/` — portfolio shell for WebGL delivery
 - `docker-compose.yml` — local infrastructure (PostgreSQL, Redis)
 
-Unity-specific runbooks, showcase docs, and Interview Arena specs live under **`UnityClient/Docs/`**.
+Unity-specific runbooks, showcase docs, and Interview Arena specs live under **`UnityClient/docs/`**.
 
 ## Main Product Flow
 
@@ -26,15 +26,17 @@ Pin login → Lobby → Ready-check → Match → Extraction/Death → Result pe
 
 ## Documentation
 
+Index: [docs/README.md](docs/README.md)
+
 | Topic | Location |
 |-------|----------|
-| Product architecture | `Docs/Architecture.md` |
-| Client ↔ server flow | `Docs/ClientServerFlow.md` |
-| API contract (draft) | `Docs/ApiContract.md` |
-| Roadmap | `Docs/Roadmap.md` |
-| Cross-cutting decisions | `Docs/Decisions.md` |
-| Unity showcase & Arena | `UnityClient/Docs/README.md` |
-| WebGL build & deploy | `UnityClient/Docs/WebDeployment.md` |
+| Product architecture | `docs/Architecture.md` |
+| Client ↔ server flow | `docs/ClientServerFlow.md` |
+| API contract (draft) | `docs/ApiContract.md` |
+| Roadmap | `docs/Roadmap.md` |
+| Cross-cutting decisions | `docs/Decisions.md` |
+| Unity showcase & Arena | `UnityClient/docs/README.md` |
+| WebGL build & deploy | `UnityClient/docs/WebDeployment.md` |
 
 ## Local infrastructure
 
