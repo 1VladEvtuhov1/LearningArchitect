@@ -39,7 +39,10 @@ debug-*.log
 **/debug-*.log
 
 # Local git-URL package experiments under Packages/ (not PackageCache)
+# Includes CoplayDev MCP scratch clones (often have nested .git → IDE SCM noise)
 UnityClient/Packages/_*/
+UnityClient/Packages/_mcp-test/
+**/Packages/_*/
 
 # Unity generated files
 sysinfo.txt
