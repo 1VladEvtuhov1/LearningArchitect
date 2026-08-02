@@ -15,12 +15,14 @@ namespace LearningArchitect.Modules.InterviewArena
         private Health health;
         private PlayerActionCoordinator actionCoordinator;
         private PlayerMotor playerMotor;
+        private MeleeStrikeController meleeStrike;
 
         private void Awake()
         {
             health = GetComponent<Health>();
             actionCoordinator = GetComponent<PlayerActionCoordinator>();
             playerMotor = GetComponent<PlayerMotor>();
+            meleeStrike = GetComponent<MeleeStrikeController>();
         }
 
         private void OnEnable()
@@ -45,6 +47,8 @@ namespace LearningArchitect.Modules.InterviewArena
             actionCoordinator.ApplyHitstun(config.HitstunDuration);
             if (playerMotor != null)
                 playerMotor.InterruptDash();
+            if (meleeStrike != null)
+                meleeStrike.InterruptStrike();
         }
     }
 }

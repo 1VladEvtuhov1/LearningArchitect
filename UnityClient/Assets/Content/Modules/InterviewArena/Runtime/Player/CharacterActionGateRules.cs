@@ -60,6 +60,10 @@ namespace LearningArchitect.Modules.InterviewArena
             return true;
         }
 
-        public static bool HasActiveAction(CharacterActionLock[] locks, int count) => count > 0;
+        public static bool HasActiveAction(CharacterActionLock[] locks, int count)
+        {
+            // Any lock (including hitstun) suppresses locomotion anim / turn-in-place commitment.
+            return count > 0;
+        }
     }
 }

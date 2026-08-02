@@ -33,7 +33,10 @@ namespace LearningArchitect.Modules.InterviewArena
             if (input == null)
                 return;
 
-            if (actionCoordinator != null && actionCoordinator.CanAttack && input.ConsumeMeleeAttack())
+            // Check gate before Consume* so a blocked press stays in the input buffer.
+            bool canAttack = actionCoordinator != null && actionCoordinator.CanAttack;
+
+            if (canAttack && input.ConsumeMeleeAttack())
             {
                 if (TryGetComponent(out PlayerCombatStance stance))
                     stance.SetStance(ArenaCombatStance.MeleeReady);
@@ -47,7 +50,7 @@ namespace LearningArchitect.Modules.InterviewArena
                 }
             }
 
-            if (actionCoordinator != null && actionCoordinator.CanAttack && input.ConsumeCrossbowAttack())
+            if (canAttack && input.ConsumeCrossbowAttack())
             {
                 if (TryGetComponent(out PlayerCombatStance stance))
                     stance.SetStance(ArenaCombatStance.BowAim);

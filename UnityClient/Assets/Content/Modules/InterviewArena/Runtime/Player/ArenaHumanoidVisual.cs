@@ -5,9 +5,9 @@ using IBodyFacingProvider = LearningArchitect.Modules.InterviewArena.IBodyFacing
 namespace LearningArchitect.Modules.InterviewArena
 {
     /// <summary>
-    /// Instantiates a humanoid visual from <see cref="HumanoidAnimationProfileSO"/>
-    /// and drives it from root physics instead of a capsule mesh.
-    /// Arena mode: lower body faces movement; idle turn-in-place toward aim; upper body IK.
+    /// Drives a humanoid visual from <see cref="HumanoidAnimationProfileSO"/>.
+    /// Prefer a nested actor under <see cref="visualAnchor"/> on the player prefab
+    /// (visible in Edit Mode). Runtime Instantiate is only a fallback if missing.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(110)]
@@ -19,6 +19,10 @@ namespace LearningArchitect.Modules.InterviewArena
         [SerializeField] private Vector3 localEulerAngles;
         [SerializeField] private Vector3 localScale = Vector3.one;
         [SerializeField] private bool hideCapsuleRenderer = true;
+        [Header("Debug Gizmos")]
+        [SerializeField] private bool drawFacingGizmos = true;
+        [SerializeField] private float facingGizmoLength = 1.75f;
+        [SerializeField] private float facingGizmoHeight = 1.1f;
 
         private HumanoidCrowdActor crowdActor;
         private HumanoidUpperBodyAimIk upperBodyAim;
@@ -44,7 +48,7 @@ namespace LearningArchitect.Modules.InterviewArena
         private bool wasJumpAnimActive;
         private bool wasDashAnimActive;
         private bool wasShootingAnimActive;
-        private bool wasMeleeAnimActive;
+        private int lastMeleeAnimStartVersion;
         private bool pendingHitTrigger;
 
         public HumanoidAnimationProfileSO Profile => profile;
@@ -183,7 +187,7 @@ namespace LearningArchitect.Modules.InterviewArena
             wasJumpAnimActive = false;
             wasDashAnimActive = false;
             wasShootingAnimActive = false;
-            wasMeleeAnimActive = false;
+            lastMeleeAnimStartVersion = 0;
             pendingHitTrigger = false;
             EnsureVisualInstance();
         }
@@ -399,11 +403,16 @@ namespace LearningArchitect.Modules.InterviewArena
 
             wasShootingAnimActive = shootingAnimActive;
 
-            bool meleeAnimActive = meleeStrike != null && meleeStrike.IsMeleeAnimActive;
-            if (meleeAnimActive && !wasMeleeAnimActive)
-                SetTrigger(profile.MeleeTriggerParameter);
-
-            wasMeleeAnimActive = meleeAnimActive;
+            if (meleeStrike != null)
+            {
+                int meleeVersion = meleeStrike.MeleeAnimStartVersion;
+                if (meleeVersion != lastMeleeAnimStartVersion)
+                {
+                    lastMeleeAnimStartVersion = meleeVersion;
+                    if (meleeVersion > 0)
+                        PulseTrigger(profile.MeleeTriggerParameter);
+                }
+            }
 
             if (pendingHitTrigger)
             {
@@ -425,7 +434,17 @@ namespace LearningArchitect.Modules.InterviewArena
                 crowdActor = parent.GetComponentInChildren<HumanoidCrowdActor>(true);
 
             if (crowdActor != null)
+            {
+                // Prefab-authored visual (Edit Mode + Play Mode).
+                if (crowdActor.transform.parent == parent)
+                {
+                    crowdActor.transform.localPosition = localPosition;
+                    crowdActor.transform.localRotation = Quaternion.Euler(localEulerAngles);
+                    crowdActor.transform.localScale = localScale;
+                }
+
                 return;
+            }
 
             if (!Application.isPlaying)
                 return;
@@ -466,6 +485,10 @@ namespace LearningArchitect.Modules.InterviewArena
                 (playerMotor.IsJumpAnimActive || playerMotor.IsDashAnimActive))
                 return true;
 
+            if (meleeStrike != null && meleeStrike.IsMeleeAnimActive)
+                return true;
+
+            // Hitstun and any remaining locks (melee lock is redundant with IsMeleeAnimActive).
             if (actionCoordinator != null && actionCoordinator.HasActiveAction)
                 return true;
 
@@ -558,6 +581,101 @@ namespace LearningArchitect.Modules.InterviewArena
                 return;
 
             animator.SetTrigger(parameterName);
+        }
+
+        private void PulseTrigger(string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameterName))
+                return;
+
+            animator.ResetTrigger(parameterName);
+            animator.SetTrigger(parameterName);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!drawFacingGizmos)
+                return;
+
+            EnsureGizmoReferences();
+
+            Vector3 origin = transform.position + Vector3.up * facingGizmoHeight;
+            float length = Mathf.Max(0.25f, facingGizmoLength);
+
+            // Logical body yaw used by combat / turn-in-place (not necessarily mesh forward).
+            Vector3 bodyForward = bodyRotationInitialized
+                ? LogicalBodyForward
+                : FlattenDirection(transform.forward);
+            DrawDirectionGizmo(origin, bodyForward, new Color(0.15f, 0.95f, 0.35f), length);
+
+            // Cursor / aim pivot direction.
+            Vector3 aim = FlattenDirection(ResolveAimDirection());
+            DrawDirectionGizmo(origin + Vector3.up * 0.05f, aim, new Color(0.2f, 0.75f, 1f), length);
+
+            // Physics root forward (Rigidbody / capsule transform).
+            DrawDirectionGizmo(origin + Vector3.up * 0.1f, FlattenDirection(transform.forward), new Color(0.85f, 0.85f, 0.85f, 0.7f), length * 0.7f);
+
+            // Visual mesh forward (what you see in animation).
+            Transform mesh = ResolveVisualMeshTransform();
+            if (mesh != null)
+                DrawDirectionGizmo(origin + Vector3.up * 0.15f, FlattenDirection(mesh.forward), new Color(1f, 0.35f, 0.85f), length * 0.85f);
+
+            // Planar velocity.
+            if (body != null)
+            {
+                Vector3 velocity = new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z);
+                if (velocity.sqrMagnitude > 0.01f)
+                    DrawDirectionGizmo(origin + Vector3.up * 0.2f, velocity.normalized, new Color(1f, 0.85f, 0.15f), Mathf.Min(length, velocity.magnitude * 0.35f + 0.4f));
+            }
+
+            // Aim cone limit around body forward.
+            float limitDegrees = PlanarAimLimitDegrees;
+            if (limitDegrees > 0.1f && bodyForward.sqrMagnitude > 0.001f)
+            {
+                Vector3 left = Quaternion.AngleAxis(-limitDegrees, Vector3.up) * bodyForward;
+                Vector3 right = Quaternion.AngleAxis(limitDegrees, Vector3.up) * bodyForward;
+                Gizmos.color = new Color(0.15f, 0.95f, 0.35f, 0.35f);
+                Gizmos.DrawLine(origin, origin + left * length * 0.55f);
+                Gizmos.DrawLine(origin, origin + right * length * 0.55f);
+            }
+        }
+
+        private void EnsureGizmoReferences()
+        {
+            if (body == null)
+                body = GetComponent<Rigidbody>();
+            if (cursorAim == null)
+                cursorAim = GetComponent<ArenaCursorAim>();
+            if (crowdActor == null && visualAnchor != null)
+                crowdActor = visualAnchor.GetComponentInChildren<HumanoidCrowdActor>(true);
+            if (crowdActor == null)
+                crowdActor = GetComponentInChildren<HumanoidCrowdActor>(true);
+        }
+
+        private Transform ResolveVisualMeshTransform()
+        {
+            if (crowdActor != null)
+                return crowdActor.transform;
+            if (visualAnchor != null)
+                return visualAnchor;
+            return null;
+        }
+
+        private static Vector3 FlattenDirection(Vector3 direction)
+        {
+            direction.y = 0f;
+            return direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
+        }
+
+        private static void DrawDirectionGizmo(Vector3 origin, Vector3 direction, Color color, float length)
+        {
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            Vector3 tip = origin + direction.normalized * length;
+            Gizmos.color = color;
+            Gizmos.DrawLine(origin, tip);
+            Gizmos.DrawSphere(tip, 0.04f);
         }
     }
 }

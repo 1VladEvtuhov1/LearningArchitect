@@ -46,6 +46,9 @@ namespace LearningArchitect.Modules.InterviewArena
             body.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
+        public void ApplyConfig(PlayerConfig playerConfig, Camera camera) =>
+            ApplyConfig(playerConfig, camera, null);
+
         public void ApplyConfig(PlayerConfig playerConfig, Camera camera, Transform anchor)
         {
             config = playerConfig;

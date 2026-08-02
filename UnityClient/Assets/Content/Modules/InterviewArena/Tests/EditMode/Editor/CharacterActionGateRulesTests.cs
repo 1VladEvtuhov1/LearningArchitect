@@ -36,6 +36,7 @@ namespace LearningArchitect.Modules.InterviewArena.Tests.Editor
             Assert.IsFalse(CharacterActionGateRules.CanAttack(locks, locks.Length));
             Assert.IsFalse(CharacterActionGateRules.CanDash(locks, locks.Length));
             Assert.IsFalse(CharacterActionGateRules.CanJump(locks, locks.Length));
+            Assert.IsTrue(CharacterActionGateRules.HasActiveAction(locks, locks.Length));
         }
     }
 }

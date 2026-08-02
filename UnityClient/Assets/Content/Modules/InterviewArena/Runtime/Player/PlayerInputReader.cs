@@ -156,7 +156,8 @@ namespace LearningArchitect.Modules.InterviewArena
                 return true;
 
             Gamepad gamepad = Gamepad.current;
-            return gamepad != null && gamepad.buttonNorth.wasPressedThisFrame;
+            // Right trigger — not buttonNorth (Y), which is Interact.
+            return gamepad != null && gamepad.rightTrigger.wasPressedThisFrame;
         }
 
         private static bool WasStanceTogglePressed()

@@ -122,13 +122,7 @@ namespace LearningArchitect.Modules.InterviewArena
                 ground.ApplyConfig(config, viewPivot);
 
             if (hoverMotor != null)
-            {
-                Transform anchor = hoverMotor.transform.Find("HoverAnchor");
-                hoverMotor.ApplyConfig(
-                    config,
-                    camera,
-                    anchor != null ? anchor : viewPivot);
-            }
+                hoverMotor.ApplyConfig(config, camera);
 
             if (cursorAim != null)
                 cursorAim.ApplyConfig(config, camera, ViewPivot);

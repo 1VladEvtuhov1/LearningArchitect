@@ -23,8 +23,15 @@ namespace LearningArchitect.Modules.InterviewArena
         private bool hitWindowResolved;
         private bool swingFeedbackPlayed;
         private float lastMeleeYawSign = 1f;
+        private int meleeAnimStartVersion;
 
         public bool IsMeleeAnimActive => strikeActive;
+
+        /// <summary>
+        /// Increments on each successful <see cref="TryStrike"/>. Visuals watch this so a
+        /// same-frame end→restart (input buffer) still fires the Animator Melee trigger.
+        /// </summary>
+        public int MeleeAnimStartVersion => meleeAnimStartVersion;
 
         private void Awake()
         {
@@ -34,6 +41,13 @@ namespace LearningArchitect.Modules.InterviewArena
             bodyFacingCommit = GetComponent<IBodyFacingCommit>();
             cursorAim = GetComponent<ArenaCursorAim>();
             actionCoordinator = GetComponent<PlayerActionCoordinator>();
+        }
+
+        private PlayerActionCoordinator ResolveActionCoordinator()
+        {
+            if (actionCoordinator == null)
+                actionCoordinator = GetComponent<PlayerActionCoordinator>();
+            return actionCoordinator;
         }
 
         public void ApplyConfig(MeleeWeaponConfig weaponConfig, Transform origin, CombatTeam team)
@@ -48,17 +62,34 @@ namespace LearningArchitect.Modules.InterviewArena
             if (config == null || strikeActive)
                 return false;
 
-            if (actionCoordinator != null && !actionCoordinator.CanAttack)
+            PlayerActionCoordinator gate = ResolveActionCoordinator();
+            if (gate != null && !gate.CanAttack)
                 return false;
 
             strikeActive = true;
             strikeElapsed = 0f;
             hitWindowResolved = false;
             swingFeedbackPlayed = false;
+            meleeAnimStartVersion++;
             CommitAttackFacing();
             ZeroPlanarVelocity();
             PublishStrikeLock();
             return true;
+        }
+
+        /// <summary>
+        /// Cancels an in-progress strike (hitstun / hard interrupt). No hit window after this.
+        /// </summary>
+        public void InterruptStrike()
+        {
+            if (!strikeActive)
+                return;
+
+            strikeActive = false;
+            strikeElapsed = 0f;
+            hitWindowResolved = false;
+            swingFeedbackPlayed = false;
+            ClearStrikeLock();
         }
 
         private void CommitAttackFacing()
@@ -79,9 +110,12 @@ namespace LearningArchitect.Modules.InterviewArena
 
         private void Update()
         {
-            if (!strikeActive || config == null)
+            if (!strikeActive)
+                return;
+
+            if (config == null)
             {
-                ClearStrikeLock();
+                InterruptStrike();
                 return;
             }
 
@@ -104,26 +138,25 @@ namespace LearningArchitect.Modules.InterviewArena
                 ResolveHitWindow();
 
             if (strikeElapsed >= duration)
-            {
-                strikeActive = false;
-                ClearStrikeLock();
-            }
+                InterruptStrike();
         }
 
         private void PublishStrikeLock()
         {
-            if (actionCoordinator == null || config == null)
+            PlayerActionCoordinator gate = ResolveActionCoordinator();
+            if (gate == null || config == null)
                 return;
 
             float remaining = config.StrikeDuration - strikeElapsed;
             bool inStartup = strikeElapsed < config.MovementLockDuration;
-            actionCoordinator.SetLock(CharacterActionLock.MeleeStrike(remaining, inStartup));
+            gate.SetLock(CharacterActionLock.MeleeStrike(remaining, inStartup));
         }
 
         private void ClearStrikeLock()
         {
-            if (actionCoordinator != null)
-                actionCoordinator.ClearLock(CharacterActionKind.MeleeStrike);
+            PlayerActionCoordinator gate = ResolveActionCoordinator();
+            if (gate != null)
+                gate.ClearLock(CharacterActionKind.MeleeStrike);
         }
 
         private void ResolveHitWindow()

@@ -1,14 +1,13 @@
 namespace LearningArchitect.Modules.InterviewArena
 {
     /// <summary>
-    /// Active character action sources. Higher <see cref="CharacterActionPriority"/> wins buffered input consume order.
+    /// Active character action sources used as lock slot keys (one lock per kind).
     /// </summary>
     public enum CharacterActionKind
     {
-        Locomotion = 0,
-        Jump = 10,
-        MeleeStrike = 20,
-        Hitstun = 30,
-        Dash = 40,
+        Jump = 0,
+        MeleeStrike = 1,
+        Hitstun = 2,
+        Dash = 3,
     }
 }
