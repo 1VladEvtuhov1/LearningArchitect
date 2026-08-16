@@ -21,7 +21,7 @@ Do not use `file://` for WebGL checks. Unity loader, manifest fetch, fullscreen,
 ## Local Unity Preview
 
 1. Open **`UnityClient/`** in Unity Hub (not the repository root).
-2. Open `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`.
+2. Open `Assets/Content/Scenes/ArchitectureShowcase.unity`.
 3. Press Play.
 4. Check module switching, variant switching, stress presets, fullscreen-relevant UI, and **language toggle** (Unity Localization: `ShowcaseContent` + `ShowcaseUI` tables — hub copy is not edited on `ModuleDefinitionSO` / `VariantDefinitionSO`).
 
@@ -35,7 +35,7 @@ Recommended current flow:
 2. Ensure only this scene is in the build:
 
 ```text
-Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity
+Assets/Content/Scenes/ArchitectureShowcase.unity
 ```
 
 3. Use a release-style WebGL profile:
@@ -204,7 +204,7 @@ Assets/Content/Editor/WebGLBuildScript.cs
 
 It should call `BuildPipeline.BuildPlayer` with:
 
-- `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`
+- `Assets/Content/Scenes/ArchitectureShowcase.unity`
 - target `BuildTarget.WebGL`
 - output path such as `Builds/WebGL`
 - non-development build options

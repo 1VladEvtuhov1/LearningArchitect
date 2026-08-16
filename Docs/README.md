@@ -24,7 +24,7 @@ Unity-specific docs (showcase hub, Interview Arena scene composition, WebGL runb
 | Layer | Example path |
 |-------|----------------|
 | Unity client | `UnityClient/Assets/Content/Modules/InterviewArena/` |
-| Showcase entry scene | `UnityClient/Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity` |
+| Showcase entry scene | `UnityClient/Assets/Content/Scenes/ArchitectureShowcase.unity` |
 | Backend (future) | `Backend/src/` |
 | Portfolio shell | `Site/` |
 

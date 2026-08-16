@@ -15,7 +15,7 @@ Review it regularly and trim anything that has become a stable decision or a res
 ### Showcase Shape
 
 - the project is currently one shared architectural showcase, not a set of separate demo scenes;
-- `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity` is the main entry scene;
+- `Assets/Content/Scenes/ArchitectureShowcase.unity` is the main entry scene;
 - `ArchitectureShowcaseHub` is the UI and orchestration shell;
 - modules are loaded through `ModuleDefinitionSO` and `VariantDefinitionSO`.
 

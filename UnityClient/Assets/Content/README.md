@@ -18,8 +18,8 @@ Open the Unity project from `UnityClient/` in Unity Hub. Paths below are relativ
 
 ## Entry scenes
 
-- `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`
-- `Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity`
+- `Assets/Content/Scenes/ArchitectureShowcase.unity`
+- `Assets/Content/Scenes/InterviewArena.unity`
 
 ## Outside `Content/` (engine / packages)
 

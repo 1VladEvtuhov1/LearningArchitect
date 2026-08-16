@@ -56,7 +56,7 @@ Why:
 
 Touches:
 
-- `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`
+- `Assets/Content/Scenes/ArchitectureShowcase.unity`
 - `Assets/Content/Showcase/Runtime`
 - `Assets/Content/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`
 
@@ -212,7 +212,7 @@ Status:
 Decision:
 
 - Interview Arena is not an eighth `ModuleDefinitionSO` entry in the architecture showcase hub.
-- gameplay lives in `Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity` and is opened from the hub through `ShowcaseSceneLoader` / `InterviewArenaLaunchDock`.
+- gameplay lives in `Assets/Content/Scenes/InterviewArena.unity` and is opened from the hub through `ShowcaseSceneLoader` / `InterviewArenaLaunchDock`.
 - the architecture showcase scene remains the default build entry point.
 
 Why:

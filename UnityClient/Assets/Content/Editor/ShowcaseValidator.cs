@@ -91,7 +91,7 @@ namespace LearningArchitect.EditorTools
     public static class ShowcaseValidator
     {
         internal const string HubPrefabPath = "Assets/Content/Showcase/Prefabs/ArchitectureShowcaseHub.prefab";
-        internal const string ShowcaseScenePath = "Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity";
+        internal const string ShowcaseScenePath = ShowcaseSceneNames.ArchitectureShowcasePath;
         internal const string HubRootName = "ArchitectureShowcaseHub";
         private const float TransformTolerance = 0.001f;
 
@@ -209,8 +209,8 @@ namespace LearningArchitect.EditorTools
 
         internal static void ValidateInterviewArenaBuildScenes(ShowcaseValidationReport report)
         {
-            const string architectureScenePath = "Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity";
-            const string interviewArenaScenePath = "Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity";
+            const string architectureScenePath = ShowcaseSceneNames.ArchitectureShowcasePath;
+            const string interviewArenaScenePath = ShowcaseSceneNames.InterviewArenaPath;
 
             bool hasShowcase = false;
             bool hasArena = false;
@@ -245,7 +245,7 @@ namespace LearningArchitect.EditorTools
 
         internal static void ValidateInterviewArenaScenePlayer(ShowcaseValidationReport report)
         {
-            const string arenaScenePath = "Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity";
+            const string arenaScenePath = ShowcaseSceneNames.InterviewArenaPath;
             if (!System.IO.File.Exists(arenaScenePath))
                 return;
 

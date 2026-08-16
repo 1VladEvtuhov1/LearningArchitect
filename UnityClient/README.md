@@ -5,7 +5,7 @@ This folder is the **Unity project** for ExtractionRPG. Open it in Unity Hub —
 ## How to open
 
 1. In Unity Hub: **Add project** → select **`ExtractionRPG/UnityClient`** (this folder).
-2. Open `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`.
+2. Open `Assets/Content/Scenes/ArchitectureShowcase.unity`.
 3. For Interview Arena: **Learning Architect → Interview Arena → Setup Complete (Prefabs + Scene + Wire Player)** (or existing setup menu).
 
 Product-level docs: `../docs/README.md`. Portfolio site: `../Site/`.
@@ -27,7 +27,7 @@ This is no longer a loose collection of isolated demos.
 
 The current project is a data-driven showcase with:
 
-- one active entry scene: `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`;
+- one active entry scene: `Assets/Content/Scenes/ArchitectureShowcase.unity`;
 - one shared hub prefab: `Assets/Content/Showcase/Prefabs/ArchitectureShowcaseHub.prefab`;
 - module selection driven by `ModuleDefinitionSO` and `VariantDefinitionSO`;
 - runtime orchestration handled by `ShowcaseCompositionRoot`, `ShowcaseCoordinator`, `ShowcaseRuntimeController`, `ModuleRuntimeHost`, and `ShowcaseStateHub`;
@@ -77,7 +77,7 @@ For public browser delivery the project now also prefers:
   - static presentation shell, bilingual landing page, embedded WebGL host, and launch/preload flow for portfolio delivery.
 - `Assets/Content/Showcase/Prefabs`
   - hub prefab and showcase-owned shell assets.
-- `Assets/Content/Showcase/Scenes`
+- `Assets/Content/Scenes`
   - the active showcase scene.
 - `Docs`
   - project documentation.
@@ -101,7 +101,7 @@ The full content rules live in `Architecture.md` (this folder).
 ## How To Open The Showcase
 
 1. Open **`UnityClient/`** in Unity Hub (folder `ExtractionRPG/UnityClient`).
-2. Open `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`.
+2. Open `Assets/Content/Scenes/ArchitectureShowcase.unity`.
 3. Press Play.
 4. Switch modules and variants through the hub UI or keyboard navigation.
 5. Use the stress presets to compare runtime behavior under the same presentation shell.

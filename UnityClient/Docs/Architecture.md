@@ -21,7 +21,7 @@ There is now also a second shell around that runtime for public delivery:
 
 The main scene is:
 
-- `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`
+- `Assets/Content/Scenes/ArchitectureShowcase.unity`
 
 The main scene object is:
 
@@ -487,7 +487,7 @@ Integration assessment and phased rollout:
 
 - `docs/Modules/InterviewArena/INTEGRATION_ASSESSMENT.md`
 
-Runtime code lives under `Assets/Content/Modules/InterviewArena/`. The playable shell is a **separate scene** (`Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity`), opened from the hub via `InterviewArenaLaunchDock` and `ShowcaseSceneLoader` — not via the module/variant extension workflow below.
+Runtime code lives under `Assets/Content/Modules/InterviewArena/`. The playable shell is a **separate scene** (`Assets/Content/Scenes/InterviewArena.unity`), opened from the hub via `InterviewArenaLaunchDock` and `ShowcaseSceneLoader` — not via the module/variant extension workflow below.
 
 ## Extension Workflow
 

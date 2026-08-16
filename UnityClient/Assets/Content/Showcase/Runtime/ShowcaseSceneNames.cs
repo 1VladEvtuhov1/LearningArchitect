@@ -10,7 +10,9 @@ namespace LearningArchitect.Core
 
         public const string ContentRoot = "Assets/Content";
 
-        public const string ArchitectureShowcasePath = ContentRoot + "/Showcase/Scenes/ArchitectureShowcase.unity";
-        public const string InterviewArenaPath = ContentRoot + "/Modules/InterviewArena/Scenes/InterviewArena.unity";
+        public const string ScenesRoot = ContentRoot + "/Scenes";
+
+        public const string ArchitectureShowcasePath = ScenesRoot + "/ArchitectureShowcase.unity";
+        public const string InterviewArenaPath = ScenesRoot + "/InterviewArena.unity";
     }
 }

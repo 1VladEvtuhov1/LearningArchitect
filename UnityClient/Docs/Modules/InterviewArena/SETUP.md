@@ -4,7 +4,7 @@ One-time steps after pulling the repo:
 
 1. Open the project in Unity.
 2. Run **Learning Architect → Interview Arena → Setup Interview Arena Scenes**.
-   - Creates/updates `Assets/Content/Modules/InterviewArena/Scenes/InterviewArena.unity`
+   - Creates/updates `Assets/Content/Scenes/InterviewArena.unity`
    - Registers build scenes: `ArchitectureShowcase` (index 0), `InterviewArena` (index 1)
    - Adds `InterviewArenaLaunchDock` to `ArchitectureShowcaseHub.prefab`
 3. Optional: **Learning Architect → Localization → Setup Showcase Localization** (adds UI keys for the dock).

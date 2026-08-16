@@ -21,7 +21,7 @@ Pin login → Lobby → Ready-check → Match → Extraction/Death → Result pe
 ## How to open Unity client
 
 1. Open **`UnityClient/`** in Unity Hub (not the repository root).
-2. Open `Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity`.
+2. Open `Assets/Content/Scenes/ArchitectureShowcase.unity`.
 3. For Interview Arena setup: **Learning Architect → Interview Arena → Setup Complete (Prefabs + Scene + Wire Player)**.
 
 ## Documentation

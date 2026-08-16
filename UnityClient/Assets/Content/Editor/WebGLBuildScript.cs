@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using LearningArchitect.Core;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace LearningArchitect.Editor
 {
     public static class WebGLBuildScript
     {
-        private const string ShowcaseScenePath = "Assets/Content/Showcase/Scenes/ArchitectureShowcase.unity";
+        private const string ShowcaseScenePath = ShowcaseSceneNames.ArchitectureShowcasePath;
         private const string OutputRoot = "Builds/WebGL";
 
         [MenuItem("Tools/LearningArchitect/Build WebGL Site Export")]
