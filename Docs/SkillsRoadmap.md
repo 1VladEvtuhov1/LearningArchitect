@@ -47,7 +47,7 @@
 | 4 | JSON save/load в файл | ✅ | `GameSettings` → `persistentDataPath/game_settings.json` | Расширить поля (audio, graphics) |
 | 5 | Аддитивная загрузка сцен | 🟡 | Runtime: `LoadSceneMode.Single` (`ShowcaseSceneLoader`); additive в Editor | Additive Arena + unload hub |
 | 6 | Loading screen + progress bar | ❌ | Fade в `ShowcaseTransitionController` | `LoadSceneAsync`, `allowSceneActivation`, UI progress |
-| 7 | Health Bar World Space | ❌ | Screen HUD (`PlayerIframeHud`); tint на меше (`InvulnerabilityWorldIndicator`) | Prefab WS Canvas над врагом |
+| 7 | Health Bar World Space | ❌ | Screen HUD: `PlayerHealthHud` (HP), `PlayerIframeHud`; tint (`InvulnerabilityWorldIndicator`) | Prefab WS Canvas над врагом |
 | 8 | FSM AI (Idle→Patrol→Chase→Attack) | 🟡 | `EnemyBrain` + `EnemyFsmLogic`: Patrol/Chase/Attack/Ranged; Idle нет | Опционально Idle; документировать testable FSM |
 | 9 | AI LOD (реже Update вдали) | ❌ | Все враги каждый кадр | Таймер по дистанции до камеры |
 | 10 | Виртуализация скролла (UI pool) | ❌ | Обычный `ScrollRect` в hub | Lobby browser при росте списка |
@@ -111,7 +111,7 @@
 | MVP / Presenter | 🟡 | `HubPresenter`, `MetricsPresenter` |
 | UI Toolkit | ❌ | UGUI + TMP |
 | Safe area / responsive | ❌ | — |
-| Data binding для HUD | 🟡 | Ручной bind buff/iframe HUD |
+| Data binding для HUD | 🟡 | Ручной bind HP/buff/iframe HUD |
 
 ### Контент, ассеты, билд
 
@@ -141,7 +141,7 @@
 |------|--------|-------------------|
 | Damage pipeline (teams, i-frames, knockback) | ✅ | `CombatHitResolver`, `Health`, weapons |
 | Buff/debuff + HUD/VFX | ✅ | `PlayerBuffController`, pickups |
-| Spawn/respawn без лишнего Instantiate | 🟡 | Respawn; не pool |
+| Spawn/respawn без лишнего Instantiate | 🟡 | Enemy + local player respawn; не pool |
 | Win/lose / extraction loop | 🟡 | `FinishPortal`, match reporter |
 | Явный boot order | 🟡 | `InterviewArenaBootstrap`, deferred gameplay wire |
 
@@ -275,11 +275,11 @@ WebGL deploy + Site                 A1–A2 loading; A6 WebGL profiler note
 | Навык / тема | Путь |
 |--------------|------|
 | Object pooling (demo) | `UnityClient/Assets/Content/Modules/ObjectPooling/` |
-| Object pooling (game) | `.../InterviewArena/Runtime/Combat/ProjectilePool.cs` |
+| Object pooling (game) | `.../InterviewArena/Scripts/Combat/ProjectilePool.cs` |
 | Enemy FSM | `.../AI/EnemyBrain.cs`, `EnemyFsmLogic.cs` |
 | Composition root (Arena) | `.../Core/InterviewArenaRuntimeContext.cs` |
 | Composition root (Hub) | `.../Showcase/Runtime/ShowcaseCompositionRoot.cs` |
-| Online HTTP | `.../Runtime/Net/`, `.../Services/`, `InterviewArenaOnlineFlowController.cs` |
+| Online HTTP | `.../Scripts/Net/`, `.../Services/`, `InterviewArenaOnlineFlowController.cs` |
 | Локализация | `.../Showcase/UI/ShowcaseLocalization.cs`, `Editor/ShowcaseLocalizationSetupTool.cs` |
 | Editor setup | `.../Editor/InterviewArenaSceneSetup.cs` |
 | GameEvent (SO) | `UnityClient/Assets/Content/Shared/Events/` |

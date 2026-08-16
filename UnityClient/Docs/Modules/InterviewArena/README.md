@@ -10,9 +10,9 @@
 |-------------|----------|
 | Отдельная сцена | `InterviewArena` + dock на hub (D-008) |
 | Locomotion | WASD, jump, dash, slopes, arena clamp |
-| Combat | Melee + crossbow, knockback, i-frames |
+| Combat | Melee + crossbow, knockback, i-frames, screen HP HUD |
 | AI | Hollow Soldier: Patrol → Chase → Attack → Ranged |
-| Respawn | Враги возвращаются на spawn pose |
+| Respawn | Враги и игрок (локально) возвращаются на spawn pose |
 | Tests | EditMode: FSM, combat rules, locomotion math, i-frames |
 | WebGL | NonAlloc, layers, Brotli, лёгкие примитивы |
 
@@ -22,13 +22,14 @@
 2. Play на сцене `InterviewArena` или зайти через dock с hub.
 3. Управление: WASD, Space, Shift, J/LMB (melee), R/RMB (crossbow).
 
-Подробнее: `SETUP.md`, `CODE_ARCHITECTURE.md`, `SCENE_COMPOSITION.md`.
+Подробнее: `SETUP.md`, `CODE_ARCHITECTURE.md`, `SCENE_COMPOSITION.md`, `CHARACTER_ANIMATION.md`.
 
 ## Reading order
 
 1. `SCENE_COMPOSITION.md` — hierarchy, naming, runtime roots, UI Canvas rules  
 2. `CODE_ARCHITECTURE.md` — runtime layers, pipelines, WebGL checklist  
-3. `SETUP.md` — editor menus  
+3. `CHARACTER_ANIMATION.md` — Animator, параметры, facing / IK / stance  
+4. `SETUP.md` — editor menus  
 4. `INTEGRATION_ASSESSMENT.md` — fit в репозиторий  
 5. `docs/04_BACKLOG.md` — lobby, backend, multiplayer  
 6. `docs/05_GAME_FEEL_PLAN.md` — полировка отклика персонажа  

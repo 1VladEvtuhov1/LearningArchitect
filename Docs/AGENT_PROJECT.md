@@ -29,6 +29,7 @@
 | `docs/Roadmap.md` | Продуктовые фазы (backend, WebGL, CI) |
 | `docs/SkillsRoadmap.md` | Skills checklist, Tier A/B/C, очередь задач |
 | `UnityClient/docs/Modules/InterviewArena/SETUP.md` | Setup Complete, Validate, Play smoke |
+| `UnityClient/docs/Modules/InterviewArena/CHARACTER_ANIMATION.md` | Animator, параметры, facing / IK / stance |
 | `UnityClient/docs/OpenThreads.md` | Открытые ветки showcase |
 
 ---
@@ -63,7 +64,7 @@
 | `ArenaHoverMotor` | Hover physics, ground probe, arena clamp |
 | `ArenaCursorAim` | Aim по курсору, поворот `ViewPivot` |
 | `PlayerMotor` | Dash в hover-режиме; классический motor без hover |
-| `ArenaHumanoidVisual` | Paladin visual, animator params |
+| `ArenaHumanoidVisual` | Vampire/Paladin visual, Animator params, logical facing |
 | `CrossbowWeaponController` | Выстрел по `muzzle.forward` (child of `ViewPivot`) |
 
 ### Execution order

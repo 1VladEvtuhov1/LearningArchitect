@@ -332,6 +332,7 @@ public Transform VfxRoot { get; }
 ```text
 Container - InterviewArenaCanvas
 Container - BackButton
+Container - PlayerHealthHud
 Container - PlayerIframeHud
 Button - StartRace
 Button - Back

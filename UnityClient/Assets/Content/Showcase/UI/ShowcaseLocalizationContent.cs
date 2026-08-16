@@ -380,8 +380,13 @@ namespace LearningArchitect.UI
                     return true;
                 case "interview_arena_subtitle":
                     text = russian
-                        ? "Солдаты: melee, арбалет на дистанции, респавн. Слева — индикатор i-frames (голубая вспышка на герое)."
-                        : "Soldiers: melee, ranged crossbow, respawn. Top-left i-frame bar; blue flash on the hero.";
+                        ? "Слева — HP, i-frames и рывок. Солдаты и игрок респавнятся на старте."
+                        : "Top-left: HP, i-frames, dash. Soldiers and the player respawn at the start.";
+                    return true;
+                case "interview_arena_player_died":
+                    text = russian
+                        ? "Погиб. Респавн на точке старта."
+                        : "You died. Respawning at the start.";
                     return true;
                 case "interview_arena_back":
                     text = russian ? "Назад к архитектурным демо" : "Back to architecture demos";

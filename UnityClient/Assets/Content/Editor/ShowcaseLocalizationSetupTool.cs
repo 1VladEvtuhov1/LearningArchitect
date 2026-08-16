@@ -148,7 +148,8 @@ namespace LearningArchitect.EditorTools
                 { "tooltip_next_variant", "Next variant" },
                 { "interview_arena_launch", "Interview Arena" },
                 { "interview_arena_title", "Interview Arena" },
-                { "interview_arena_subtitle", "Soldiers: melee, ranged crossbow, respawn. Top-left i-frame bar; blue flash on the hero." },
+                { "interview_arena_subtitle", "Top-left: HP, i-frames, dash. Soldiers and the player respawn at the start." },
+                { "interview_arena_player_died", "You died. Respawning at the start." },
                 { "interview_arena_back", "Back to architecture demos" }
             };
 
@@ -198,7 +199,8 @@ namespace LearningArchitect.EditorTools
                 { "tooltip_next_variant", "Следующий вариант" },
                 { "interview_arena_launch", "Interview Arena" },
                 { "interview_arena_title", "Interview Arena" },
-                { "interview_arena_subtitle", "Солдаты: melee, арбалет на дистанции, респавн. Слева — индикатор i-frames (голубая вспышка на герое)." },
+                { "interview_arena_subtitle", "Слева — HP, i-frames и рывок. Солдаты и игрок респавнятся на старте." },
+                { "interview_arena_player_died", "Погиб. Респавн на точке старта." },
                 { "interview_arena_back", "Назад к архитектурным демо" }
             };
 
