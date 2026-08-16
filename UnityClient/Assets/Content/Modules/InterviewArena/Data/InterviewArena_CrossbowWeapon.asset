@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: InterviewArena_CrossbowWeapon
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.CrossbowWeaponConfig
   damage: 22
-  cooldown: 0.9
+  cooldown: 0.35
   boltSpeed: 26
   boltLifetime: 2.4
   boltRadius: 0.12
@@ -21,3 +21,18 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 256
+  shots:
+  - id: Shot1
+    shotDuration: 0.55
+    movementLockDuration: 0.35
+    comboInputStart: 0.18
+    comboInputEnd: 0.4
+    comboTransitionTime: 0.4
+    nextStrikeIndex: 1
+  - id: Shot2
+    shotDuration: 0.55
+    movementLockDuration: 0.35
+    comboInputStart: 0
+    comboInputEnd: 0
+    comboTransitionTime: 0
+    nextStrikeIndex: -1

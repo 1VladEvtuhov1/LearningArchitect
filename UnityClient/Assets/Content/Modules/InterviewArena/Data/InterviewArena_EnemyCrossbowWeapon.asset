@@ -21,3 +21,11 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 128
+  shots:
+  - id: Shot1
+    shotDuration: 0.35
+    movementLockDuration: 0
+    comboInputStart: 0
+    comboInputEnd: 0
+    comboTransitionTime: 0
+    nextStrikeIndex: -1

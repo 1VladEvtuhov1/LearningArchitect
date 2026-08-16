@@ -12,15 +12,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67a4eeab93f0da64c9765a6ec52fb94f, type: 3}
   m_Name: InterviewArena_MeleeWeapon
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.MeleeWeaponConfig
-  damage: 28
-  strikeDuration: 1.08
-  hitWindowStartNormalized: 0.38
-  hitWindowEndNormalized: 0.52
-  forwardOffset: 0.85
-  strikeRadius: 0.95
-  knockbackImpulse: 4.5
-  strikeLungeImpulse: 2.8
-  movementLockDuration: 0.17
   hitMask:
     serializedVersion: 2
     m_Bits: 256
+  strikes:
+  - id: Light1
+    animTriggerOverride: ComboRight1
+    damage: 28
+    strikeDuration: 0.8
+    hitWindowStartNormalized: 0.3
+    hitWindowEndNormalized: 0.45
+    forwardOffset: 0.85
+    strikeRadius: 0.95
+    knockbackImpulse: 4.5
+    strikeStepDistance: 0.42
+    strikeStepStart: 0.02
+    strikeStepEnd: 0.22
+    movementLockDuration: 0.8
+    comboInputStart: 0.34
+    comboInputEnd: 0.6
+    comboTransitionTime: 0.66
+    nextStrikeIndex: 2
+  - id: Heavy
+    animTriggerOverride:
+    damage: 42
+    strikeDuration: 1.35
+    hitWindowStartNormalized: 0.42
+    hitWindowEndNormalized: 0.58
+    forwardOffset: 0.95
+    strikeRadius: 1.05
+    knockbackImpulse: 6.5
+    strikeStepDistance: 0.5
+    strikeStepStart: 0.08
+    strikeStepEnd: 0.4
+    movementLockDuration: 1.35
+    comboInputStart: 0
+    comboInputEnd: 0
+    comboTransitionTime: 0
+    nextStrikeIndex: -1
+  - id: Light2
+    animTriggerOverride: ComboRight2
+    damage: 32
+    strikeDuration: 0.85
+    hitWindowStartNormalized: 0.32
+    hitWindowEndNormalized: 0.48
+    forwardOffset: 0.85
+    strikeRadius: 0.95
+    knockbackImpulse: 5
+    strikeStepDistance: 0.55
+    strikeStepStart: 0.02
+    strikeStepEnd: 0.26
+    movementLockDuration: 0.85
+    comboInputStart: 0.36
+    comboInputEnd: 0.64
+    comboTransitionTime: 0.7
+    nextStrikeIndex: 3
+  - id: Light3
+    animTriggerOverride: ComboRight3
+    damage: 38
+    strikeDuration: 0.95
+    hitWindowStartNormalized: 0.34
+    hitWindowEndNormalized: 0.52
+    forwardOffset: 0.9
+    strikeRadius: 1
+    knockbackImpulse: 5.5
+    strikeStepDistance: 0.78
+    strikeStepStart: 0.04
+    strikeStepEnd: 0.34
+    movementLockDuration: 0.95
+    comboInputStart: 0
+    comboInputEnd: 0
+    comboTransitionTime: 0
+    nextStrikeIndex: -1
