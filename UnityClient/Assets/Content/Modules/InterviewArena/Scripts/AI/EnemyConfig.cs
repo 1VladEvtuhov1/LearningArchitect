@@ -28,7 +28,8 @@ namespace LearningArchitect.Modules.InterviewArena
         [Header("Attack")]
         [SerializeField] private float attackRange = 1.65f;
         [SerializeField] private float attackCooldown = 1.05f;
-        [SerializeField] private float attackWindup = 0.22f;
+        [Tooltip("Delay from ComboRight1 start to overlap. Match player Light1 hit start (0.3 × 0.8s).")]
+        [SerializeField] private float attackWindup = 0.24f;
         [SerializeField] private float attackDamage = 16f;
         [SerializeField] private float attackKnockback = 5.5f;
         [SerializeField] private float strikeForwardOffset = 0.75f;

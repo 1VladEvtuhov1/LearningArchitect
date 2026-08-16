@@ -30,7 +30,6 @@ namespace LearningArchitect.Modules.InterviewArena
             meleeAnimStartVersion++;
             if (TryGetComponent(out IBodyFacingCommit facing))
                 facing.SnapPlanarFacing(StrikeOrigin.forward);
-            CombatHitFeedback.PlayMeleeWindup(StrikeOrigin, config.StrikeRadius);
             return true;
         }
 
@@ -59,7 +58,7 @@ namespace LearningArchitect.Modules.InterviewArena
             cooldownTimer = config.AttackCooldown;
 
             Transform origin = StrikeOrigin;
-            int damaged = CombatStrikeUtility.TryMeleeOverlapStrike(
+            CombatStrikeUtility.TryMeleeOverlapStrike(
                 queryService,
                 origin,
                 config.StrikeForwardOffset,
@@ -72,8 +71,6 @@ namespace LearningArchitect.Modules.InterviewArena
                 out _);
 
             CombatHitFeedback.PlayMeleeSwing(origin, config.StrikeRadius);
-            if (damaged > 0)
-                CombatHitFeedback.PlayMeleeHitConfirm(origin.position + origin.forward * config.StrikeForwardOffset);
         }
 
         private void Update()

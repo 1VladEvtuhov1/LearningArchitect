@@ -26,7 +26,7 @@ MonoBehaviour:
   rotationSpeed: 10
   attackRange: 1.65
   attackCooldown: 1.05
-  attackWindup: 0.22
+  attackWindup: 0.24
   attackDamage: 16
   attackKnockback: 5.5
   strikeForwardOffset: 0.75

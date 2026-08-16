@@ -249,6 +249,8 @@ Mixamo Longbow-клипы в Arena-контроллере **не стоят**. �
 
 Враги используют тот же controller и те же стейты Combo Right. `EnemyMeleeAttack` поднимает `MeleeAnimStartVersion` и trigger `ComboRight1`; `ArenaHumanoidVisual` пульсирует его так же, как player melee. Дальний выстрел (melee-only presentation) пульсирует `Melee` (alias Combo Right 1). Новый стейт в Animator не нужен: клипы уже стоят.
 
+`EnemyConfig.attackWindup` (0.24 с) совпадает со стартом hit window игрока Light1 (`0.3 × 0.8` с) на том же клипе. Стейт `Combo Right 1` играет на скорости 1.8 — более длинный windup бьёт уже в recovery клипа. Flash на старте замаха нет: swing VFX в момент overlap, hit flash — из `Health.PlayDamageHit`.
+
 Удар игрока **отменяет** windup врага (`EnemyMeleeAttack.Interrupt`) и включает hitstun (`EnemyConfig.hitstunDuration`, 0.85 с). Пока stun активен, `EnemyBrain` не начинает новый удар и не стреляет. Hit-стейты — презентация; cancel удара принадлежит геймплею, не Animator.
 
 Шаг корпуса — **код, не root motion**. `MeleeStrikeStep` задаёт постоянную planar-скорость на окне `strikeStepStart`…`strikeStepEnd` (дистанция в метрах на удар). Направление — committed strike forward. `ArenaHoverMotor` / `PlayerMotor` не обнуляют XZ, пока `IsStrikeStepActive` (как dash).
