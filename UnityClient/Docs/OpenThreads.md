@@ -134,9 +134,9 @@ Next Useful Steps:
 
 Primary Files:
 
-- `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationProfileSO.cs`
-- `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidCrowdActor.cs`
-- `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
+- `Assets/Content/Modules/LayeredCharacterAnimation/Scripts/HumanoidAnimationProfileSO.cs`
+- `Assets/Content/Modules/LayeredCharacterAnimation/Scripts/HumanoidCrowdActor.cs`
+- `Assets/Content/Modules/LayeredCharacterAnimation/Scripts/HumanoidAnimationVariant.cs`
 - `docs/HumanoidAnimationSetup.md`
 
 ### T-005: Finish Carrier-Prefab Cleanup Across Modules
@@ -166,7 +166,7 @@ Next Useful Steps:
 Primary Files:
 
 - `Assets/Content/Showcase/Runtime/ShowcaseVisualInstanceFactory.cs`
-- `Assets/Content/Modules/LayeredCharacterAnimation/Runtime/HumanoidAnimationVariant.cs`
+- `Assets/Content/Modules/LayeredCharacterAnimation/Scripts/HumanoidAnimationVariant.cs`
 - `Assets/Content/Editor/ShowcaseValidator.cs`
 
 ### T-006: Tighten Recruiter Demo Content Contract

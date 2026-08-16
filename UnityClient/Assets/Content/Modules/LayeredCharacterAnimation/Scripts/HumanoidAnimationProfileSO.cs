@@ -32,14 +32,20 @@ namespace LearningArchitect.Modules.Animation3D
         [SerializeField] private string dashTriggerParameter = "Dash";
         [SerializeField] private string meleeTriggerParameter = "Melee";
         [SerializeField] private string hitTriggerParameter = "Hit";
+        [SerializeField] private string hitFrontTriggerParameter = "HitFront";
+        [SerializeField] private string hitBackTriggerParameter = "HitBack";
+        [SerializeField] private string hitLeftTriggerParameter = "HitLeft";
+        [SerializeField] private string hitRightTriggerParameter = "HitRight";
+        [SerializeField] private string isBlockingParameter = "IsBlocking";
+        [SerializeField] private string blockStartTriggerParameter = "BlockStart";
         [SerializeField] private string turnInPlaceParameter = "TurnInPlace";
         [SerializeField] private string turnDirectionParameter = "TurnDirection";
         [SerializeField] private string turnAngleParameter = "TurnAngle";
 
         [Header("Runtime Tuning")]
-        [Tooltip("Extra local/world Y rotation so authored aim clips align with +Z forward.")]
+        [Tooltip("Single authored facing bake for this profile relative to LogicalBodyForward. Clip packs must share one convention.")]
         [SerializeField] private float visualYawOffsetDegrees;
-        [Tooltip("Body yaw offset while in melee-ready locomotion stance.")]
+        [Tooltip("Legacy melee-only offset. Prefer matching VisualYawOffsetDegrees; Arena ignores this when packs are aligned.")]
         [SerializeField] private float visualYawOffsetMeleeDegrees;
         [SerializeField] private string aimStanceParameter = "IsBowStance";
         [SerializeField] private string aimYawParameter = "AimYaw";
@@ -92,6 +98,12 @@ namespace LearningArchitect.Modules.Animation3D
         public string DashTriggerParameter => dashTriggerParameter;
         public string MeleeTriggerParameter => meleeTriggerParameter;
         public string HitTriggerParameter => hitTriggerParameter;
+        public string HitFrontTriggerParameter => hitFrontTriggerParameter;
+        public string HitBackTriggerParameter => hitBackTriggerParameter;
+        public string HitLeftTriggerParameter => hitLeftTriggerParameter;
+        public string HitRightTriggerParameter => hitRightTriggerParameter;
+        public string IsBlockingParameter => isBlockingParameter;
+        public string BlockStartTriggerParameter => blockStartTriggerParameter;
         public string TurnInPlaceParameter => turnInPlaceParameter;
         public string TurnDirectionParameter => turnDirectionParameter;
         public string TurnAngleParameter => turnAngleParameter;
