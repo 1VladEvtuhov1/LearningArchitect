@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.EnemyConfig
   maxHealth: 90
   invulnerabilityDuration: 0.35
+  hitstunDuration: 0.85
   respawnDelay: 4.5
   detectRange: 9
   loseDetectRange: 12

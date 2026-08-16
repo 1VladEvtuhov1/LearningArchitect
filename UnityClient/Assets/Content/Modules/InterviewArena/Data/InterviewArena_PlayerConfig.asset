@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a20281474f570b4cb501d86e580acd5, type: 3}
   m_Name: InterviewArena_PlayerConfig
   m_EditorClassIdentifier: LearningArchitect.Modules.InterviewArena::LearningArchitect.Modules.InterviewArena.PlayerConfig
-  moveSpeed: 8
-  groundAcceleration: 58
-  groundDeceleration: 68
-  airAcceleration: 22
-  rotationSpeed: 14
+  moveSpeed: 3
+  groundAcceleration: 50
+  groundDeceleration: 50
+  airAcceleration: 11
+  rotationSpeed: 7
   airControl: 0.35
   maxGroundAngle: 48
   jumpImpulse: 6.5
@@ -24,9 +24,10 @@ MonoBehaviour:
   jumpCutMultiplier: 0.45
   fallGravityMultiplier: 1.65
   maxFallSpeed: 22
-  dashImpulse: 11
+  dashImpulse: 7
   dashCooldown: 1.1
-  dashDuration: 0.14
+  dashDuration: 0.18
+  dashIframeCoverage: 1
   airborneWallSlide: 0.35
   obstructionMask:
     serializedVersion: 2
@@ -36,6 +37,21 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
+  useArenaHover: 1
+  hoverHeight: 0.14
+  hoverSpring: 120
+  hoverDamper: 18
+  hoverGravity: 34
+  maxVerticalSpeed: 12
+  probeRadius: 0.26
+  probeExtraDistance: 0.55
+  forwardProbeOffset: 0.45
+  sideProbeOffset: 0.25
+  maxStepHeight: 0.42
+  inputDeadZone: 0.05
+  aimTurnSpeed: 900
   actionInputBufferDuration: 0.2
   hitstunDuration: 0.35
   jumpActionLockDuration: 0.15
+  blockConeHalfAngleDegrees: 70
+  respawnDelay: 1.6

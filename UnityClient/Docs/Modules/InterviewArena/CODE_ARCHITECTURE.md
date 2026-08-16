@@ -16,7 +16,7 @@ This document is the source of truth for **logic, layering, and optimization cho
 ## Layer Map
 
 ```text
-Assets/Content/Modules/InterviewArena/Runtime/
+Assets/Content/Modules/InterviewArena/Scripts/
 ├── Core/
 │   ├── GameState / GameStateMachine
 │   ├── InterviewArenaRuntimeContext   ← scene composition root
@@ -108,9 +108,13 @@ Friendly fire is blocked via `CombatRules.CanDamage`. Queries stay NonAlloc (`Ph
 | Mechanic | Implementation |
 |----------|----------------|
 | i-frames | `InvulnerabilityTimer` inside `Health` after each confirmed hit |
+| Dash i-frames | Middle 85% of `dashDuration` via `DashIframeRules` + `PlayerDashIframeGuard` |
+| Enemy hitstun | `EnemyHealthHitstun` cancels melee windup; `EnemyBrain` does not start attacks while stunned |
 | Knockback | `DamageInfo.KnockbackImpulse` + `KnockbackReceiver` on `Rigidbody` |
 | FSM enemies | `EnemyBrain` — Patrol / Chase / Attack / **Ranged** (enemy crossbow) |
 | Enemy respawn | `EnemyRespawnController` — disable on death, restore at spawn pose |
+| Player death (local) | `PlayerDeathController` — short plant, restore at spawn; online match stays with `MatchReporter` |
+| HP UI | `PlayerHealthHud` — always-visible screen bar (`CurrentHealth` / `MaxHealth`) |
 | i-frames UI | `PlayerIframeHud` + `InvulnerabilityWorldIndicator` on player |
 
 ## Extension Hooks (next milestones)
@@ -128,6 +132,7 @@ Friendly fire is blocked via `CombatRules.CanDamage`. Queries stay NonAlloc (`Ph
 - `PlayerLocomotionMathTests` — slope projection / walkable angle
 - `CombatRulesTests` — team damage matrix
 - `EnemyFsmLogicTests` / `InvulnerabilityTimerTests`
+- `DashIframeRulesTests` / `EnemyMeleeAttackTests` / `EnemyHealthHitstunTests`
 
 EditMode tests avoid requiring a authored scene.
 
@@ -140,6 +145,7 @@ EditMode tests avoid requiring a authored scene.
 | Projectile pool (no per-shot `Instantiate`) | Implemented |
 | Physics layers `InterviewArena_*` (6–9) + masks on SO | Implemented via editor setup |
 | Build compression Brotli (`webGLCompressionFormat: 2`) | ProjectSettings |
+| Player HP HUD wired on `TryWirePlayerAndCamera` | Implemented |
 | Player i-frame HUD wired on `TryWirePlayerAndCamera` | Implemented |
 
 After clone: **Learning Architect → Interview Arena → Setup Complete**.

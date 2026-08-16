@@ -33,6 +33,8 @@ namespace LearningArchitect.EditorTools
         private const string RunCompletedEventPath = "Assets/Content/Modules/InterviewArena/Data/InterviewArena_RunCompletedEvent.asset";
         private const string PaladinCombatProfilePath =
             "Assets/Content/Modules/LayeredCharacterAnimation/Data/Animation_PaladinCombatProfile.asset";
+        private const string VampireCombatProfilePath =
+            "Assets/Content/Modules/LayeredCharacterAnimation/Data/Animation_VampireCombatProfile.asset";
 
         [MenuItem("Learning Architect/Interview Arena/Setup Interview Arena Scenes")]
         public static void SetupAll()
@@ -62,7 +64,7 @@ namespace LearningArchitect.EditorTools
             EnsureFolder("Assets/Content", "Modules");
             EnsureFolder("Assets/Content/Modules", "InterviewArena");
             EnsureFolder("Assets/Content/Modules/InterviewArena", "Data");
-            EnsureFolder("Assets/Content/Modules/InterviewArena", "Scenes");
+            EnsureFolder("Assets/Content", "Scenes");
 
             PlayerConfig playerConfig = EnsurePlayerConfigAsset();
 
@@ -106,7 +108,7 @@ namespace LearningArchitect.EditorTools
             GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem));
             AddUiInputModule(eventSystem);
 
-            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerIframeHud playerIframeHud, out PlayerDashCooldownHud playerDashCooldownHud, out PlayerBuffHud playerBuffHud, out GameObject popupsCanvasObject);
+            BuildSceneUi(roots.Ui, out Transform hudDynamicRoot, out PlayerHealthHud playerHealthHud, out PlayerIframeHud playerIframeHud, out PlayerDashCooldownHud playerDashCooldownHud, out PlayerBuffHud playerBuffHud, out GameObject popupsCanvasObject);
 
             BackendApiConfig backendConfig = EnsureBackendApiConfigAsset();
             InterviewArenaOnlineFlowController onlineFlow = WireOnlineFlow(popupsCanvasObject.transform, context, backendConfig);
@@ -116,6 +118,7 @@ namespace LearningArchitect.EditorTools
             SerializedObject serializedContext = new SerializedObject(context);
             serializedContext.FindProperty("playerConfig").objectReferenceValue = playerConfig;
             serializedContext.FindProperty("arenaFloorCollider").objectReferenceValue = platformCollider;
+            serializedContext.FindProperty("playerHealthHud").objectReferenceValue = playerHealthHud;
             serializedContext.FindProperty("playerIframeHud").objectReferenceValue = playerIframeHud;
             serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue = playerDashCooldownHud;
             serializedContext.FindProperty("playerBuffHud").objectReferenceValue = playerBuffHud;
@@ -208,12 +211,16 @@ namespace LearningArchitect.EditorTools
 
             Health playerHealth = root.AddComponent<Health>();
             playerHealth.ApplyConfig(CombatTeam.Player, 100f, 0.5f);
+            MeleeBlockController meleeBlock = root.AddComponent<MeleeBlockController>();
+            meleeBlock.ApplyConfig(config);
+            EnsurePlayerDashIframeGuard(root);
+            root.AddComponent<PlayerDeathController>();
             root.AddComponent<KnockbackReceiver>();
             root.AddComponent<InvulnerabilityWorldIndicator>();
             root.AddComponent<PlayerBuffController>();
             root.AddComponent<PlayerBuffPickupInteractor>();
             root.AddComponent<PlayerBuffVfx>();
-            HumanoidAnimationProfileSO combatProfile = EnsurePaladinCombatProfile();
+            HumanoidAnimationProfileSO combatProfile = EnsureVampireCombatProfile();
             WireArenaHumanoidVisual(root, visualAnchor.transform, combatProfile);
             EnsureEmbeddedHumanoidVisual(visualAnchor.transform, combatProfile);
             WirePlayerSupportReferences(root);
@@ -246,6 +253,10 @@ namespace LearningArchitect.EditorTools
             combatSerialized.FindProperty("crossbow").objectReferenceValue = crossbow;
             combatSerialized.ApplyModifiedPropertiesWithoutUndo();
 
+            SerializedObject blockSerialized = new SerializedObject(meleeBlock);
+            blockSerialized.FindProperty("config").objectReferenceValue = config;
+            blockSerialized.ApplyModifiedPropertiesWithoutUndo();
+
             PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);
             UnityEngine.Object.DestroyImmediate(root);
             AssetDatabase.SaveAssets();
@@ -271,33 +282,72 @@ namespace LearningArchitect.EditorTools
         [MenuItem("Learning Architect/Interview Arena/Bake Humanoid Visual Into Player Prefab")]
         public static void BakeHumanoidVisualIntoPlayerPrefab()
         {
-            HumanoidAnimationProfileSO profile = EnsurePaladinCombatProfile();
+            BakePlayerVisual(EnsureVampireCombatProfile());
+        }
+
+        [MenuItem("Learning Architect/Interview Arena/Bake Humanoid Visual Into Enemy Prefab")]
+        public static void BakeHumanoidVisualIntoEnemyPrefab()
+        {
+            BakeEnemyVisual(EnsurePaladinCombatProfile());
+        }
+
+        private static Transform FindChildByName(Transform root, string name)
+        {
+            if (root == null || string.IsNullOrEmpty(name))
+                return null;
+
+            Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (transforms[i] != null && transforms[i].name == name)
+                    return transforms[i];
+            }
+
+            return null;
+        }
+
+        public static void BakePlayerVisual(HumanoidAnimationProfileSO profile)
+        {
+            BakeVisualIntoPrefab(PlayerPrefabPath, profile, "Player");
+        }
+
+        public static void BakeEnemyVisual(HumanoidAnimationProfileSO profile)
+        {
+            BakeVisualIntoPrefab(EnemyPrefabPath, profile, "Enemy");
+        }
+
+        private static void BakeVisualIntoPrefab(
+            string prefabPath,
+            HumanoidAnimationProfileSO profile,
+            string label)
+        {
             if (profile == null || !profile.HasActorPrefab)
             {
-                Debug.LogError("[InterviewArena] Paladin combat animation profile or actor prefab is missing.");
+                Debug.LogError($"[InterviewArena] {label} combat animation profile or actor prefab is missing.");
                 return;
             }
 
-            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(prefabPath);
             if (prefabRoot == null)
             {
-                Debug.LogError($"[InterviewArena] Missing prefab at {PlayerPrefabPath}.");
+                Debug.LogError($"[InterviewArena] Missing prefab at {prefabPath}.");
                 return;
             }
 
             try
             {
-                Transform visualAnchor = prefabRoot.transform.Find("VisualAnchor");
+                Transform visualAnchor = FindChildByName(prefabRoot.transform, "VisualAnchor");
                 if (visualAnchor == null)
                 {
-                    Debug.LogError("[InterviewArena] Player prefab is missing VisualAnchor.");
+                    Debug.LogError($"[InterviewArena] {label} prefab is missing VisualAnchor.");
                     return;
                 }
 
+                WireArenaHumanoidVisual(prefabRoot, visualAnchor, profile);
                 EnsureEmbeddedHumanoidVisual(visualAnchor, profile);
-                PrefabUtility.SaveAsPrefabAsset(prefabRoot, PlayerPrefabPath);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, prefabPath);
                 AssetDatabase.SaveAssets();
-                Debug.Log($"[InterviewArena] Embedded humanoid visual under VisualAnchor in {PlayerPrefabPath}.");
+                Debug.Log($"[InterviewArena] Embedded humanoid visual under VisualAnchor in {prefabPath}.");
             }
             finally
             {
@@ -366,6 +416,9 @@ namespace LearningArchitect.EditorTools
             if (serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue == null)
                 EnsurePlayerDashCooldownHud(context, serializedContext);
 
+            if (serializedContext.FindProperty("playerHealthHud").objectReferenceValue == null)
+                EnsurePlayerHealthHud(context, serializedContext);
+
             InterviewArenaCombatServices combatServices = ResolveOrCreateSceneCombatServices(context);
             Transform projectilesRoot = serializedContext.FindProperty("projectilesRoot").objectReferenceValue as Transform;
             if (projectilesRoot != null)
@@ -388,6 +441,15 @@ namespace LearningArchitect.EditorTools
                 hudSerialized.ApplyModifiedPropertiesWithoutUndo();
             }
 
+            PlayerHealthHud healthHud =
+                serializedContext.FindProperty("playerHealthHud").objectReferenceValue as PlayerHealthHud;
+            if (healthHud != null && playerHealth != null)
+            {
+                SerializedObject healthHudSerialized = new SerializedObject(healthHud);
+                healthHudSerialized.FindProperty("playerHealth").objectReferenceValue = playerHealth;
+                healthHudSerialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+
             PlayerDashCooldownHud dashHud =
                 serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue as PlayerDashCooldownHud;
             if (dashHud != null && motor != null)
@@ -398,6 +460,145 @@ namespace LearningArchitect.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[InterviewArena] Player instance placed and wired on bootstrap.");
+        }
+
+        [MenuItem("Learning Architect/Interview Arena/Ensure Player Health Hud And Death")]
+        public static void EnsurePlayerHealthHudAndDeath()
+        {
+            Scene scene = EditorSceneManager.GetActiveScene();
+            if (scene.path != ArenaScenePath)
+                scene = EditorSceneManager.OpenScene(ArenaScenePath, OpenSceneMode.Single);
+
+            InterviewArenaRuntimeContext context = UnityEngine.Object.FindFirstObjectByType<InterviewArenaRuntimeContext>();
+            if (context == null)
+            {
+                Debug.LogError("[InterviewArena] Scene has no InterviewArenaRuntimeContext.");
+                return;
+            }
+
+            SerializedObject serializedContext = new SerializedObject(context);
+            Transform hudCanvas = serializedContext.FindProperty("canvasHudDynamic").objectReferenceValue as Transform;
+            EnsurePlayerHealthHud(context, serializedContext, hudCanvas);
+            serializedContext.ApplyModifiedPropertiesWithoutUndo();
+
+            GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+            if (prefabAsset != null)
+            {
+                GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+                try
+                {
+                    EnsurePlayerDeathController(prefabRoot);
+                    PrefabUtility.SaveAsPrefabAsset(prefabRoot, PlayerPrefabPath);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(prefabRoot);
+                }
+            }
+
+            PlayerMotor player = context.Player;
+            if (player != null)
+            {
+                EnsurePlayerDeathController(player.gameObject);
+                Health playerHealth = player.GetComponent<Health>();
+                PlayerHealthHud healthHud =
+                    serializedContext.FindProperty("playerHealthHud").objectReferenceValue as PlayerHealthHud;
+                if (healthHud != null && playerHealth != null)
+                {
+                    SerializedObject healthHudSerialized = new SerializedObject(healthHud);
+                    healthHudSerialized.FindProperty("playerHealth").objectReferenceValue = playerHealth;
+                    healthHudSerialized.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                MarkPlayerInstanceWiringDirty(player.gameObject);
+            }
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[InterviewArena] Player health HUD and death respawn ensured.");
+        }
+
+        [MenuItem("Learning Architect/Interview Arena/Ensure Hitstun And Dash Iframes")]
+        public static void EnsureHitstunAndDashIframes()
+        {
+            Scene scene = EditorSceneManager.GetActiveScene();
+            if (scene.path != ArenaScenePath)
+                scene = EditorSceneManager.OpenScene(ArenaScenePath, OpenSceneMode.Single);
+
+            EnemyConfig enemyConfig = EnsureEnemyConfigAsset();
+
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath) != null)
+            {
+                GameObject playerPrefabRoot = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+                try
+                {
+                    EnsurePlayerDashIframeGuard(playerPrefabRoot);
+                    PrefabUtility.SaveAsPrefabAsset(playerPrefabRoot, PlayerPrefabPath);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(playerPrefabRoot);
+                }
+            }
+
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath) != null)
+            {
+                GameObject enemyPrefabRoot = PrefabUtility.LoadPrefabContents(EnemyPrefabPath);
+                try
+                {
+                    EnsureEnemyHealthHitstun(enemyPrefabRoot, enemyConfig);
+                    PrefabUtility.SaveAsPrefabAsset(enemyPrefabRoot, EnemyPrefabPath);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(enemyPrefabRoot);
+                }
+            }
+
+            InterviewArenaRuntimeContext context =
+                UnityEngine.Object.FindFirstObjectByType<InterviewArenaRuntimeContext>();
+            if (context != null && context.Player != null)
+                EnsurePlayerDashIframeGuard(context.Player.gameObject);
+
+            EnemyBrain[] enemies = UnityEngine.Object.FindObjectsByType<EnemyBrain>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                if (enemies[i] != null)
+                    EnsureEnemyHealthHitstun(enemies[i].gameObject, enemyConfig);
+            }
+
+            AssetDatabase.SaveAssets();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[InterviewArena] Enemy hitstun and player dash i-frames ensured on prefabs and scene.");
+        }
+
+        private static void EnsurePlayerDashIframeGuard(GameObject root)
+        {
+            if (root == null)
+                return;
+
+            if (root.GetComponent<PlayerDashIframeGuard>() == null)
+                root.AddComponent<PlayerDashIframeGuard>();
+        }
+
+        private static void EnsureEnemyHealthHitstun(GameObject root, EnemyConfig config)
+        {
+            if (root == null)
+                return;
+
+            EnemyHealthHitstun hitstun = root.GetComponent<EnemyHealthHitstun>();
+            if (hitstun == null)
+                hitstun = root.AddComponent<EnemyHealthHitstun>();
+
+            if (config != null)
+                hitstun.ApplyConfig(config);
+
+            SerializedObject serialized = new SerializedObject(hitstun);
+            serialized.FindProperty("config").objectReferenceValue = config;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void EnsureInterviewArenaPhysicsLayers()
@@ -610,9 +811,12 @@ namespace LearningArchitect.EditorTools
             crossbow.ApplyConfig(enemyCrossbow, crossbowMuzzle.transform, boltPool, CombatTeam.Enemy);
             EnemyRespawnController respawn = root.AddComponent<EnemyRespawnController>();
             respawn.ApplyConfig(config);
+            EnsureEnemyHealthHitstun(root, config);
             EnemyBrain brain = root.AddComponent<EnemyBrain>();
             brain.ApplyConfig(config, facingPivot.transform);
-            WireArenaHumanoidVisual(root, visualAnchor.transform, EnsurePaladinCombatProfile());
+            HumanoidAnimationProfileSO paladinProfile = EnsurePaladinCombatProfile();
+            WireArenaHumanoidVisual(root, visualAnchor.transform, paladinProfile);
+            EnsureEmbeddedHumanoidVisual(visualAnchor.transform, paladinProfile);
 
             SerializedObject sensorSerialized = new SerializedObject(sensor);
             sensorSerialized.FindProperty("awarenessOrigin").objectReferenceValue = facingPivot.transform;
@@ -653,6 +857,78 @@ namespace LearningArchitect.EditorTools
             CrossbowWeaponConfig asset = ScriptableObject.CreateInstance<CrossbowWeaponConfig>();
             AssetDatabase.CreateAsset(asset, EnemyCrossbowConfigPath);
             return asset;
+        }
+
+        private static PlayerHealthHud CreatePlayerHealthHud(Transform canvasParent)
+        {
+            GameObject host = DefaultControls.CreateSlider(CreateStandardUiResources());
+            host.name = "Container - PlayerHealthHud";
+            host.AddComponent<CanvasGroup>();
+            host.AddComponent<PlayerHealthHud>();
+            host.transform.SetParent(canvasParent, false);
+
+            RectTransform hostRect = host.GetComponent<RectTransform>();
+            hostRect.anchorMin = new Vector2(0f, 1f);
+            hostRect.anchorMax = new Vector2(0f, 1f);
+            hostRect.pivot = new Vector2(0f, 1f);
+            hostRect.anchoredPosition = new Vector2(28f, -100f);
+            hostRect.sizeDelta = new Vector2(240f, 24f);
+
+            Slider slider = host.GetComponent<Slider>();
+            slider.minValue = 0f;
+            slider.maxValue = 1f;
+            slider.wholeNumbers = false;
+            slider.value = 1f;
+            slider.interactable = false;
+            slider.transition = Selectable.Transition.None;
+            slider.navigation = new Navigation { mode = Navigation.Mode.None };
+            slider.direction = Slider.Direction.LeftToRight;
+
+            Graphic[] graphics = host.GetComponentsInChildren<Graphic>(true);
+            for (int i = 0; i < graphics.Length; i++)
+            {
+                if (graphics[i] != null)
+                    graphics[i].raycastTarget = false;
+            }
+
+            Image fillImage = slider.fillRect != null
+                ? slider.fillRect.GetComponent<Image>()
+                : null;
+            if (fillImage != null)
+                fillImage.color = ShowcasePalette.WithAlpha(ShowcasePalette.Success, 0.95f);
+
+            CanvasGroup group = host.GetComponent<CanvasGroup>();
+
+            TextMeshProUGUI label = CreateLabel(
+                host.transform,
+                "Text - Label",
+                12,
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(0f, 22f),
+                new Vector2(240f, 18f));
+            label.alignment = TextAlignmentOptions.Left;
+            label.raycastTarget = false;
+            label.text = "100/100";
+
+            PlayerHealthHud hud = host.GetComponent<PlayerHealthHud>();
+            SerializedObject hudSerialized = new SerializedObject(hud);
+            hudSerialized.FindProperty("healthSlider").objectReferenceValue = slider;
+            hudSerialized.FindProperty("fillImage").objectReferenceValue = fillImage;
+            hudSerialized.FindProperty("canvasGroup").objectReferenceValue = group;
+            hudSerialized.FindProperty("label").objectReferenceValue = label;
+            hudSerialized.ApplyModifiedPropertiesWithoutUndo();
+            return hud;
+        }
+
+        private static DefaultControls.Resources CreateStandardUiResources()
+        {
+            return new DefaultControls.Resources
+            {
+                standard = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd"),
+                background = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd"),
+                knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd")
+            };
         }
 
         private static PlayerIframeHud CreatePlayerIframeHud(Transform canvasParent)
@@ -805,6 +1081,61 @@ namespace LearningArchitect.EditorTools
 
             existing = CreatePlayerDashCooldownHud(hudCanvas);
             serializedContext.FindProperty("playerDashCooldownHud").objectReferenceValue = existing;
+        }
+
+        private static void EnsurePlayerHealthHud(
+            InterviewArenaRuntimeContext context,
+            SerializedObject serializedContext,
+            Transform hudCanvas = null)
+        {
+            if (context == null || serializedContext == null)
+                return;
+
+            PlayerHealthHud existing =
+                serializedContext.FindProperty("playerHealthHud").objectReferenceValue as PlayerHealthHud;
+            if (existing != null && existing.GetComponentInChildren<Slider>(true) == null)
+            {
+                serializedContext.FindProperty("playerHealthHud").objectReferenceValue = null;
+                UnityEngine.Object.DestroyImmediate(existing.gameObject);
+                existing = null;
+            }
+
+            if (existing != null)
+                return;
+
+            existing = UnityEngine.Object.FindFirstObjectByType<PlayerHealthHud>();
+            if (existing != null && existing.GetComponentInChildren<Slider>(true) == null)
+            {
+                UnityEngine.Object.DestroyImmediate(existing.gameObject);
+                existing = null;
+            }
+
+            if (existing != null)
+            {
+                serializedContext.FindProperty("playerHealthHud").objectReferenceValue = existing;
+                return;
+            }
+
+            if (hudCanvas == null)
+            {
+                Transform uiRoot = context.transform.root.Find("UI");
+                hudCanvas = uiRoot != null ? uiRoot.Find("Canvas_HUD_Dynamic") : null;
+            }
+
+            if (hudCanvas == null)
+                return;
+
+            existing = CreatePlayerHealthHud(hudCanvas);
+            serializedContext.FindProperty("playerHealthHud").objectReferenceValue = existing;
+        }
+
+        private static void EnsurePlayerDeathController(GameObject root)
+        {
+            if (root == null)
+                return;
+
+            if (root.GetComponent<PlayerDeathController>() == null)
+                root.AddComponent<PlayerDeathController>();
         }
 
         private static void CreateTrainingDummy(Transform parent, string name, Vector3 position)
@@ -1062,6 +1393,13 @@ namespace LearningArchitect.EditorTools
                     PlayerIframeHud hud = hudCanvas.GetComponentInChildren<PlayerIframeHud>(true);
                     serializedContext.FindProperty("playerIframeHud").objectReferenceValue = hud;
                 }
+            }
+
+            if (serializedContext.FindProperty("playerHealthHud").objectReferenceValue == null)
+            {
+                Transform hudCanvas = roots.Ui.Find("Canvas_HUD_Dynamic");
+                if (hudCanvas != null)
+                    EnsurePlayerHealthHud(context, serializedContext, hudCanvas);
             }
 
             if (serializedContext.FindProperty("playerBuffHud").objectReferenceValue == null)
@@ -1450,6 +1788,7 @@ namespace LearningArchitect.EditorTools
         private static void BuildSceneUi(
             Transform uiRoot,
             out Transform hudDynamicRoot,
+            out PlayerHealthHud playerHealthHud,
             out PlayerIframeHud playerIframeHud,
             out PlayerDashCooldownHud playerDashCooldownHud,
             out PlayerBuffHud playerBuffHud,
@@ -1505,6 +1844,7 @@ namespace LearningArchitect.EditorTools
             serializedUi.FindProperty("backButtonLabel").objectReferenceValue = backLabel;
             serializedUi.ApplyModifiedPropertiesWithoutUndo();
 
+            playerHealthHud = CreatePlayerHealthHud(hudCanvasObject.transform);
             playerIframeHud = CreatePlayerIframeHud(hudCanvasObject.transform);
             playerDashCooldownHud = CreatePlayerDashCooldownHud(hudCanvasObject.transform);
             playerBuffHud = CreatePlayerBuffHud(hudCanvasObject.transform);
@@ -1534,6 +1874,19 @@ namespace LearningArchitect.EditorTools
             Debug.LogWarning(
                 "[InterviewArena] Missing Paladin combat profile. "
                 + "Run Learning Architect → Setup Paladin Combat Animation first.");
+            return null;
+        }
+
+        private static HumanoidAnimationProfileSO EnsureVampireCombatProfile()
+        {
+            HumanoidAnimationProfileSO profile =
+                AssetDatabase.LoadAssetAtPath<HumanoidAnimationProfileSO>(VampireCombatProfilePath);
+            if (profile != null)
+                return profile;
+
+            Debug.LogWarning(
+                "[InterviewArena] Missing Vampire combat profile. "
+                + "Run Learning Architect → Animation → Setup Vampire As Player Visual first.");
             return null;
         }
 
@@ -1668,12 +2021,30 @@ namespace LearningArchitect.EditorTools
             if (arenaFloor != null)
                 motorSerialized.FindProperty("arenaFloor").objectReferenceValue = arenaFloor;
             motorSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+            EnsureMeleeBlockController(root, config);
+            EnsurePlayerDashIframeGuard(root);
+        }
+
+        private static void EnsureMeleeBlockController(GameObject root, PlayerConfig config)
+        {
+            MeleeBlockController block = root.GetComponent<MeleeBlockController>();
+            if (block == null)
+                block = root.AddComponent<MeleeBlockController>();
+
+            block.ApplyConfig(config);
+            SerializedObject blockSerialized = new SerializedObject(block);
+            blockSerialized.FindProperty("config").objectReferenceValue = config;
+            blockSerialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void WirePlayerSupportReferences(GameObject root)
         {
             if (root == null)
                 return;
+
+            EnsurePlayerDeathController(root);
+            EnsurePlayerDashIframeGuard(root);
 
             Health health = root.GetComponent<Health>();
             InvulnerabilityWorldIndicator indicator = root.GetComponent<InvulnerabilityWorldIndicator>();
