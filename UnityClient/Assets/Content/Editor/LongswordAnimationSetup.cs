@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using LearningArchitect.Modules.Animation3D;
+using LearningArchitect.Modules.InterviewArena;
 
 using UnityEditor;
 
@@ -87,12 +88,15 @@ namespace LearningArchitect.EditorTools
         private const string DashClipName = "LS_SprintBash";
 
         private const string HitReactClipName = "LS_HitLegsRight";
-
-
-
+        private const string HitLegsLeftClipName = "LS_HitLegsLeft";
+        private const string BlockLoopClipName = "LongsLP_BlockLoop";
+        private const string LegacyHitFrontClipName = "Longs_HitFront_p";
+        private const string LegacyHitBackClipName = "Longs_Hit_Back";
+        private const string LegacyHitLeftClipName = "Longs_HitLeft_p";
+        private const string LegacyHitRightClipName = "Longs_HitRight_p";
         private const string LegacyMeleeAttackClipName = "Longs_Attack_R";
-
         private const string LegacyMeleePt2Path = "Assets/LongswordAnimsetPro/Animations/Longsword_Animset_pt2.fbx";
+        private const string LegacyMeleePt3Path = "Assets/LongswordAnimsetPro/Animations/Longsword_Animset_pt3.fbx";
 
 
 
@@ -432,9 +436,33 @@ namespace LearningArchitect.EditorTools
 
         public static AnimationClip TryLoadMeleeAttackClip() =>
 
-            LoadClip(LongswordUpdatePt3Path, MeleeAttackClipName)
+            TryLoadComboRightClip(1)
 
             ?? LoadClip(LegacyMeleePt2Path, LegacyMeleeAttackClipName);
+
+
+
+        public static AnimationClip TryLoadComboRightClip(int hitIndex)
+
+        {
+
+            string clipName = hitIndex == 1
+
+                ? "LS_ComboRight_1"
+
+                : hitIndex == 2
+
+                    ? "LS_ComboRight_2"
+
+                    : hitIndex == 3
+
+                        ? "LS_ComboRight_3"
+
+                        : null;
+
+            return string.IsNullOrEmpty(clipName) ? null : LoadClip(LongswordUpdatePt3Path, clipName);
+
+        }
 
 
 
@@ -445,8 +473,71 @@ namespace LearningArchitect.EditorTools
 
 
         public static AnimationClip TryLoadHitReactClip() =>
-
             LoadClip(LongswordUpdatePt3Path, HitReactClipName);
+
+        public static AnimationClip TryLoadBlockLoopClip() =>
+            LoadClip(LongswordUpdatePt2Path, BlockLoopClipName);
+
+        public static AnimationClip TryLoadHitClip(HitReactDirection direction) =>
+            direction switch
+            {
+                HitReactDirection.Front =>
+                    LoadClip(LegacyMeleePt3Path, LegacyHitFrontClipName)
+                    ?? TryLoadHitReactClip(),
+                HitReactDirection.Back =>
+                    LoadClip(LegacyMeleePt3Path, LegacyHitBackClipName)
+                    ?? LoadClip(LongswordUpdatePt3Path, HitLegsLeftClipName),
+                HitReactDirection.Left =>
+                    LoadClip(LongswordUpdatePt3Path, HitLegsLeftClipName)
+                    ?? LoadClip(LegacyMeleePt3Path, LegacyHitLeftClipName),
+                HitReactDirection.Right =>
+                    TryLoadHitReactClip()
+                    ?? LoadClip(LegacyMeleePt3Path, LegacyHitRightClipName),
+                _ => TryLoadHitReactClip()
+            };
+
+        /// <summary>
+        /// Legacy pt3 hit clips ship demo SendEvent messages. Arena HumanoidVisual has no receiver.
+        /// </summary>
+        public static void StripLegacyHitClipEvents()
+        {
+            StripNamedClipEvents(
+                LegacyMeleePt3Path,
+                LegacyHitFrontClipName,
+                LegacyHitBackClipName);
+        }
+
+        private static void StripNamedClipEvents(string fbxPath, params string[] clipNames)
+        {
+            if (AssetImporter.GetAtPath(fbxPath) is not ModelImporter importer)
+            {
+                Debug.LogError($"[LongswordAnimationSetup] FBX not found: {fbxPath}");
+                return;
+            }
+
+            ModelImporterClipAnimation[] clips = importer.clipAnimations;
+            if (clips == null || clips.Length == 0)
+                clips = importer.defaultClipAnimations;
+
+            var names = new HashSet<string>(clipNames);
+            bool dirty = false;
+            for (int i = 0; i < clips.Length; i++)
+            {
+                if (!names.Contains(clips[i].name))
+                    continue;
+                if (clips[i].events == null || clips[i].events.Length == 0)
+                    continue;
+
+                clips[i].events = System.Array.Empty<AnimationEvent>();
+                dirty = true;
+            }
+
+            if (!dirty)
+                return;
+
+            importer.clipAnimations = clips;
+            importer.SaveAndReimport();
+        }
 
 
 
@@ -485,12 +576,29 @@ namespace LearningArchitect.EditorTools
                 {
 
                     case "Melee":
+                    case "Combo Right 1":
 
                         state.motion = meleeClip;
 
                         patched = true;
 
                         break;
+
+                    case "Combo Right 2":
+                    {
+                        AnimationClip clip2 = TryLoadComboRightClip(2);
+                        if (clip2 != null)
+                            state.motion = clip2;
+                        break;
+                    }
+
+                    case "Combo Right 3":
+                    {
+                        AnimationClip clip3 = TryLoadComboRightClip(3);
+                        if (clip3 != null)
+                            state.motion = clip3;
+                        break;
+                    }
 
                     case "Dash" when dashClip != null:
 
@@ -500,11 +608,46 @@ namespace LearningArchitect.EditorTools
 
                         break;
 
-                    case "Hit React" when hitClip != null:
-
-                        state.motion = hitClip;
-
+                    case "Block Loop":
+                    {
+                        AnimationClip blockClip = TryLoadBlockLoopClip();
+                        if (blockClip != null)
+                            state.motion = blockClip;
                         break;
+                    }
+
+                    case "Hit Front":
+                    {
+                        AnimationClip front = TryLoadHitClip(HitReactDirection.Front);
+                        if (front != null)
+                            state.motion = front;
+                        break;
+                    }
+
+                    case "Hit Back":
+                    {
+                        AnimationClip back = TryLoadHitClip(HitReactDirection.Back);
+                        if (back != null)
+                            state.motion = back;
+                        break;
+                    }
+
+                    case "Hit Left":
+                    {
+                        AnimationClip left = TryLoadHitClip(HitReactDirection.Left);
+                        if (left != null)
+                            state.motion = left;
+                        break;
+                    }
+
+                    case "Hit Right":
+                    case "Hit React" when hitClip != null:
+                    {
+                        AnimationClip right = TryLoadHitClip(HitReactDirection.Right) ?? hitClip;
+                        if (right != null)
+                            state.motion = right;
+                        break;
+                    }
 
                 }
 

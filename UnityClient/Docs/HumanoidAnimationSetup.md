@@ -1,5 +1,8 @@
 # LearningArchitect Character Animation Setup
 
+Arena player/enemy animator contract (parameters, facing, IK, stance):  
+[`Modules/InterviewArena/CHARACTER_ANIMATION.md`](Modules/InterviewArena/CHARACTER_ANIMATION.md).
+
 This document describes the current character-animation setup for the showcase module now named `Layered Character Animation`.
 
 The module demonstrates one common game-dev mechanic:

@@ -255,7 +255,7 @@ namespace LearningArchitect.EditorTools
 
             EditorUtility.SetDirty(controller);
             report.AppendLine(count > 0
-                ? $"Melee state speed -> {MeleeAnimSpeed} ({count} state(s))"
+                ? $"Combo Right / Melee state speed -> {MeleeAnimSpeed} ({count} state(s))"
                 : "WARN: Melee state not found.");
         }
 
@@ -264,7 +264,8 @@ namespace LearningArchitect.EditorTools
             int count = 0;
             foreach (ChildAnimatorState child in machine.states)
             {
-                if (child.state != null && child.state.name == "Melee")
+                if (child.state != null &&
+                    (child.state.name == "Melee" || child.state.name.StartsWith("Combo Right")))
                 {
                     child.state.speed = speed;
                     count++;

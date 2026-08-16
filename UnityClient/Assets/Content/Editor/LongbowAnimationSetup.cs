@@ -21,9 +21,28 @@ namespace LearningArchitect.EditorTools
         private const string ProfilePath =
             "Assets/Content/Modules/LayeredCharacterAnimation/Data/Animation_PaladinCombatProfile.asset";
 
+        /// <summary>
+        /// Mixamo Longbow clips are authored ~+90° yaw vs Paladin/Longsword forward.
+        /// Aim/recoil clips are another +180°: after the 90° loco bake the bow-arm
+        /// still pointed at clip -Z (shot out the back). 90+180=270 aligns the draw with +Z.
+        /// </summary>
+        private const float MixamoFacingBakeYawDegrees = 90f;
+        private const float MixamoAimFacingBakeYawDegrees = 270f;
+
         private static readonly string[] ClipFiles =
         {
             "standingidle 01",
+            "standingaimwalk forward",
+            "standingaimwalk back",
+            "standingaimwalk left",
+            "standingaimwalk right",
+            "standingdrawarrow",
+            "standingaimoverdraw",
+            "standingaimrecoil",
+        };
+
+        private static readonly HashSet<string> AimFacingClips = new HashSet<string>
+        {
             "standingaimwalk forward",
             "standingaimwalk back",
             "standingaimwalk left",
@@ -75,16 +94,23 @@ namespace LearningArchitect.EditorTools
 
                 ModelImporterClipAnimation[] clips = importer.defaultClipAnimations;
                 bool loop = LoopingClips.Contains(file);
+                float bakeYaw = AimFacingClips.Contains(file)
+                    ? MixamoAimFacingBakeYawDegrees
+                    : MixamoFacingBakeYawDegrees;
                 for (int i = 0; i < clips.Length; i++)
                 {
                     clips[i].name = file;
                     clips[i].loopTime = loop;
+                    clips[i].rotationOffset = bakeYaw;
                 }
 
                 importer.clipAnimations = clips;
                 importer.SaveAndReimport();
 
-                report.AppendLine((loop ? "[loop] " : "[once] ") + file + "  clips=" + clips.Length);
+                report.AppendLine(
+                    (loop ? "[loop] " : "[once] ")
+                    + file
+                    + $"  clips={clips.Length}  bakeYawY={bakeYaw}");
                 configured++;
             }
 
@@ -102,22 +128,13 @@ namespace LearningArchitect.EditorTools
                 return;
             }
 
-            AnimationClip idleClip = LoadLongbowClip("standingidle 01");
-            AnimationClip walkForwardClip = LoadLongbowClip("standingaimwalk forward");
-            AnimationClip walkBackClip = LoadLongbowClip("standingaimwalk back");
-            AnimationClip strafeLeftClip = LoadLongbowClip("standingaimwalk left");
-            AnimationClip strafeRightClip = LoadLongbowClip("standingaimwalk right");
-            AnimationClip recoilClip = LoadLongbowClip("standingaimrecoil");
             AnimationClip jumpForwardClip = LoadLegacyClip("jump forward");
             AnimationClip jumpBackwardClip = LoadLegacyClip("jump backward");
 
-            if (idleClip == null || walkForwardClip == null || walkBackClip == null ||
-                strafeLeftClip == null || strafeRightClip == null || recoilClip == null ||
-                jumpForwardClip == null || jumpBackwardClip == null)
+            if (jumpForwardClip == null || jumpBackwardClip == null)
             {
                 Debug.LogError(
-                    "[LongbowAnimationSetup] Missing clips. Run Setup Longbow Aiming Pack Rig first "
-                    + "(and keep jump clips in LayeredCharacterAnimation/Models).");
+                    "[LongbowAnimationSetup] Missing jump clips in LayeredCharacterAnimation/Models.");
                 return;
             }
 
@@ -161,30 +178,39 @@ namespace LearningArchitect.EditorTools
                 Debug.Log("[LongbowAnimationSetup] Melee locomotion: LongswordAnimsetPro_Update_pt1 (LongsLP_*).");
             }
 
+            if (meleeIdle == null || meleeForward == null || meleeBack == null ||
+                meleeLeft == null || meleeRight == null)
+            {
+                Debug.LogError("[LongbowAnimationSetup] Missing Longsword melee locomotion clips.");
+                return;
+            }
+
+            // Arena presentation is melee-only. Bow Locomotion stays in the graph for
+            // IsBowStance transitions but uses the same Longsword clips so Mixamo never plays.
             (AnimatorState bowLocomotion, AnimatorState meleeLocomotion) = RebuildBaseLocomotionLayer(
                 controller,
-                idleClip,
-                walkForwardClip,
-                walkBackClip,
-                strafeLeftClip,
-                strafeRightClip,
-                meleeIdle ?? idleClip,
-                meleeForward ?? walkForwardClip,
-                meleeBack ?? walkBackClip,
-                meleeLeft ?? strafeLeftClip,
-                meleeRight ?? strafeRightClip);
-            AnimationClip dashClip = RpgAnimationSetup.TryLoadSprintClip() ?? walkForwardClip;
+                meleeIdle,
+                meleeForward,
+                meleeBack,
+                meleeLeft,
+                meleeRight,
+                meleeIdle,
+                meleeForward,
+                meleeBack,
+                meleeLeft,
+                meleeRight);
+            AnimationClip dashClip = RpgAnimationSetup.TryLoadSprintClip() ?? meleeForward;
 
             RebuildActionStates(controller, jumpForwardClip, jumpBackwardClip, dashClip, bowLocomotion, meleeLocomotion);
-            RebuildShootRecoilState(controller, recoilClip, bowLocomotion, meleeLocomotion);
+            RemoveBaseLayerBowRecoil(controller);
             DisableUpperBodyShootingLayer(controller);
             EnableBaseLayerIkPass(controller);
 
             AnimatorState locomotionState = controller.layers[0].stateMachine.defaultState;
             if (locomotionState != null)
-                RpgAnimationSetup.PatchActionClips(controller, bowLocomotion, meleeLocomotion, walkForwardClip);
+                RpgAnimationSetup.PatchActionClips(controller, bowLocomotion, meleeLocomotion, meleeForward);
 
-            UpdateProfile(idleClip, walkForwardClip, jumpForwardClip, jumpBackwardClip);
+            UpdateProfile(meleeIdle, meleeForward, jumpForwardClip, jumpBackwardClip);
 
             if (LongswordAnimationSetup.TryApplyTurnInPlaceToController(controller))
                 Debug.Log("[LongbowAnimationSetup] Longsword turn-in-place layer applied.");
@@ -192,43 +218,67 @@ namespace LearningArchitect.EditorTools
             if (LongswordAnimationSetup.TryPatchActionClipsToController(controller))
                 Debug.Log("[LongbowAnimationSetup] Longsword Update actions applied (melee, dash, hit).");
 
+            LearningArchitect.Editor.PaladinMelee2AnimatorSetup.SetupMelee2();
+            LearningArchitect.Editor.PaladinGuardAnimatorSetup.Setup();
+
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             Debug.Log(
-                "[LongbowAnimationSetup] Combat controller rebuilt with Longbow Aiming Pack "
-                + "(directional aim-walk + full-body bow recoil on base layer).");
+                "[LongbowAnimationSetup] Combat controller rebuilt: melee locomotion default, "
+                + "upper shooting layer disabled (Fire/IsBowStance params kept).");
         }
 
-        private static void RebuildShootRecoilState(
-            AnimatorController controller,
-            AnimationClip recoilClip,
-            AnimatorState bowLocomotion,
-            AnimatorState meleeLocomotion)
+        /// <summary>
+        /// Fire is owned by the masked upper layer; remove legacy full-body base recoil.
+        /// </summary>
+        private static void RemoveBaseLayerBowRecoil(AnimatorController controller)
         {
             AnimatorControllerLayer baseLayer = controller.layers[0];
             AnimatorStateMachine stateMachine = baseLayer.stateMachine;
-            if (bowLocomotion == null && meleeLocomotion == null)
-                return;
-
-            if (recoilClip == null)
-                return;
-
             RemoveStatesNamed(stateMachine, "Bow Recoil");
             RemoveAnyStateTransitionsUsing(stateMachine, "IsShooting");
             RemoveAnyStateTransitionsUsing(stateMachine, "Fire");
+        }
 
-            AnimatorState recoilState = stateMachine.AddState("Bow Recoil", new Vector3(300f, 140f, 0f));
-            recoilState.motion = recoilClip;
+        /// <summary>
+        /// Keep the upper layer (shared controller / mask) but strip Fire / bow overlay states.
+        /// Arena never writes those params; default weight stays 0.
+        /// </summary>
+        private static void DisableUpperBodyShootingLayer(AnimatorController controller)
+        {
+            int upperIndex = -1;
+            for (int i = 0; i < controller.layers.Length; i++)
+            {
+                if (controller.layers[i].name.Contains("Upper"))
+                {
+                    upperIndex = i;
+                    break;
+                }
+            }
 
-            AnimatorStateTransition toRecoil = stateMachine.AddAnyStateTransition(recoilState);
-            toRecoil.hasExitTime = false;
-            toRecoil.duration = 0.05f;
-            toRecoil.canTransitionToSelf = false;
-            toRecoil.AddCondition(AnimatorConditionMode.If, 0f, "Fire");
+            if (upperIndex < 0)
+                return;
 
-            AddStanceReturnTransitions(recoilState, bowLocomotion, meleeLocomotion, 0.85f);
+            SerializedObject controllerSerialized = new SerializedObject(controller);
+            controllerSerialized.Update();
+            SerializedProperty layersProp = controllerSerialized.FindProperty("m_AnimatorLayers");
+            SerializedProperty layerProp = layersProp.GetArrayElementAtIndex(upperIndex);
+            layerProp.FindPropertyRelative("m_DefaultWeight").floatValue = 0f;
+            controllerSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+            AnimatorStateMachine stateMachine = controller.layers[upperIndex].stateMachine;
+
+            for (int i = stateMachine.anyStateTransitions.Length - 1; i >= 0; i--)
+                stateMachine.RemoveAnyStateTransition(stateMachine.anyStateTransitions[i]);
+
+            RemoveStatesNamed(stateMachine, "No Upper Override", "Upper Body Shoot", "Bow Upper Idle");
+
+            AnimatorState noOverride = stateMachine.AddState("No Upper Override", new Vector3(280f, 110f, 0f));
+            noOverride.writeDefaultValues = false;
+            noOverride.motion = null;
+            stateMachine.defaultState = noOverride;
         }
 
         private static void RemoveAnyStateTransitionsUsing(AnimatorStateMachine stateMachine, string parameterName)
@@ -247,10 +297,6 @@ namespace LearningArchitect.EditorTools
             }
         }
 
-        /// <summary>
-        /// Longbow clips are full-body aim poses. Layering recoil on a masked upper body while the
-        /// base layer plays the same skeleton breaks retargeting — keep one full-body layer only.
-        /// </summary>
         private static void EnableBaseLayerIkPass(AnimatorController controller)
         {
             if (controller.layers.Length == 0)
@@ -262,50 +308,6 @@ namespace LearningArchitect.EditorTools
             SerializedProperty baseLayer = layers.GetArrayElementAtIndex(0);
             baseLayer.FindPropertyRelative("m_IKPass").boolValue = true;
             controllerSerialized.ApplyModifiedPropertiesWithoutUndo();
-        }
-
-        private static void DisableUpperBodyShootingLayer(AnimatorController controller)
-        {
-            if (controller.layers.Length < 2)
-                return;
-
-            AnimatorControllerLayer upperLayer = controller.layers[0];
-            for (int i = 0; i < controller.layers.Length; i++)
-            {
-                if (controller.layers[i].name.Contains("Upper"))
-                {
-                    upperLayer = controller.layers[i];
-                    break;
-                }
-            }
-
-            upperLayer.defaultWeight = 0f;
-
-            SerializedObject controllerSerialized = new SerializedObject(controller);
-            for (int i = 0; i < controller.layers.Length; i++)
-            {
-                if (!controller.layers[i].name.Contains("Upper"))
-                    continue;
-
-                controllerSerialized.Update();
-                SerializedProperty layers = controllerSerialized.FindProperty("m_AnimatorLayers");
-                SerializedProperty layer = layers.GetArrayElementAtIndex(i);
-                layer.FindPropertyRelative("m_DefaultWeight").floatValue = 0f;
-                controllerSerialized.ApplyModifiedPropertiesWithoutUndo();
-                break;
-            }
-
-            AnimatorStateMachine stateMachine = upperLayer.stateMachine;
-
-            for (int i = stateMachine.anyStateTransitions.Length - 1; i >= 0; i--)
-                stateMachine.RemoveAnyStateTransition(stateMachine.anyStateTransitions[i]);
-
-            for (int i = 0; i < stateMachine.states.Length; i++)
-            {
-                AnimatorState state = stateMachine.states[i].state;
-                for (int t = state.transitions.Length - 1; t >= 0; t--)
-                    state.RemoveTransition(state.transitions[t]);
-            }
         }
 
         private static void RebuildActionStates(
@@ -458,7 +460,7 @@ namespace LearningArchitect.EditorTools
             AddStanceSwapTransition(bowLocomotion, meleeLocomotion);
             AddStanceSwapTransition(meleeLocomotion, bowLocomotion);
 
-            stateMachine.defaultState = bowLocomotion;
+            stateMachine.defaultState = meleeLocomotion;
             return (bowLocomotion, meleeLocomotion);
         }
 
@@ -534,7 +536,8 @@ namespace LearningArchitect.EditorTools
             serialized.FindProperty("jumpTriggerParameter").stringValue = "Jump";
             serialized.FindProperty("jumpBackwardParameter").stringValue = "JumpBackward";
             serialized.FindProperty("dashTriggerParameter").stringValue = "Dash";
-            serialized.FindProperty("visualYawOffsetDegrees").floatValue = 90f;
+            // Single facing convention: Mixamo bow clips are bake-aligned in SetupLongbowRig.
+            serialized.FindProperty("visualYawOffsetDegrees").floatValue = 0f;
             serialized.FindProperty("visualYawOffsetMeleeDegrees").floatValue = 0f;
             serialized.FindProperty("aimStanceParameter").stringValue = "IsBowStance";
             serialized.FindProperty("aimYawParameter").stringValue = "AimYaw";

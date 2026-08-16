@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2405911a5b7dfe64f8ae4954c90f267e, type: 3}
-  m_Name: Animation_PaladinCombatProfile
+  m_Name: Animation_VampireCombatProfile
   m_EditorClassIdentifier: Assembly-CSharp::LearningArchitect.Modules.Animation3D.HumanoidAnimationProfileSO
-  actorPrefab: {fileID: 4521194826964460208, guid: b8749b9ab2f603241aa689143d6e402a, type: 3}
-  avatar: {fileID: 9000000, guid: 958c1c5f92a678648b4f967f74a018d6, type: 3}
+  actorPrefab: {fileID: 4222649914544701477, guid: b0238e329fb46744b897325484e986cf, type: 3}
+  avatar: {fileID: 9000000, guid: 3aaf38176678e1d4994b710ba08065f2, type: 3}
   animatorController: {fileID: 9100000, guid: f143d232332b8dd47864b4059365f869, type: 2}
-  idleClip: {fileID: 7400002, guid: 6998358787dba6247af58374d3800986, type: 3}
+  idleClip: {fileID: -203655887218126122, guid: 47dc52f613c94204f95ab7071dfc7d0f, type: 3}
   locomotionClip: {fileID: 7400004, guid: 6998358787dba6247af58374d3800986, type: 3}
   turnLeftClip: {fileID: 7400012, guid: 7c3c4d895ee89ce43b0e1138cc8994e0, type: 3}
   turnRightClip: {fileID: 7400010, guid: 7c3c4d895ee89ce43b0e1138cc8994e0, type: 3}
